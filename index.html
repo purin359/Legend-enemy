@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 <style>
 body { font-family: sans-serif; padding:20px; }
 select, button { margin-right:10px; }
@@ -76,9 +76,15 @@ function load() {
 
     const key = normalize(enemyName);
 
+    // 表示用（スペース統一：半角1個にする）
+    const displayName = enemyName
+      .replace(/\r?\n/g, "")
+      .replace(/[ 　]+/g, " ")
+      .trim();
+
     if (!map[key]) {
       map[key] = {
-        name: enemyName.trim(), // 表示用（スペース残す）
+        name: displayName,
         count: 0,
         first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
       };
