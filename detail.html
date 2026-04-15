@@ -106,10 +106,6 @@ async function load() {
           img.src = "image/" + encodeURIComponent(safeName) + ".png";
           img.onerror = () => img.src = "image/noimage.png";
 
-          if (normalize(enemyName) === normalize(name)) {
-            img.classList.add("highlight");
-          }
-
           td.appendChild(img);
         });
 
