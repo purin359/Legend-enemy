@@ -89,8 +89,13 @@ function load() {
   const tbody = document.getElementById("table");
   tbody.innerHTML = "";
 
-  list.forEach(e => {
-   const imgPath = enemiesData[e.name]?.image || "image/" + e.name + ".png";
+ list.forEach(e => {
+
+  const safeName = e.name
+    .replace(/\r?\n/g, "")
+    .trim();
+
+  const imgPath = "image/" + encodeURIComponent(safeName) + ".png";
 
     const tr = document.createElement("tr");
 
