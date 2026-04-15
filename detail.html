@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>敵詳細</title>
+<style>
+body { font-family: sans-serif; padding:20px; }
+li { margin-bottom:5px; }
+</style>
+</head>
+<body>
+
+<h2 id="title"></h2>
+<ul id="list"></ul>
+
+<script>
+async function load() {
+  const params = new URLSearchParams(location.search);
+  const name = params.get("name");
+
+  document.getElementById("title").textContent = name;
+
+  const stagesData = await fetch("stages.json").then(r=>r.json());
+
+  const ul = document.getElementById("list");
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (st.enemies.includes(name)) {
+        const li = document.createElement("li");
+        li.textContent =
+          `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`;
+        ul.appendChild(li);
+      }
+    });
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
