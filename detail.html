@@ -65,6 +65,7 @@ li { margin-bottom:15px; }
 async function load() {
   const params = new URLSearchParams(location.search);
   const name = params.get("name");
+  const mode = params.get("mode");
 
   document.getElementById("title").textContent = name;
 
@@ -74,6 +75,14 @@ async function load() {
   let total = 0;
 
   stagesData.forEach(ch => {
+
+  const isTarget =
+    (mode === "N"  && /^N\d/.test(ch.chapterId)) ||
+    (mode === "NA" && ch.chapterId.startsWith("NA")) ||
+    (mode === "ND" && ch.chapterId.startsWith("ND"));
+
+  if (!isTarget) return;
+    
     ch.stages.forEach(st => {
 
       if (st.enemies.includes(name)) {
