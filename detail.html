@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細</title>
+<title>敵詳細１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -45,11 +45,19 @@ li { margin-bottom:15px; }
   width: 40px;
   margin-right: 5px;
 }
+  
+  ul {
+  list-style: none;
+  padding-left: 0;
+}
+  
 </style>
 </head>
 <body>
 
 <h2 id="title"></h2>
+
+  <p id="count"></p>
 
 <ul id="list"></ul>
 
@@ -63,10 +71,13 @@ async function load() {
   const stagesData = await fetch("stages.json").then(r=>r.json());
   const ul = document.getElementById("list");
 
+  let total = 0;
+
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
 
       if (st.enemies.includes(name)) {
+  total++;
 
         const li = document.createElement("li");
 
@@ -122,6 +133,9 @@ ul.appendChild(li);
 
     });
   });
+
+  document.getElementById("count").textContent =
+  total === 0 ? "見つかりませんでした" : total + "件見つかりました";
 }
 
 load();
