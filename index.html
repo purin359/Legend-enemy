@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -100,33 +100,46 @@ function load() {
 
   list.forEach(e => {
 
-    const safeName = e.name
-      .replace(/\r?\n/g, "")
-      .trim();
+  const safeName = e.name
+    .replace(/\r?\n/g, "")
+    .trim();
 
-    const img = document.createElement("img");
+  const img = document.createElement("img");
+  img.src = "image/" + encodeURIComponent(safeName) + ".png";
+  img.onerror = () => img.src = "image/noimage.png";
 
-    img.src = "image/" + encodeURIComponent(safeName) + ".png";
+  // ★ここ重要（確実に動くクリック）
+  img.addEventListener("click", () => {
+    const mode = document.getElementById("mode").value;
 
-    // 画像エラー対策
-    img.onerror = () => img.src = "image/noimage.png";
+    const url = new URL("detail.html", location.href);
+    url.searchParams.set("name", e.name);
+    url.searchParams.set("mode", mode);
 
-    img.onclick = () => goDetail(e.name);
-
-    const tr = document.createElement("tr");
-
-    const tdImg = document.createElement("td");
-    tdImg.appendChild(img);
-
-    tr.appendChild(tdImg);
-    tr.innerHTML += `
-      <td>${e.name}</td>
-      <td>${e.count}</td>
-      <td>${e.first}</td>
-    `;
-
-    tbody.appendChild(tr);
+    window.location.href = url.toString();
   });
+
+  const tr = document.createElement("tr");
+
+  const tdImg = document.createElement("td");
+  tdImg.appendChild(img);
+
+  const tdName = document.createElement("td");
+  tdName.textContent = e.name;
+
+  const tdCount = document.createElement("td");
+  tdCount.textContent = e.count;
+
+  const tdFirst = document.createElement("td");
+  tdFirst.textContent = e.first;
+
+  tr.appendChild(tdImg);
+  tr.appendChild(tdName);
+  tr.appendChild(tdCount);
+  tr.appendChild(tdFirst);
+
+  tbody.appendChild(tr);
+});
 }
 
 function toggleSort() {
