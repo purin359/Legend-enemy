@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧１</title>
+<title>敵出現一覧</title>
 <style>
 body { font-family: sans-serif; padding:20px; }
 select, button { margin-right:10px; }
@@ -110,10 +110,11 @@ function load() {
  list.forEach(e => {
 
   const safeName = e.name
-    .replace(/\r?\n/g, "")
-    .trim();
+  .replace(/\r?\n/g, "")
+  .replace(/[ 　]+/g, " ")
+  .trim();
 
-  const imgPath = "image/" + encodeURIComponent(safeName) + ".png";
+const imgPath = "image/" + encodeURIComponent(safeName) + ".png";
 
     const tr = document.createElement("tr");
 
