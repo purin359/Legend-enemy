@@ -2,1481 +2,1481 @@
   "E000": {
     "name":"わんこ",
     "type": ["無属性"],
-    "image": "image/わんこ.png"
+    "image": "img/enemies/わんこ.png"
   },
   "E001": {
     "name": "にょろ",
     "type": ["無属性"],
-    "image": "image/にょろ.png"
+    "image": "img/enemies/にょろ.png"
   },
   "E002": {
     "name": "例のヤツ",
     "type": ["無属性"],
-    "image": "image/例のヤツ.png"
+    "image": "img/enemies/例のヤツ.png"
   },
   "E003": {
     "name": "カバちゃん",
     "type": ["無属性"],
-    "image": "image/カバちゃん.png"
+    "image": "img/enemies/カバちゃん.png"
   },
   "E004": {
     "name": "ブタヤロウ",
     "type": ["赤"],
-    "image": "image/ブタヤロウ.png"
+    "image": "img/enemies/ブタヤロウ.png"
   },
   "E005": {
     "name": "ジャッキー・ペン",
     "type": ["無属性"],
-    "image": "image/ジャッキー・ペン.png"
+    "image": "img/enemies/ジャッキー・ペン.png"
   },
   "E006": {
     "name": "ゴリさん",
     "type": ["無属性"],
-    "image": "image/ゴリさん.png"
+    "image": "img/enemies/ゴリさん.png"
   },
   "E007": {
     "name": "メェメェ",
     "type": ["無属性"],
-    "image": "image/メェメェ.png"
+    "image": "img/enemies/メェメェ.png"
   },
   "E008": {
     "name": "ゴマさま",
     "type": ["赤"],
-    "image": "image/ゴマさま.png"
+    "image": "img/enemies/ゴマさま.png"
   },
   "E009": {
     "name": "ワニック",
     "type": ["無属性"],
-    "image": "image/ワニック.png"
+    "image": "img/enemies/ワニック.png"
   },
   "E010": {
     "name": "パオン",
     "type": ["無属性"],
-    "image": "image/パオン.png"
+    "image": "img/enemies/パオン.png"
   },
   "E011": {
     "name": "ウサ銀",
     "type": ["赤"],
-    "image": "image/ウサ銀.png"
+    "image": "img/enemies/ウサ銀.png"
   },
   "E012": {
     "name": "カ・ンガリュ",
     "type": ["無属性"],
-    "image": "image/カ・ンガリュ.png"
+    "image": "img/enemies/カ・ンガリュ.png"
   },
   "E013": {
     "name": "リッスントゥミー",
     "type": ["無属性"],
-    "image": "image/リッスントゥミー.png"
+    "image": "img/enemies/リッスントゥミー.png"
   },
   "E014": {
     "name": "ガガガガ",
     "type": ["浮き"],
-    "image": "image/ガガガガ.png"
+    "image": "img/enemies/ガガガガ.png"
   },
   "E015": {
     "name": "一角くん",
     "type": ["赤"],
-    "image": "image/一角くん.png"
+    "image": "img/enemies/一角くん.png"
   },
   "E016": {
     "name": "クマ先生",
     "type": ["無属性"],
-    "image": "image/クマ先生.png"
+    "image": "img/enemies/クマ先生.png"
   },
   "E017": {
     "name": "カオル君",
     "type": ["浮き"],
-    "image": "image/カオル君.png"
+    "image": "img/enemies/カオル君.png"
   },
   "E018": {
     "name": "ブラックマ",
     "type": ["黒"],
-    "image": "image/ブラックマ.png"
+    "image": "img/enemies/ブラックマ.png"
   },
   "E019": {
     "name": "赤羅我王",
     "type": ["赤","浮き"],
-    "image": "image/赤羅我王.png"
+    "image": "img/enemies/赤羅我王.png"
   },
   "E020": {
     "name": "カンバン娘",
     "type": ["無属性"],
-    "image": "image/カンバン娘.png"
+    "image": "img/enemies/カンバン娘.png"
   },
   "E021": {
     "name": "悪の帝王 ニャンダム",
     "type": ["赤"],
-    "image": "image/悪の帝王 ニャンダム.png"
+    "image": "img/enemies/悪の帝王 ニャンダム.png"
   },
   "E022": {
     "name": "ぶんぶん先生",
     "type": ["浮き"],
-    "image": "image/ぶんぶん先生.png"
+    "image": "img/enemies/ぶんぶん先生.png"
   },
   "E023": {
     "name": "メタルカバちゃん",
     "type": ["メタル"],
-    "image": "image/メタルカバちゃん.png"
+    "image": "img/enemies/メタルカバちゃん.png"
   },
   "E024": {
     "name": "エリザベス2世",
     "type": ["赤"],
-    "image": "image/エリザベス2世.png"
+    "image": "img/enemies/エリザベス2世.png"
   },
   "E025": {
     "name": "殺意のわんこ",
     "type": ["黒"],
-    "image": "image/殺意のわんこ.png"
+    "image": "img/enemies/殺意のわんこ.png"
   },
   "E026": {
     "name": "師匠",
     "type": ["無属性"],
-    "image": "image/師匠.png"
+    "image": "img/enemies/師匠.png"
   },
   "E027": {
     "name": "セレブ",
     "type": ["無属性"],
-    "image": "image/セレブ.png"
+    "image": "img/enemies/セレブ.png"
   },
   "E028": {
     "name": "だっふんど",
     "type": ["無属性"],
-    "image": "image/だっふんど.png"
+    "image": "img/enemies/だっふんど.png"
   },
   "E029": {
     "name": "アヒルンルン",
     "type": ["無属性"],
-    "image": "image/アヒルンルン.png"
+    "image": "img/enemies/アヒルンルン.png"
   },
   "E030": {
     "name": "ナマルケモルル",
     "type": ["無属性"],
-    "image": "image/ナマルケモルル.png"
+    "image": "img/enemies/ナマルケモルル.png"
   },
   "E031": {
     "name": "フルぼっこ",
     "type": ["無属性"],
-    "image": "image/フルぼっこ.png"
+    "image": "img/enemies/フルぼっこ.png"
   },
   "E032": {
     "name": "赤井ブン太郎",
     "type": ["赤","浮き"],
-    "image": "image/赤井ブン太郎.png"
+    "image": "img/enemies/赤井ブン太郎.png"
   },
   "E033": {
     "name": "イノシャシ",
     "type": ["赤"],
-    "image": "image/イノシャシ.png"
+    "image": "img/enemies/イノシャシ.png"
   },
   "E034": {
     "name": "ブラッゴリ",
     "type": ["黒"],
-    "image": "image/ブラッゴリ.png"
+    "image": "img/enemies/ブラッゴリ.png"
   },
   "E035": {
     "name": "シャドウボクサー",
     "type": ["黒"],
-    "image": "image/シャドウボクサー.png"
+    "image": "img/enemies/シャドウボクサー.png"
   },
   "E036": {
     "name": "超メタルカバちゃん",
     "type": ["メタル"],
-    "image": "image/超メタルカバちゃん.png"
+    "image": "img/enemies/超メタルカバちゃん.png"
   },
   "E037": {
     "name": "ナカイくん",
     "type": ["無属性"],
-    "image": "image/ナカイくん.png"
+    "image": "img/enemies/ナカイくん.png"
   },
   "E038": {
     "name": "まゆげどり",
     "type": ["浮き"],
-    "image": "image/まゆげどり.png"
+    "image": "img/enemies/まゆげどり.png"
   },
   "E039": {
     "name": "こぶへい",
     "type": ["無属性"],
-    "image": "image/こぶへい.png"
+    "image": "img/enemies/こぶへい.png"
   },
   "E040": {
     "name": "コアラッキョ",
     "type": ["無属性"],
-    "image": "image/コアラッキョ.png"
+    "image": "img/enemies/コアラッキョ.png"
   },
   "E041": {
     "name": "クロサワ監督",
     "type": ["黒"],
-    "image": "image/クロサワ監督.png"
+    "image": "img/enemies/クロサワ監督.png"
   },
   "E042": {
     "name": "メタルサイボーグ",
     "type": ["メタル"],
-    "image": "image/メタルサイボーグ.png"
+    "image": "img/enemies/メタルサイボーグ.png"
   },
   "E043": {
     "name": "ブラックブンブン",
     "type": ["浮き","黒"],
-    "image": "image/ブラックブンブン.png"
+    "image": "img/enemies/ブラックブンブン.png"
   },
   "E044": {
     "name": "ハイ・エナジー",
     "type": ["無属性"],
-    "image": "image/ハイ・エナジー.png"
+    "image": "img/enemies/ハイ・エナジー.png"
   },
   "E045": {
     "name": "レッドサイクロン",
     "type": ["赤","浮き"],
-    "image": "image/レッドサイクロン.png"
+    "image": "img/enemies/レッドサイクロン.png"
   },
   "E046": {
     "name": "ブラックサイクロン",
     "type": ["浮き","黒"],
-    "image": "image/ブラックサイクロン.png"
+    "image": "img/enemies/ブラックサイクロン.png"
   },
   "E047": {
     "name": "ホワイトサイクロン",
     "type": ["浮き"],
-    "image": "image/ホワイトサイクロン.png"
+    "image": "img/enemies/ホワイトサイクロン.png"
   },
   "E048": {
     "name": "エンジェルサイクロン",
     "type": ["天使"],
-    "image": "image/エンジェルサイクロン.png"
+    "image": "img/enemies/エンジェルサイクロン.png"
   },
   "E049": {
     "name": "メタルサイクロン",
     "type": ["メタル"],
-    "image": "image/メタルサイクロン.png"
+    "image": "img/enemies/メタルサイクロン.png"
   },
   "E050": {
     "name": "スペースサイクロン",
     "type": ["浮き","エイリアン"],
-    "image": "image/スペースサイクロン.png"
+    "image": "img/enemies/スペースサイクロン.png"
   },
   "E051": {
     "name": "ハリケーンサイクロン",
     "type": ["浮き"],
-    "image": "image/ハリケーンサイクロン.png"
+    "image": "img/enemies/ハリケーンサイクロン.png"
   },
   "E052": {
     "name": "アンデッドサイクロン",
     "type": ["ゾンビ"],
-    "image": "image/アンデッドサイクロン.png"
+    "image": "img/enemies/アンデッドサイクロン.png"
   },
   "E053": {
     "name": "スーパースペースサイクロン",
     "type": ["エイリアン"],
-    "image": "image/スーパースペースサイクロン.png"
+    "image": "img/enemies/スーパースペースサイクロン.png"
   },
   "E054": {
     "name": "デビルサイクロン",
     "type": ["悪魔"],
-    "image": "image/デビルサイクロン.png"
+    "image": "img/enemies/デビルサイクロン.png"
   },
   "E055": {
     "name": "エンシェントサイクロン",
     "type": ["古代種"],
-    "image": "image/エンシェントサイクロン.png"
+    "image": "img/enemies/エンシェントサイクロン.png"
   },
   "E056": {
     "name": "ダチョウ同好会",
     "type": ["無属性"],
-    "image": "image/ダチョウ同好会.png"
+    "image": "img/enemies/ダチョウ同好会.png"
   },
   "E057": {
     "name": "ダディ",
     "type": ["無属性"],
-    "image": "image/ダディ.png"
+    "image": "img/enemies/ダディ.png"
   },
   "E058": {
     "name": "メタルゴマさま",
     "type": ["メタル"],
-    "image": "image/メタルゴマさま.png"
+    "image": "img/enemies/メタルゴマさま.png"
   },
   "E059": {
     "name": "ウルフとウルルン",
     "type": ["無属性"],
-    "image": "image/ウルフとウルルン.png"
+    "image": "img/enemies/ウルフとウルルン.png"
   },
   "E060": {
     "name": "天使愛好家",
     "type": ["メタル"],
-    "image": "image/天使愛好家.png"
+    "image": "img/enemies/天使愛好家.png"
   },
   "E061": {
     "name": "天使ガブリエル",
     "type": ["天使"],
-    "image": "image/天使ガブリエル.png"
+    "image": "img/enemies/天使ガブリエル.png"
   },
   "E062": {
     "name": "天使カバちゃん",
     "type": ["天使"],
-    "image": "image/天使カバちゃん.png"
+    "image": "img/enemies/天使カバちゃん.png"
   },
   "E063": {
     "name": "天使ゴンザレス",
     "type": ["天使"],
-    "image": "image/天使ゴンザレス.png"
+    "image": "img/enemies/天使ゴンザレス.png"
   },
   "E064": {
     "name": "カベわんこ",
     "type": ["無属性"],
-    "image": "image/カベわんこ.png"
+    "image": "img/enemies/カベわんこ.png"
   },
   "E065": {
     "name": "赤毛のにょろ",
     "type": ["赤"],
-    "image": "image/赤毛のにょろ.png"
+    "image": "img/enemies/赤毛のにょろ.png"
   },
   "E066": {
     "name": "マンボーグ鈴木",
     "type": ["天使"],
-    "image": "image/マンボーグ鈴木.png"
+    "image": "img/enemies/マンボーグ鈴木.png"
   },
   "E067": {
     "name": "ド鳩・サブ・レー",
     "type": ["浮き"],
-    "image": "image/ド鳩・サブ・レー.png"
+    "image": "img/enemies/ド鳩・サブ・レー.png"
   },
   "E068": {
     "name": "ブラッコ",
     "type": ["黒"],
-    "image": "image/ブラッコ.png"
+    "image": "img/enemies/ブラッコ.png"
   },
   "E069": {
     "name": "天使スレイプニール",
     "type": ["天使"],
-    "image": "image/天使スレイプニール.png"
+    "image": "img/enemies/天使スレイプニール.png"
   },
   "E070": {
     "name": "はぐれたヤツ",
     "type": ["無属性"],
-    "image": "image/はぐれたヤツ.png"
+    "image": "img/enemies/はぐれたヤツ.png"
   },
   "E071": {
     "name": "メタルわんこ",
     "type": ["メタル"],
-    "image": "image/メタルわんこ.png"
+    "image": "img/enemies/メタルわんこ.png"
   },
   "E072": {
     "name": "松 黒蔵",
     "type": ["黒"],
-    "image": "image/松 黒蔵.png"
+    "image": "img/enemies/松 黒蔵.png"
   },
   "E073": {
     "name": "コニャンダム",
     "type": ["赤"],
-    "image": "image/コニャンダム.png"
+    "image": "img/enemies/コニャンダム.png"
   },
   "E074": {
     "name": "天使ヒオコエル",
     "type": ["天使"],
-    "image": "image/天使ヒオコエル.png"
+    "image": "img/enemies/天使ヒオコエル.png"
   },
   "E075": {
     "name": "エイリワン",
     "type": ["エイリアン"],
-    "image": "image/エイリワン.png"
+    "image": "img/enemies/エイリワン.png"
   },
   "E076": {
     "name": "カーバチャン",
     "type": ["エイリアン"],
-    "image": "image/カーバチャン.png"
+    "image": "img/enemies/カーバチャン.png"
   },
   "E077": {
     "name": "ヤドカリー",
     "type": ["エイリアン"],
-    "image": "image/ヤドカリー.png"
+    "image": "img/enemies/ヤドカリー.png"
   },
   "E078": {
     "name": "ゴマサーマン",
     "type": ["エイリアン"],
-    "image": "image/ゴマサーマン.png"
+    "image": "img/enemies/ゴマサーマン.png"
   },
   "E079": {
     "name": "レディ・ガ",
     "type": ["浮き","エイリアン"],
-    "image": "image/レディ・ガ.png"
+    "image": "img/enemies/レディ・ガ.png"
   },
   "E080": {
     "name": "カヲルさん",
     "type": ["浮き","エイリアン"],
-    "image": "image/カヲルさん.png"
+    "image": "img/enemies/カヲルさん.png"
   },
   "E081": {
     "name": "クマンチュー",
     "type": ["エイリアン"],
-    "image": "image/クマンチュー.png"
+    "image": "img/enemies/クマンチュー.png"
   },
   "E082": {
     "name": "ワーニック",
     "type": ["エイリアン"],
-    "image": "image/ワーニック.png"
+    "image": "img/enemies/ワーニック.png"
   },
   "E083": {
     "name": "デカメガネル",
     "type": ["エイリアン"],
-    "image": "image/デカメガネル.png"
+    "image": "img/enemies/デカメガネル.png"
   },
   "E084": {
     "name": "エリザベス56世",
     "type": ["エイリアン"],
-    "image": "image/エリザベス56世.png"
+    "image": "img/enemies/エリザベス56世.png"
   },
   "E085": {
     "name": "イノヴァルカン",
     "type": ["エイリアン"],
-    "image": "image/イノヴァルカン.png"
+    "image": "img/enemies/イノヴァルカン.png"
   },
   "E086": {
     "name": "破壊生物クオリネン",
     "type": ["浮き","エイリアン"],
-    "image": "image/破壊生物クオリネン.png"
+    "image": "img/enemies/破壊生物クオリネン.png"
   },
   "E087": {
     "name": "ハサミーマン",
     "type": ["エイリアン"],
-    "image": "image/ハサミーマン.png"
+    "image": "img/enemies/ハサミーマン.png"
   },
   "E088": {
     "name": "サイバーX",
     "type": ["エイリアン"],
-    "image": "image/サイバーX.png"
+    "image": "img/enemies/サイバーX.png"
   },
   "E089": {
     "name": "プドール夫人",
     "type": ["エイリアン"],
-    "image": "image/プドール夫人.png"
+    "image": "img/enemies/プドール夫人.png"
   },
   "E090": {
     "name": "ギャラクシーニャンダム",
     "type": ["エイリアン"],
-    "image": "image/ギャラクシーニャンダム.png"
+    "image": "img/enemies/ギャラクシーニャンダム.png"
   },
   "E091": {
     "name": "反逆のヴァルキリー",
     "type": ["浮き","エイリアン"],
-    "image": "image/反逆のヴァルキリー.png"
+    "image": "img/enemies/反逆のヴァルキリー.png"
   },
   "E092": {
     "name": "カルピンチョ",
     "type": ["赤"],
-    "image": "image/カルピンチョ.png"
+    "image": "img/enemies/カルピンチョ.png"
   },
   "E093": {
     "name": "ツバメンズ",
     "type": ["浮き"],
-    "image": "image/ツバメンズ.png"
+    "image": "img/enemies/ツバメンズ.png"
   },
   "E094": {
     "name": "バトルコアラッキョ",
     "type": ["赤"],
-    "image": "image/バトルコアラッキョ.png"
+    "image": "img/enemies/バトルコアラッキョ.png"
   },
   "E095": {
     "name": "メタルカオル君",
     "type": ["メタル"],
-    "image": "image/メタルカオル君.png"
+    "image": "img/enemies/メタルカオル君.png"
   },
   "E096": {
     "name": "よっちゃん",
     "type": ["浮き","エイリアン"],
-    "image": "image/よっちゃん.png"
+    "image": "img/enemies/よっちゃん.png"
   },
   "E097": {
     "name": "アルパッカ",
     "type": ["エイリアン"],
-    "image": "image/アルパッカ.png"
+    "image": "img/enemies/アルパッカ.png"
   },
   "E098": {
     "name": "ヨキカナ",
     "type": ["エイリアン"],
-    "image": "image/ヨキカナ.png"
+    "image": "img/enemies/ヨキカナ.png"
   },
   "E099": {
     "name": "パラサイトブンブン",
     "type": ["浮き","エイリアン"],
-    "image": "image/パラサイトブンブン.png"
+    "image": "img/enemies/パラサイトブンブン.png"
   },
   "E100": {
     "name": "暴走のネコムート",
     "type": ["浮き","エイリアン"],
-    "image": "image/暴走のネコムート.png"
+    "image": "img/enemies/暴走のネコムート.png"
   },
   "E101": {
     "name": "断罪天使クオリネル",
     "type": ["天使"],
-    "image": "image/断罪天使クオリネル.png"
+    "image": "img/enemies/断罪天使クオリネル.png"
   },
   "E102": {
     "name": "ドリュウ",
     "type": ["無属性"],
-    "image": "image/ドリュウ.png"
+    "image": "img/enemies/ドリュウ.png"
   },
   "E103": {
     "name": "キョセーヌ",
     "type": ["赤","黒"],
-    "image": "image/キョセーヌ.png"
+    "image": "img/enemies/キョセーヌ.png"
   },
   "E104": {
     "name": "わんこずきんミーニャ",
     "type": ["無属性"],
-    "image": "image/わんこずきんミーニャ.png"
+    "image": "img/enemies/わんこずきんミーニャ.png"
   },
   "E105": {
     "name": "ミスターエンジェル",
     "type": ["天使"],
-    "image": "image/ミスターエンジェル.png"
+    "image": "img/enemies/ミスターエンジェル.png"
   },
   "E106": {
     "name": "タッちゃん",
     "type": ["黒"],
-    "image": "image/タッちゃん.png"
+    "image": "img/enemies/タッちゃん.png"
   },
   "E107": {
     "name": "イノエンジェル",
     "type": ["天使"],
-    "image": "image/イノエンジェル.png"
+    "image": "img/enemies/イノエンジェル.png"
   },
   "E108": {
     "name": "ヒカル",
     "type": ["無属性"],
-    "image": "image/ヒカル.png"
+    "image": "img/enemies/ヒカル.png"
   },
   "E109": {
     "name": "般若我王",
     "type": ["赤"],
-    "image": "image/般若我王.png"
+    "image": "img/enemies/般若我王.png"
   },
   "E110": {
     "name": "森の蜜子",
     "type": ["浮き","エイリアン"],
-    "image": "image/森の蜜子.png"
+    "image": "img/enemies/森の蜜子.png"
   },
   "E111": {
     "name": "ちびぶんぶん",
     "type": ["浮き"],
-    "image": "image/ちびぶんぶん.png"
+    "image": "img/enemies/ちびぶんぶん.png"
   },
   "E112": {
     "name": "教授",
     "type": ["赤"],
-    "image": "image/教授.png"
+    "image": "img/enemies/教授.png"
   },
   "E113": {
     "name": "イノワール",
     "type": ["黒"],
-    "image": "image/イノワール.png"
+    "image": "img/enemies/イノワール.png"
   },
   "E114": {
     "name": "ゾンビワン",
     "type": ["ゾンビ"],
-    "image": "image/ゾンビワン.png"
+    "image": "img/enemies/ゾンビワン.png"
   },
   "E115": {
     "name": "にょろろん",
     "type": ["ゾンビ"],
-    "image": "image/にょろろん.png"
+    "image": "img/enemies/にょろろん.png"
   },
   "E116": {
     "name": "カバタリアン",
     "type": ["ゾンビ"],
-    "image": "image/カバタリアン.png"
+    "image": "img/enemies/カバタリアン.png"
   },
   "E117": {
     "name": "トンシー",
     "type": ["ゾンビ"],
-    "image": "image/トンシー.png"
+    "image": "img/enemies/トンシー.png"
   },
   "E118": {
     "name": "ジャッキー・ペンZ",
     "type": ["ゾンビ"],
-    "image": "image/ジャッキー・ペンZ.png"
+    "image": "img/enemies/ジャッキー・ペンZ.png"
   },
   "E119": {
     "name": "ゴリ・ンジュ",
     "type": ["ゾンビ"],
-    "image": "image/ゴリ・ンジュ.png"
+    "image": "img/enemies/ゴリ・ンジュ.png"
   },
   "E120": {
     "name": "ブチゴマさま",
     "type": ["ゾンビ"],
-    "image": "image/ブチゴマさま.png"
+    "image": "img/enemies/ブチゴマさま.png"
   },
   "E121": {
     "name": "スカルボクサー",
     "type": ["ゾンビ"],
-    "image": "image/スカルボクサー.png"
+    "image": "img/enemies/スカルボクサー.png"
   },
   "E122": {
     "name": "ワニボン",
     "type": ["ゾンビ"],
-    "image": "image/ワニボン.png"
+    "image": "img/enemies/ワニボン.png"
   },
   "E123": {
     "name": "墓手太郎",
     "type": ["ゾンビ"],
-    "image": "image/墓手太郎.png"
+    "image": "img/enemies/墓手太郎.png"
   },
   "E124": {
     "name": "墓手花子",
     "type": ["ゾンビ"],
-    "image": "image/墓手花子.png"
+    "image": "img/enemies/墓手花子.png"
   },
   "E125": {
     "name": "オオさん",
     "type": ["ゾンビ"],
-    "image": "image/オオさん.png"
+    "image": "img/enemies/オオさん.png"
   },
   "E126": {
     "name": "ヒツギイヌ",
     "type": ["ゾンビ"],
-    "image": "image/ヒツギイヌ.png"
+    "image": "img/enemies/ヒツギイヌ.png"
   },
   "E127": {
     "name": "キャベロン",
     "type": ["ゾンビ"],
-    "image": "image/キャベロン.png"
+    "image": "img/enemies/キャベロン.png"
   },
   "E128": {
     "name": "犬武者 武蔵",
     "type": ["ゾンビ"],
-    "image": "image/犬武者 武蔵.png"
+    "image": "img/enemies/犬武者 武蔵.png"
   },
   "E129": {
     "name": "亡者デブウ",
     "type": ["ゾンビ"],
-    "image": "image/亡者デブウ.png"
+    "image": "img/enemies/亡者デブウ.png"
   },
   "E130": {
     "name": "イルカ娘",
     "type": ["無属性"],
-    "image": "image/イルカ娘.png"
+    "image": "img/enemies/イルカ娘.png"
   },
   "E131": {
     "name": "イカ天",
     "type": ["天使"],
-    "image": "image/イカ天.png"
+    "image": "img/enemies/イカ天.png"
   },
   "E132": {
     "name": "ネコ仙人",
     "type": ["無属性"],
-    "image": "image/ネコ仙人.png"
+    "image": "img/enemies/ネコ仙人.png"
   },
   "E133": {
     "name": "ケロ助",
     "type": ["無属性"],
-    "image": "image/ケロ助.png"
+    "image": "img/enemies/ケロ助.png"
   },
   "E134": {
     "name": "エリートエイリワン",
     "type": ["エイリアン"],
-    "image": "image/エリートエイリワン.png"
+    "image": "img/enemies/エリートエイリワン.png"
   },
   "E135": {
     "name": "スター・ペン",
     "type": ["エイリアン"],
-    "image": "image/スター・ペン.png"
+    "image": "img/enemies/スター・ペン.png"
   },
   "E136": {
     "name": "グレゴリー将軍",
     "type": ["エイリアン"],
-    "image": "image/グレゴリー将軍.png"
+    "image": "img/enemies/グレゴリー将軍.png"
   },
   "E137": {
     "name": "ハハパオン",
     "type": ["エイリアン"],
-    "image": "image/ハハパオン.png"
+    "image": "img/enemies/ハハパオン.png"
   },
   "E138": {
     "name": "巨匠",
     "type": ["エイリアン"],
-    "image": "image/巨匠.png"
+    "image": "img/enemies/巨匠.png"
   },
   "E139": {
     "name": "キャプテン・モグー",
     "type": ["エイリアン"],
-    "image": "image/キャプテン・モグー.png"
+    "image": "img/enemies/キャプテン・モグー.png"
   },
   "E140": {
     "name": "スペースマンボルグ",
     "type": ["浮き","エイリアン"],
-    "image": "image/スペースマンボルグ.png"
+    "image": "img/enemies/スペースマンボルグ.png"
   },
   "E141": {
     "name": "神さま",
     "type": ["浮き"],
-    "image": "image/神さま.png"
+    "image": "img/enemies/神さま.png"
   },
   "E142": {
     "name": "大夢くん",
     "type": ["天使","エイリアン"],
-    "image": "image/大夢くん.png"
+    "image": "img/enemies/大夢くん.png"
   },
   "E143": {
     "name": "天使ブッタ",
     "type": ["天使"],
-    "image": "image/天使ブッタ.png"
+    "image": "img/enemies/天使ブッタ.png"
   },
   "E144": {
     "name": "チワワン伯爵",
     "type": ["無属性"],
-    "image": "image/チワワン伯爵.png"
+    "image": "img/enemies/チワワン伯爵.png"
   },
   "E145": {
     "name": "謎仮面のウララー",
     "type": ["無属性"],
-    "image": "image/謎仮面のウララー.png"
+    "image": "img/enemies/謎仮面のウララー.png"
   },
   "E146": {
     "name": "ヒウマ",
     "type": ["赤"],
-    "image": "image/ヒウマ.png"
+    "image": "img/enemies/ヒウマ.png"
   },
   "E147": {
     "name": "ウルトラメェメェ",
     "type": ["エイリアン"],
-    "image": "image/ウルトラメェメェ.png"
+    "image": "img/enemies/ウルトラメェメェ.png"
   },
   "E148": {
     "name": "レジェンドブンブンΩ",
     "type": ["浮き"],
-    "image": "image/レジェンドブンブンΩ.png"
+    "image": "img/enemies/レジェンドブンブンΩ.png"
   },
   "E149": {
     "name": "真レジェンドブンブン",
     "type": ["古代種"],
-    "image": "image/真レジェンドブンブン.png"
+    "image": "img/enemies/真レジェンドブンブン.png"
   },
   "E150": {
     "name": "古代わんこ",
     "type": ["古代種"],
-    "image": "image/古代わんこ.png"
+    "image": "img/enemies/古代わんこ.png"
   },
   "E151": {
     "name": "イングリッス",
     "type": ["古代種"],
-    "image": "image/イングリッス.png"
+    "image": "img/enemies/イングリッス.png"
   },
   "E152": {
     "name": "コライノくん",
     "type": ["古代種"],
-    "image": "image/コライノくん.png"
+    "image": "img/enemies/コライノくん.png"
   },
   "E153": {
     "name": "超町長",
     "type": ["浮き","古代種"],
-    "image": "image/超町長.png"
+    "image": "img/enemies/超町長.png"
   },
   "E154": {
     "name": "ダテメガネル",
     "type": ["古代種"],
-    "image": "image/ダテメガネル.png"
+    "image": "img/enemies/ダテメガネル.png"
   },
   "E155": {
     "name": "マナブくん",
     "type": ["エイリアン"],
-    "image": "image/マナブくん.png"
+    "image": "img/enemies/マナブくん.png"
   },
   "E156": {
     "name": "ゲコック",
     "type": ["エイリアン"],
-    "image": "image/ゲコック.png"
+    "image": "img/enemies/ゲコック.png"
   },
   "E157": {
     "name": "神さま（本気）",
     "type": ["無属性"],
-    "image": "image/神さま（本気）.png"
+    "image": "img/enemies/神さま（本気）.png"
   },
   "E158": {
     "name": "古我王",
     "type": ["浮き","古代種"],
-    "image": "image/古我王.png"
+    "image": "img/enemies/古我王.png"
   },
   "E159": {
     "name": "オールドリー",
     "type": ["古代種"],
-    "image": "image/オールドリー.png"
+    "image": "img/enemies/オールドリー.png"
   },
   "E160": {
     "name": "クマンケン",
     "type": ["ゾンビ"],
-    "image": "image/クマンケン.png"
+    "image": "img/enemies/クマンケン.png"
   },
   "E161": {
     "name": "シノシシ",
     "type": ["ゾンビ"],
-    "image": "image/シノシシ.png"
+    "image": "img/enemies/シノシシ.png"
   },
   "E162": {
     "name": "ユメミちゃん",
     "type": ["黒"],
-    "image": "image/ユメミちゃん.png"
+    "image": "img/enemies/ユメミちゃん.png"
   },
   "E163": {
     "name": "メタックマ",
     "type": ["メタル"],
-    "image": "image/メタックマ.png"
+    "image": "img/enemies/メタックマ.png"
   },
   "E164": {
     "name": "ミニスターサイクロン",
     "type": ["エイリアン"],
-    "image": "image/ミニスターサイクロン.png"
+    "image": "img/enemies/ミニスターサイクロン.png"
   },
   "E165": {
     "name": "チンアナ５兄弟",
     "type": ["エイリアン"],
-    "image": "image/チンアナ５兄弟.png"
+    "image": "img/enemies/チンアナ５兄弟.png"
   },
   "E166": {
     "name": "ルーパールーパー",
     "type": ["エイリアン"],
-    "image": "image/ルーパールーパー.png"
+    "image": "img/enemies/ルーパールーパー.png"
   },
   "E167": {
     "name": "ファイナルギガグランド神さま",
     "type": ["無属性"],
-    "image": "image/ファイナルギガグランド神さま.png"
+    "image": "img/enemies/ファイナルギガグランド神さま.png"
   },
   "E168": {
     "name": "スターフィリバスター",
     "type": ["浮き","エイリアン"],
-    "image": "image/スターフィリバスター.png"
+    "image": "img/enemies/スターフィリバスター.png"
   },
   "E169": {
     "name": "土偶戦士ドグ丸",
     "type": ["古代種"],
-    "image": "image/土偶戦士ドグ丸.png"
+    "image": "img/enemies/土偶戦士ドグ丸.png"
   },
   "E170": {
     "name": "チキランラン",
     "type": ["ゾンビ"],
-    "image": "image/チキランラン.png"
+    "image": "img/enemies/チキランラン.png"
   },
   "E171": {
     "name": "スリラーズ",
     "type": ["ゾンビ"],
-    "image": "image/スリラーズ.png"
+    "image": "img/enemies/スリラーズ.png"
   },
   "E172": {
     "name": "フグ太くん",
     "type": ["古代種"],
-    "image": "image/フグ太くん.png"
+    "image": "img/enemies/フグ太くん.png"
   },
   "E173": {
     "name": "超新星テッサー",
     "type": ["エイリアン"],
-    "image": "image/超新星テッサー.png"
+    "image": "img/enemies/超新星テッサー.png"
   },
   "E174": {
     "name": "阿亀我王",
     "type": ["赤","黒"],
-    "image": "image/阿亀我王.png"
+    "image": "img/enemies/阿亀我王.png"
   },
   "E175": {
     "name": "聖者ポプウ",
     "type": ["天使"],
-    "image": "image/聖者ポプウ.png"
+    "image": "img/enemies/聖者ポプウ.png"
   },
   "E176": {
     "name": "太古の蜜江",
     "type": ["浮き","古代種"],
-    "image": "image/太古の蜜江.png"
+    "image": "img/enemies/太古の蜜江.png"
   },
   "E177": {
     "name": "かわわっぱJr.",
     "type": ["無属性"],
-    "image": "image/かわわっぱJr..png"
+    "image": "img/enemies/かわわっぱJr..png"
   },
   "E178": {
     "name": "フェンリルとウルス",
     "type": ["古代種"],
-    "image": "image/フェンリルとウルス.png"
+    "image": "img/enemies/フェンリルとウルス.png"
   },
   "E179": {
     "name": "ワーニネーター",
     "type": ["メタル"],
-    "image": "image/ワーニネーター.png"
+    "image": "img/enemies/ワーニネーター.png"
   },
   "E180": {
     "name": "タッキー",
     "type": ["浮き"],
-    "image": "image/タッキー.png"
+    "image": "img/enemies/タッキー.png"
   },
   "E181": {
     "name": "綺羅星ペロ",
     "type": ["エイリアン"],
-    "image": "image/綺羅星ペロ.png"
+    "image": "img/enemies/綺羅星ペロ.png"
   },
   "E182": {
     "name": "死霊妖精クオリネム",
     "type": ["ゾンビ"],
-    "image": "image/死霊妖精クオリネム.png"
+    "image": "img/enemies/死霊妖精クオリネム.png"
   },
   "E183": {
     "name": "ミニアンデッドサイクロン",
     "type": ["ゾンビ"],
-    "image": "image/ミニアンデッドサイクロン.png"
+    "image": "img/enemies/ミニアンデッドサイクロン.png"
   },
   "E184": {
     "name": "天使ドーヴエル",
     "type": ["天使"],
-    "image": "image/天使ドーヴエル.png"
+    "image": "img/enemies/天使ドーヴエル.png"
   },
   "E185": {
     "name": "ドレミちゃん",
     "type": ["無属性"],
-    "image": "image/ドレミちゃん.png"
+    "image": "img/enemies/ドレミちゃん.png"
   },
   "E186": {
     "name": "達人ウリル",
     "type": ["無属性"],
-    "image": "image/達人ウリル.png"
+    "image": "img/enemies/達人ウリル.png"
   },
   "E187": {
     "name": "メタルコアラッキョ",
     "type": ["メタル"],
-    "image": "image/メタルコアラッキョ.png"
+    "image": "img/enemies/メタルコアラッキョ.png"
   },
   "E188": {
     "name": "ジョン・レオン",
     "type": ["赤","エイリアン","ゾンビ"],
-    "image": "image/ジョン・レオン.png"
+    "image": "img/enemies/ジョン・レオン.png"
   },
   "E189": {
     "name": "イディ:Re",
     "type": ["古代種"],
-    "image": "image/イディ:Re.png"
+    "image": "img/enemies/イディ:Re.png"
   },
   "E190": {
     "name": "テバムラサキホネツバメ",
     "type": ["浮き","ゾンビ"],
-    "image": "image/テバムラサキホネツバメ.png"
+    "image": "img/enemies/テバムラサキホネツバメ.png"
   },
   "E191": {
     "name": "ウリボーイ",
     "type": ["無属性"],
-    "image": "image/ウリボーイ.png"
+    "image": "img/enemies/ウリボーイ.png"
   },
   "E192": {
     "name": "悪のネコ帝王",
     "type": ["古代種"],
-    "image": "image/悪のネコ帝王.png"
+    "image": "img/enemies/悪のネコ帝王.png"
   },
   "E193": {
     "name": "ごん兵衛",
     "type": ["赤"],
-    "image": "image/ごん兵衛.png"
+    "image": "img/enemies/ごん兵衛.png"
   },
   "E194": {
     "name": "マーさん",
     "type": ["無属性"],
-    "image": "image/マーさん.png"
+    "image": "img/enemies/マーさん.png"
   },
   "E195": {
     "name": "怒りのブラッゴリ",
     "type": ["黒","超獣"],
-    "image": "image/怒りのブラッゴリ.png"
+    "image": "img/enemies/怒りのブラッゴリ.png"
   },
   "E196": {
     "name": "古神炎ドロン",
     "type": ["古代種"],
-    "image": "image/古神炎ドロン.png"
+    "image": "img/enemies/古神炎ドロン.png"
   },
   "E197": {
     "name": "デビルワン",
     "type": ["悪魔"],
-    "image": "image/デビルワン.png"
+    "image": "img/enemies/デビルワン.png"
   },
   "E198": {
     "name": "インフェルにょろ",
     "type": ["悪魔"],
-    "image": "image/インフェルにょろ.png"
+    "image": "img/enemies/インフェルにょろ.png"
   },
   "E199": {
     "name": "ケルベローズ",
     "type": ["悪魔"],
-    "image": "image/ケルベローズ.png"
+    "image": "img/enemies/ケルベローズ.png"
   },
   "E200": {
     "name": "ギルティ・ペン",
     "type": ["悪魔"],
-    "image": "image/ギルティ・ペン.png"
+    "image": "img/enemies/ギルティ・ペン.png"
   },
   "E201": {
     "name": "ヘルゴリラー",
     "type": ["悪魔"],
-    "image": "image/ヘルゴリラー.png"
+    "image": "img/enemies/ヘルゴリラー.png"
   },
   "E202": {
     "name": "悪魔ベヒモッス",
     "type": ["悪魔"],
-    "image": "image/悪魔ベヒモッス.png"
+    "image": "img/enemies/悪魔ベヒモッス.png"
   },
   "E203": {
     "name": "アックマ閣下",
     "type": ["悪魔"],
-    "image": "image/アックマ閣下.png"
+    "image": "img/enemies/アックマ閣下.png"
   },
   "E204": {
     "name": "魔我王",
     "type": ["悪魔"],
-    "image": "image/魔我王.png"
+    "image": "img/enemies/魔我王.png"
   },
   "E205": {
     "name": "神官マモーン",
     "type": ["悪魔"],
-    "image": "image/神官マモーン.png"
+    "image": "img/enemies/神官マモーン.png"
   },
   "E206": {
     "name": "大神官マモーン",
     "type": ["悪魔"],
-    "image": "image/大神官マモーン.png"
+    "image": "img/enemies/大神官マモーン.png"
   },
   "E207": {
     "name": "破壊神ジャガンドー",
     "type": ["悪魔"],
-    "image": "image/破壊神ジャガンドー.png"
+    "image": "img/enemies/破壊神ジャガンドー.png"
   },
   "E208": {
     "name": "操られしネコ女王",
     "type": ["悪魔"],
-    "image": "image/操られしネコ女王.png"
+    "image": "img/enemies/操られしネコ女王.png"
   },
   "E209": {
     "name": "シスターデビル",
     "type": ["悪魔"],
-    "image": "image/シスターデビル.png"
+    "image": "img/enemies/シスターデビル.png"
   },
   "E210": {
     "name": "マデューさん",
     "type": ["悪魔"],
-    "image": "image/マデューさん.png"
+    "image": "img/enemies/マデューさん.png"
   },
   "E211": {
     "name": "サタンカーメン8号",
     "type": ["悪魔"],
-    "image": "image/サタンカーメン8号.png"
+    "image": "img/enemies/サタンカーメン8号.png"
   },
   "E212": {
     "name": "ミッドナイトナカイ",
     "type": ["悪魔"],
-    "image": "image/ミッドナイトナカイ.png"
+    "image": "img/enemies/ミッドナイトナカイ.png"
   },
   "E213": {
     "name": "デビルカツヤ",
     "type": ["悪魔"],
-    "image": "image/デビルカツヤ.png"
+    "image": "img/enemies/デビルカツヤ.png"
   },
   "E214": {
     "name": "デスコアラッキョ",
     "type": ["悪魔"],
-    "image": "image/デスコアラッキョ.png"
+    "image": "img/enemies/デスコアラッキョ.png"
   },
   "E215": {
     "name": "レッド・エナG",
     "type": ["赤"],
-    "image": "image/レッド・エナG.png"
+    "image": "img/enemies/レッド・エナG.png"
   },
   "E216": {
     "name": "ヒュージゴマ",
     "type": ["赤","超生命体"],
-    "image": "image/ヒュージゴマ.png"
+    "image": "img/enemies/ヒュージゴマ.png"
   },
   "E217": {
     "name": "ジャイアント黒蔵",
     "type": ["黒","超生命体"],
-    "image": "image/ジャイアント黒蔵.png"
+    "image": "img/enemies/ジャイアント黒蔵.png"
   },
   "E218": {
     "name": "ギガガガ",
     "type": ["浮き","超生命体"],
-    "image": "image/ギガガガ.png"
+    "image": "img/enemies/ギガガガ.png"
   },
   "E219": {
     "name": "デッカーバチャン",
     "type": ["エイリアン","超生命体"],
-    "image": "image/デッカーバチャン.png"
+    "image": "img/enemies/デッカーバチャン.png"
   },
   "E220": {
     "name": "ビッグペンZ",
     "type": ["ゾンビ","超生命体"],
-    "image": "image/ビッグペンZ.png"
+    "image": "img/enemies/ビッグペンZ.png"
   },
   "E221": {
     "name": "大天使エクスエル",
     "type": ["天使","超生命体"],
-    "image": "image/大天使エクスエル.png"
+    "image": "img/enemies/大天使エクスエル.png"
   },
   "E222": {
     "name": "オーメンズ",
     "type": ["悪魔","超生命体"],
-    "image": "image/オーメンズ.png"
+    "image": "img/enemies/オーメンズ.png"
   },
   "E223": {
     "name": "大型土器ダイハニワン",
     "type": ["古代種","超生命体"],
-    "image": "image/大型土器ダイハニワン.png"
+    "image": "img/enemies/大型土器ダイハニワン.png"
   },
   "E224": {
     "name": "超古獣ナーラ",
     "type": ["古代種","超獣"],
-    "image": "image/超古獣ナーラ.png"
+    "image": "img/enemies/超古獣ナーラ.png"
   },
   "E225": {
     "name": "トロリンチョ",
     "type": ["ゾンビ"],
-    "image": "image/トロリンチョ.png"
+    "image": "img/enemies/トロリンチョ.png"
   },
   "E226": {
     "name": "野生のわんこ",
     "type": ["無属性","超獣"],
-    "image": "image/野生のわんこ.png"
+    "image": "img/enemies/野生のわんこ.png"
   },
   "E227": {
     "name": "超鳥獣アヒルジョー",
     "type": ["赤","超獣"],
-    "image": "image/超鳥獣アヒルジョー.png"
+    "image": "img/enemies/超鳥獣アヒルジョー.png"
   },
   "E228": {
     "name": "超竜獣オウルハズク",
     "type": ["浮き","超獣"],
-    "image": "image/超竜獣オウルハズク.png"
+    "image": "img/enemies/超竜獣オウルハズク.png"
   },
   "E229": {
     "name": "超甲獣シザーレックス",
     "type": ["エイリアン","超獣"],
-    "image": "image/超甲獣シザーレックス.png"
+    "image": "img/enemies/超甲獣シザーレックス.png"
   },
   "E230": {
     "name": "オオウサ銀",
     "type": ["赤","超生命体"],
-    "image": "image/オオウサ銀.png"
+    "image": "img/enemies/オオウサ銀.png"
   },
   "E231": {
     "name": "ちびわんこ",
     "type": ["無属性"],
-    "image": "image/ちびわんこ.png"
+    "image": "img/enemies/ちびわんこ.png"
   },
   "E232": {
     "name": "古兵器マンボロス",
     "type": ["浮き","古代種"],
-    "image": "image/古兵器マンボロス.png"
+    "image": "img/enemies/古兵器マンボロス.png"
   },
   "E233": {
     "name": "超棘獣ナマケモルガ",
     "type": ["悪魔","超獣"],
-    "image": "image/超棘獣ナマケモルガ.png"
+    "image": "img/enemies/超棘獣ナマケモルガ.png"
   },
   "E234": {
     "name": "超闇獣ダックジョー",
     "type": ["黒","超獣"],
-    "image": "image/超闇獣ダックジョー.png"
+    "image": "img/enemies/超闇獣ダックジョー.png"
   },
   "E235": {
     "name": "ハニワンワン",
     "type": ["古代種"],
-    "image": "image/ハニワンワン.png"
+    "image": "img/enemies/ハニワンワン.png"
   },
   "E236": {
     "name": "超天獣ラジャコング",
     "type": ["天使","超獣"],
-    "image": "image/超天獣ラジャコング.png"
+    "image": "img/enemies/超天獣ラジャコング.png"
   },
   "E237": {
     "name": "超爆獣アリアント",
     "type": ["ゾンビ","超獣"],
-    "image": "image/超爆獣アリアント.png"
+    "image": "img/enemies/超爆獣アリアント.png"
   },
   "E238": {
     "name": "大天使チビネル",
     "type": ["天使","超生命体"],
-    "image": "image/大天使チビネル.png"
+    "image": "img/enemies/大天使チビネル.png"
   },
   "E239": {
     "name": "超翼獣ピヨルーツ",
     "type": ["無属性","超獣"],
-    "image": "image/超翼獣ピヨルーツ.png"
+    "image": "img/enemies/超翼獣ピヨルーツ.png"
   },
   "E240": {
     "name": "超古獣マガモジョー",
     "type": ["古代種","超獣"],
-    "image": "image/超古獣マガモジョー.png"
+    "image": "img/enemies/超古獣マガモジョー.png"
   },
   "E241": {
     "name": "超猿獣ルーザ",
     "type": ["古代種","超獣"],
-    "image": "image/超猿獣ルーザ.png"
+    "image": "img/enemies/超猿獣ルーザ.png"
   },
   "E242": {
     "name": "超生命体ゼロルーザ",
     "type": ["古代種","超生命体"],
-    "image": "image/超生命体ゼロルーザ.png"
+    "image": "img/enemies/超生命体ゼロルーザ.png"
   },
   "E243": {
     "name": "メタフィリバスター",
     "type": ["浮き"],
-    "image": "image/メタフィリバスター.png"
+    "image": "img/enemies/メタフィリバスター.png"
   },
   "E244": {
     "name": "超舌獣ラングマスター",
     "type": ["悪魔","超獣"],
-    "image": "image/超舌獣ラングマスター.png"
+    "image": "img/enemies/超舌獣ラングマスター.png"
   },
   "E245": {
     "name": "デヴィル夫人",
     "type": ["悪魔"],
-    "image": "image/デヴィル夫人.png"
+    "image": "img/enemies/デヴィル夫人.png"
   },
   "E246": {
     "name": "ミニホワイトサイクロン",
     "type": ["浮き"],
-    "image": "image/ミニホワイトサイクロン.png"
+    "image": "img/enemies/ミニホワイトサイクロン.png"
   },
   "E247": {
     "name": "超炎獣テオニール",
     "type": ["赤","超獣"],
-    "image": "image/超炎獣テオニール.png"
+    "image": "img/enemies/超炎獣テオニール.png"
   },
   "E248": {
     "name": "超豚獣ピーギィ",
     "type": ["エイリアン","超獣"],
-    "image": "image/超豚獣ピーギィ.png"
+    "image": "img/enemies/超豚獣ピーギィ.png"
   },
   "E249": {
     "name": "超象獣パパオウ",
     "type": ["無属性","超獣"],
-    "image": "image/超象獣パパオウ.png"
+    "image": "img/enemies/超象獣パパオウ.png"
   },
   "E250": {
     "name": "大魔王ニャンダム",
     "type": ["悪魔"],
-    "image": "image/大魔王ニャンダム.png"
+    "image": "img/enemies/大魔王ニャンダム.png"
   },
   "E251": {
     "name": "大魔導士ミモーン",
     "type": ["無属性"],
-    "image": "image/大魔導士ミモーン.png"
+    "image": "img/enemies/大魔導士ミモーン.png"
   },
   "E252": {
     "name": "聖天ゴクラッコ",
     "type": ["天使"],
-    "image": "image/聖天ゴクラッコ.png"
+    "image": "img/enemies/聖天ゴクラッコ.png"
   },
   "E253": {
     "name": "超暴獣イビルージョン",
     "type": ["古代種","超獣"],
-    "image": "image/超暴獣イビルージョン.png"
+    "image": "img/enemies/超暴獣イビルージョン.png"
   },
   "E254": {
     "name": "超魚獣アンガブル",
     "type": ["浮き","ゾンビ","超獣"],
-    "image": "image/超魚獣アンガブル.png"
+    "image": "img/enemies/超魚獣アンガブル.png"
   },
   "E255": {
     "name": "川野かわわっぱ",
     "type": ["無属性"],
-    "image": "image/川野かわわっぱ.png"
+    "image": "img/enemies/川野かわわっぱ.png"
   },
   "E256": {
     "name": "メガメェメェ",
     "type": ["無属性","超生命体"],
-    "image": "image/メガメェメェ.png"
+    "image": "img/enemies/メガメェメェ.png"
   },
   "E257": {
     "name": "超牙獣クロコックス",
     "type": ["黒","超獣"],
-    "image": "image/超牙獣クロコックス.png"
+    "image": "img/enemies/超牙獣クロコックス.png"
   },
   "E258": {
     "name": "ミニエンジェルサイクロン",
     "type": ["天使"],
-    "image": "image/ミニエンジェルサイクロン.png"
+    "image": "img/enemies/ミニエンジェルサイクロン.png"
   },
   "E259": {
     "name": "超禍獣シングリオン",
     "type": ["浮き","超獣"],
-    "image": "image/超禍獣シングリオン.png"
+    "image": "img/enemies/超禍獣シングリオン.png"
   },
   "E260": {
     "name": "論の賢者ソラクティス",
     "type": ["浮き","超賢者"],
-    "image": "image/論の賢者ソラクティス.png"
+    "image": "img/enemies/論の賢者ソラクティス.png"
   },
   "E261": {
     "name": "名賢わんこ",
     "type": ["無属性","超賢者"],
-    "image": "image/名賢わんこ.png"
+    "image": "img/enemies/名賢わんこ.png"
   },
   "E262": {
     "name": "天使メガミエル",
     "type": ["天使","超賢者"],
-    "image": "image/天使メガミエル.png"
+    "image": "img/enemies/天使メガミエル.png"
   },
   "E263": {
     "name": "ドヴェルダーク",
     "type": ["黒","超賢者"],
-    "image": "image/ドヴェルダーク.png"
+    "image": "img/enemies/ドヴェルダーク.png"
   },
   "E264": {
     "name": "ドクターK.O.",
     "type": ["赤","超賢者"],
-    "image": "image/ドクターK.O..png"
+    "image": "img/enemies/ドクターK.O..png"
   },
   "E265": {
     "name": "テク・ノロ爺",
     "type": ["エイリアン","超賢者"],
-    "image": "image/テク・ノロ爺.png"
+    "image": "img/enemies/テク・ノロ爺.png"
   },
   "E266": {
     "name": "ツバサターン",
     "type": ["悪魔","超賢者"],
-    "image": "image/ツバサターン.png"
+    "image": "img/enemies/ツバサターン.png"
   },
   "E267": {
     "name": "ダ・チョー老",
     "type": ["ゾンビ","超賢者"],
-    "image": "image/ダ・チョー老.png"
+    "image": "img/enemies/ダ・チョー老.png"
   },
   "E268": {
     "name": "イディ:Ne",
     "type": ["古代種"],
-    "image": "image/イディ:Ne.png"
+    "image": "img/enemies/イディ:Ne.png"
   },
   "E269": {
     "name": "生命の賢者Dr.ノーヴァ",
     "type": ["古代種","超賢者"],
-    "image": "image/生命の賢者Dr.ノーヴァ.png"
+    "image": "img/enemies/生命の賢者Dr.ノーヴァ.png"
   },
   "E270": {
     "name": "ふくろう博士",
     "type": ["浮き","黒","超賢者"],
-    "image": "image/ふくろう博士.png"
+    "image": "img/enemies/ふくろう博士.png"
   },
   "E271": {
     "name": "超拳獣ブンナグリオス",
     "type": ["エイリアン","超獣"],
-    "image": "image/超拳獣ブンナグリオス.png"
+    "image": "img/enemies/超拳獣ブンナグリオス.png"
   },
   "E272": {
     "name": "シャチコ",
     "type": ["古代種","超賢者"],
-    "image": "image/シャチコ.png"
+    "image": "img/enemies/シャチコ.png"
   },
   "E273": {
     "name": "テッポー",
     "type": ["赤"],
-    "image": "image/テッポー.png"
+    "image": "img/enemies/テッポー.png"
   },
   "E274": {
     "name": "アンドロメ・ダ長官",
     "type": ["エイリアン"],
-    "image": "image/アンドロメ・ダ長官.png"
+    "image": "img/enemies/アンドロメ・ダ長官.png"
   },
   "E275": {
     "name": "理の賢者ニュトーン",
     "type": ["赤","超賢者"],
-    "image": "image/理の賢者ニュトーン.png"
+    "image": "img/enemies/理の賢者ニュトーン.png"
   },
   "E276": {
     "name": "エンジェ・ルース",
     "type": ["天使"],
-    "image": "image/エンジェ・ルース.png"
+    "image": "img/enemies/エンジェ・ルース.png"
   },
   "E277": {
     "name": "ジャンボーグ鈴木",
     "type": ["天使","超生命体"],
-    "image": "image/ジャンボーグ鈴木.png"
+    "image": "img/enemies/ジャンボーグ鈴木.png"
   },
   "E278": {
     "name": "ダッフンデッド",
     "type": ["ゾンビ"],
-    "image": "image/ダッフンデッド.png"
+    "image": "img/enemies/ダッフンデッド.png"
   },
   "E279": {
     "name": "クロマジロ",
     "type": ["黒"],
-    "image": "image/クロマジロ.png"
+    "image": "img/enemies/クロマジロ.png"
   },
   "E280": {
     "name": "アカンゾウ",
     "type": ["赤"],
-    "image": "image/アカンゾウ.png"
+    "image": "img/enemies/アカンゾウ.png"
   },
   "E281": {
     "name": "トリニティ",
     "type": ["赤","黒","悪魔"],
-    "image": "image/トリニティ.png"
+    "image": "img/enemies/トリニティ.png"
   },
   "E282": {
     "name": "淘の賢者ダーヴィン",
     "type": ["エイリアン","超賢者"],
-    "image": "image/淘の賢者ダーヴィン.png"
+    "image": "img/enemies/淘の賢者ダーヴィン.png"
   },
   "E283": {
     "name": "ゴーストわんこ",
     "type": ["浮き"],
-    "image": "image/ゴーストわんこ.png"
+    "image": "img/enemies/ゴーストわんこ.png"
   },
   "E284": {
     "name": "ゴーストにょろ",
     "type": ["浮き"],
-    "image": "image/ゴーストにょろ.png"
+    "image": "img/enemies/ゴーストにょろ.png"
   },
   "E285": {
     "name": "ゴーストメェメェ",
     "type": ["浮き"],
-    "image": "image/ゴーストメェメェ.png"
+    "image": "img/enemies/ゴーストメェメェ.png"
   },
   "E286": {
     "name": "パオンモス",
     "type": ["無属性"],
-    "image": "image/パオンモス.png"
+    "image": "img/enemies/パオンモス.png"
   },
   "E287": {
     "name": "純金倶楽部",
     "type": ["メタル"],
-    "image": "image/純金倶楽部.png"
+    "image": "img/enemies/純金倶楽部.png"
   },
   "E288": {
     "name": "パワハラッコ部長",
     "type": ["赤"],
-    "image": "image/パワハラッコ部長.png"
+    "image": "img/enemies/パワハラッコ部長.png"
   },
   "E289": {
     "name": "レインボークマトーク",
     "type": ["赤","浮き","黒","天使","エイリアン","ゾンビ"],
-    "image": "image/レインボークマトーク.png"
+    "image": "img/enemies/レインボークマトーク.png"
   },
   "E290": {
     "name": "柏餅2.0",
     "type": ["メタル"],
-    "image": "image/柏餅2.0.png"
+    "image": "img/enemies/柏餅2.0.png"
   },
   "E291": {
     "name": "わんこ城",
     "type": ["城"],
-    "image": "image/わんこ城.png"
+    "image": "img/enemies/わんこ城.png"
   },
   "E292": {
     "name": "呪いのわんこ城",
     "type": ["城"],
-    "image": "image/呪いのわんこ城.png"
+    "image": "img/enemies/呪いのわんこ城.png"
   },
   "E293": {
     "name": "烈波城",
     "type": ["城"],
-    "image": "image/烈波城.png"
+    "image": "img/enemies/烈波城.png"
   },
   "E294": {
     "name": "悪魔城",
     "type": ["城"],
-    "image": "image/悪魔城.png"
+    "image": "img/enemies/悪魔城.png"
   },
   "E295": {
     "name": "起源の覚醒の城",
     "type": ["城"],
-    "image": "image/起源の覚醒の城.png"
+    "image": "img/enemies/起源の覚醒の城.png"
   }
 }
