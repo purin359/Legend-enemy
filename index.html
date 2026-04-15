@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 <style>
 body { font-family: sans-serif; padding:20px; }
 select, button { margin-right:10px; }
@@ -148,11 +148,13 @@ function toggleSort() {
 
 function goDetail(name) {
   const mode = document.getElementById("mode").value;
-  location.href =
-    "detail.html?name=" + encodeURIComponent(name) +
-    "&mode=" + mode;
-}
 
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("name", name);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
+}
 init();
 </script>
 </body>
