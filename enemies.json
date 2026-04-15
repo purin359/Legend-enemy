@@ -107,7 +107,7 @@
   "E021": {
     "name": "悪の帝王 ニャンダム",
     "type": ["赤"],
-    "image": "image/悪の帝王 ニャンダム.png"
+    "image": "image/悪の帝王ニャンダム.png"
   },
   "E022": {
     "name": "ぶんぶん先生",
@@ -362,7 +362,7 @@
   "E072": {
     "name": "松 黒蔵",
     "type": ["黒"],
-    "image": "image/松 黒蔵.png"
+    "image": "image/松黒蔵.png"
   },
   "E073": {
     "name": "コニャンダム",
@@ -642,7 +642,7 @@
   "E128": {
     "name": "犬武者 武蔵",
     "type": ["ゾンビ"],
-    "image": "image/犬武者 武蔵.png"
+    "image": "image/犬武者武蔵.png"
   },
   "E129": {
     "name": "亡者デブウ",
@@ -787,7 +787,7 @@
   "E157": {
     "name": "神さま（本気）",
     "type": ["無属性"],
-    "image": "image/神さま（本気）.png"
+    "image": "image/神さま(本気).png"
   },
   "E158": {
     "name": "古我王",
@@ -947,7 +947,7 @@
   "E189": {
     "name": "イディ:Re",
     "type": ["古代種"],
-    "image": "image/イディ:Re.png"
+    "image": "image/イディRe.png"
   },
   "E190": {
     "name": "テバムラサキホネツバメ",
@@ -1342,7 +1342,7 @@
   "E268": {
     "name": "イディ:Ne",
     "type": ["古代種"],
-    "image": "image/イディ:Ne.png"
+    "image": "image/イディNe.png"
   },
   "E269": {
     "name": "生命の賢者Dr.ノーヴァ",
