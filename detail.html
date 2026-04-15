@@ -1,3 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>敵詳細</title>
+
+<style>
+body { font-family: sans-serif; padding:20px; }
+
+li { margin-bottom:15px; }
+
+.stageTitle {
+  font-weight: bold;
+  margin-bottom:5px;
+}
+
+.imgWrap img {
+  width:40px;
+  margin-right:5px;
+}
+
+.highlight {
+  border:2px solid red;
+}
+</style>
+</head>
+<body>
+
+<h2 id="title"></h2>
+
+<ul id="list"></ul>
+
 <script>
 async function load() {
   const params = new URLSearchParams(location.search);
@@ -6,7 +38,6 @@ async function load() {
   document.getElementById("title").textContent = name;
 
   const stagesData = await fetch("stages.json").then(r=>r.json());
-
   const ul = document.getElementById("list");
 
   stagesData.forEach(ch => {
@@ -18,11 +49,13 @@ async function load() {
 
         // ステージ名
         const title = document.createElement("div");
+        title.className = "stageTitle";
         title.textContent =
           `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`;
 
         // 敵画像エリア
         const imgWrap = document.createElement("div");
+        imgWrap.className = "imgWrap";
 
         st.enemies.forEach(enemyName => {
           const safeName = enemyName
@@ -31,8 +64,17 @@ async function load() {
 
           const img = document.createElement("img");
           img.src = "image/" + encodeURIComponent(safeName) + ".png";
-          img.style.width = "40px";
-          img.style.marginRight = "5px";
+
+          // 画像ない場合
+          img.onerror = () => img.src = "image/noimage.png";
+
+          // ホバーで名前
+          img.title = enemyName;
+
+          // 選択された敵を強調
+          if (enemyName === name) {
+            img.classList.add("highlight");
+          }
 
           imgWrap.appendChild(img);
         });
@@ -49,3 +91,6 @@ async function load() {
 
 load();
 </script>
+
+</body>
+</html>
