@@ -90,7 +90,7 @@ function load() {
   tbody.innerHTML = "";
 
   list.forEach(e => {
-   const imgPath = enemiesData[id].image;
+   const imgPath = enemiesData[id]?.image || "image/enemies/" + e.name + ".png";
 
     const tr = document.createElement("tr");
 
