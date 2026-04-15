@@ -24,7 +24,7 @@ th { cursor:pointer; }
   <option value="ND">レジェンド0</option>
 </select>
 
-<button onclick="toggleSort()">並び替え切替</button>
+<button onclick="toggleSort()">並び順切替</button>
 
 <table>
 <thead>
@@ -42,6 +42,13 @@ th { cursor:pointer; }
 let enemiesData = {};
 let stagesData = [];
 let desc = true;
+
+  function normalize(str) {
+  return str
+    .replace(/\r?\n/g, "")
+    .replace(/[ 　]+/g, "") // ← 半角＆全角スペース削除
+    .trim();
+}
 
 async function init() {
   enemiesData = await fetch("enemies.json").then(r=>r.json());
@@ -65,7 +72,7 @@ function load() {
   if (!isTarget) return;
 
   ch.stages.forEach(st => {
-    st.enemies.forEach(name => {
+    if (st.enemies.map(normalize).includes(normalize(name))) {
       if (!map[name]) {
         map[name] = {
           count: 0,
