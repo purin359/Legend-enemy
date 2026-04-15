@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 <style>
 body { font-family: sans-serif; padding:20px; }
 select, button { margin-right:10px; }
@@ -90,7 +90,7 @@ function load() {
   tbody.innerHTML = "";
 
   list.forEach(e => {
-    const imgPath = "img/enemies/" + e.name + ".png";
+   const imgPath = enemiesData[id].image;
 
     const tr = document.createElement("tr");
 
