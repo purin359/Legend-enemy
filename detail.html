@@ -2,19 +2,30 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細２</title>
+<title>敵詳細</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
 
-li { margin-bottom:15px; }
+ul { list-style:none; padding-left:0; }
 
-.stageTitle {
-  font-weight: bold;
-  margin-bottom:5px;
+.stageTable {
+  width:100%;
+  border-collapse: collapse;
+  margin-bottom:15px;
 }
 
-.imgWrap img {
+.stageTable th, .stageTable td {
+  border:1px solid #ccc;
+  padding:8px;
+}
+
+.stageTable th {
+  width:120px;
+  background:#f0f0f0;
+}
+
+img {
   width:40px;
   margin-right:5px;
 }
@@ -22,46 +33,23 @@ li { margin-bottom:15px; }
 .highlight {
   border:2px solid red;
 }
-
-  .stageTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 15px;
-}
-
-.stageTable th,
-.stageTable td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
-
-.stageTable th {
-  width: 120px;
-  background: #f0f0f0;
-  text-align: left;
-}
-
-.enemyImg {
-  width: 40px;
-  margin-right: 5px;
-}
-  
-  ul {
-  list-style: none;
-  padding-left: 0;
-}
-  
 </style>
 </head>
 <body>
 
 <h2 id="title"></h2>
-
-  <p id="count"></p>
+<p id="count"></p>
 
 <ul id="list"></ul>
 
 <script>
+function normalize(str) {
+  return str
+    .replace(/\r?\n/g, "")
+    .replace(/[ 　]+/g, "")
+    .trim();
+}
+
 async function load() {
   const params = new URLSearchParams(location.search);
   const name = params.get("name");
@@ -76,75 +64,71 @@ async function load() {
 
   stagesData.forEach(ch => {
 
-  const isTarget =
-    (mode === "N"  && /^N\d/.test(ch.chapterId)) ||
-    (mode === "NA" && ch.chapterId.startsWith("NA")) ||
-    (mode === "ND" && ch.chapterId.startsWith("ND"));
+    const isTarget =
+      (mode === "N"  && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND")) ||
+      (mode === "NA" && ch.chapterId.startsWith("NA")) ||
+      (mode === "ND" && ch.chapterId.startsWith("ND"));
 
-  if (!isTarget) return;
-    
+    if (!isTarget) return;
+
     ch.stages.forEach(st => {
 
-      if (st.enemies.includes(name)) {
-  total++;
+      if (st.enemies.map(normalize).includes(normalize(name))) {
+
+        total++;
 
         const li = document.createElement("li");
 
-const table = document.createElement("table");
-table.className = "stageTable";
+        const table = document.createElement("table");
+        table.className = "stageTable";
 
-// --- ステージ行 ---
-const tr1 = document.createElement("tr");
+        // ステージ
+        const tr1 = document.createElement("tr");
+        tr1.innerHTML = `
+          <th>ステージ</th>
+          <td>${ch.chapterName}-${st.stageName}</td>
+        `;
 
-const th1 = document.createElement("th");
-th1.textContent = "ステージ";
+        // 敵
+        const tr2 = document.createElement("tr");
+        const th = document.createElement("th");
+        th.textContent = "出現する敵";
 
-const td1 = document.createElement("td");
-td1.textContent =
-  `${ch.chapterName}-${st.stageName}`;
+        const td = document.createElement("td");
 
-tr1.appendChild(th1);
-tr1.appendChild(td1);
+        st.enemies.forEach(enemyName => {
 
-// --- 敵行 ---
-const tr2 = document.createElement("tr");
+          const safeName = enemyName
+            .replace(/\r?\n/g, "")
+            .trim();
 
-const th2 = document.createElement("th");
-th2.textContent = "出現する敵";
+          const img = document.createElement("img");
+          img.src = "image/" + encodeURIComponent(safeName) + ".png";
+          img.onerror = () => img.src = "image/noimage.png";
 
-const td2 = document.createElement("td");
+          if (normalize(enemyName) === normalize(name)) {
+            img.classList.add("highlight");
+          }
 
-st.enemies.forEach(enemyName => {
-  const safeName = enemyName
-    .replace(/\r?\n/g, "")
-    .trim();
+          td.appendChild(img);
+        });
 
-  const img = document.createElement("img");
-  img.src = "image/" + encodeURIComponent(safeName) + ".png";
-  img.className = "enemyImg";
+        tr2.appendChild(th);
+        tr2.appendChild(td);
 
-  img.onerror = () => img.src = "image/noimage.png";
-  img.title = enemyName;
+        table.appendChild(tr1);
+        table.appendChild(tr2);
 
-  td2.appendChild(img);
-});
-
-tr2.appendChild(th2);
-tr2.appendChild(td2);
-
-// --- まとめ ---
-table.appendChild(tr1);
-table.appendChild(tr2);
-
-li.appendChild(table);
-ul.appendChild(li);
+        li.appendChild(table);
+        ul.appendChild(li);
       }
 
     });
+
   });
 
   document.getElementById("count").textContent =
-  total === 0 ? "見つかりませんでした" : total + "件見つかりました";
+    total === 0 ? "見つかりませんでした" : total + "件見つかりました";
 }
 
 load();
