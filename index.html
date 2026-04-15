@@ -2,10 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧１</title>
+<title>敵出現一覧</title>
+
 <style>
 body { font-family: sans-serif; padding:20px; }
-select, button { margin-right:10px; }
 
 table { border-collapse: collapse; width:100%; }
 th, td { border:1px solid #ccc; padding:5px; }
@@ -39,106 +39,94 @@ th { cursor:pointer; }
 </table>
 
 <script>
-let enemiesData = {};
 let stagesData = [];
 let desc = true;
 
-  function normalize(str) {
+// 比較専用（スペース無視）
+function normalize(str) {
   return str
     .replace(/\r?\n/g, "")
-    .replace(/[ 　]+/g, "") // 比較用だけ
+    .replace(/[ 　]+/g, "")
     .trim();
 }
-async function init() {
-  enemiesData = await fetch("enemies.json").then(r=>r.json());
-  stagesData = await fetch("stages.json").then(r=>r.json());
 
+async function init() {
+  stagesData = await fetch("stages.json").then(r=>r.json());
   load();
 }
 
 function load() {
   const mode = document.getElementById("mode").value;
-
   const map = {};
 
   stagesData.forEach(ch => {
 
-  const isTarget =
-    (mode === "N"  && /^N\d/.test(ch.chapterId)) ||
-    (mode === "NA" && ch.chapterId.startsWith("NA")) ||
-    (mode === "ND" && ch.chapterId.startsWith("ND"));
+    const isTarget =
+      (mode === "N"  && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND")) ||
+      (mode === "NA" && ch.chapterId.startsWith("NA")) ||
+      (mode === "ND" && ch.chapterId.startsWith("ND"));
 
-  if (!isTarget) return;
+    if (!isTarget) return;
 
-  ch.stages.forEach(st => {
-  st.enemies.forEach(enemyName => {
+    ch.stages.forEach(st => {
+      st.enemies.forEach(enemyName => {
 
-    const key = normalize(enemyName);
+        const key = normalize(enemyName);
 
-    const displayName = enemyName
-      .replace(/\r?\n/g, "")
-      .trim(); // ← スペース消さない！！
+        const displayName = enemyName
+          .replace(/\r?\n/g, "")
+          .trim();
 
-    if (!map[key]) {
-      map[key] = {
-        name: displayName,
-        count: 0,
-        first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
-      };
-    }
+        if (!map[key]) {
+          map[key] = {
+            name: displayName,
+            count: 0,
+            first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+          };
+        }
 
-    map[key].count++;
+        map[key].count++;
+      });
+    });
+
   });
-});
 
-});
-  
-  let list = Object.keys(map).map(key => ({
-  name: map[key].name,
-  count: map[key].count,
-  first: map[key].first
-}));
+  let list = Object.values(map);
 
   list.sort((a,b)=> desc ? b.count-a.count : a.count-b.count);
 
   const tbody = document.getElementById("table");
   tbody.innerHTML = "";
 
- list.forEach(e => {
+  list.forEach(e => {
 
-  const base = e.name
-    .replace(/\r?\n/g, "")
-    .trim();
+    const safeName = e.name
+      .replace(/\r?\n/g, "")
+      .trim();
 
-  // すべてのスペースを統一（半角1個）
-  const normalizedSpace = base.replace(/[ 　\u00A0]+/g, " ");
+    const img = document.createElement("img");
 
-  const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(safeName) + ".png";
 
-  img.src = "image/" + encodeURIComponent(normalizedSpace) + ".png";
+    // 画像エラー対策
+    img.onerror = () => img.src = "image/noimage.png";
 
-  // フォールバック①：スペース削除
-  img.onerror = () => {
-    img.onerror = () => {
-      // フォールバック②：そのまま（最終）
-      img.src = "image/" + encodeURIComponent(base) + ".png";
-    };
-    img.src = "image/" + encodeURIComponent(normalizedSpace.replace(/ /g, "")) + ".png";
-  };
+    img.onclick = () => goDetail(e.name);
 
-  const tr = document.createElement("tr");
+    const tr = document.createElement("tr");
 
-  tr.innerHTML = `
-    <td></td>
-    <td>${e.name}</td>
-    <td>${e.count}</td>
-    <td>${e.first}</td>
-  `;
+    const tdImg = document.createElement("td");
+    tdImg.appendChild(img);
 
-  tr.children[0].appendChild(img);
+    tr.appendChild(tdImg);
+    tr.innerHTML += `
+      <td>${e.name}</td>
+      <td>${e.count}</td>
+      <td>${e.first}</td>
+    `;
 
-  tbody.appendChild(tr);
-});
+    tbody.appendChild(tr);
+  });
 }
 
 function toggleSort() {
@@ -155,7 +143,9 @@ function goDetail(name) {
 
   location.href = url.toString();
 }
+
 init();
 </script>
+
 </body>
 </html>
