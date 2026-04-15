@@ -116,7 +116,10 @@ function toggleSort() {
 }
 
 function goDetail(name) {
-  location.href = "detail.html?name=" + encodeURIComponent(name);
+  const mode = document.getElementById("mode").value;
+  location.href =
+    "detail.html?name=" + encodeURIComponent(name) +
+    "&mode=" + mode;
 }
 
 init();
