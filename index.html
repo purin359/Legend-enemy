@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 <style>
 body { font-family: sans-serif; padding:20px; }
 select, button { margin-right:10px; }
@@ -106,23 +106,39 @@ function load() {
 
  list.forEach(e => {
 
-  const safeName = e.name
-  .replace(/\r?\n/g, "")
-  .trim();
+  const base = e.name
+    .replace(/\r?\n/g, "")
+    .trim();
 
-const imgPath = "image/" + encodeURIComponent(safeName) + ".png";
+  // すべてのスペースを統一（半角1個）
+  const normalizedSpace = base.replace(/[ 　\u00A0]+/g, " ");
 
-    const tr = document.createElement("tr");
+  const img = document.createElement("img");
 
-    tr.innerHTML = `
-      <td><img src="${imgPath}" onclick="goDetail('${e.name}')"></td>
-      <td>${e.name}</td>
-      <td>${e.count}</td>
-      <td>${e.first}</td>
-    `;
+  img.src = "image/" + encodeURIComponent(normalizedSpace) + ".png";
 
-    tbody.appendChild(tr);
-  });
+  // フォールバック①：スペース削除
+  img.onerror = () => {
+    img.onerror = () => {
+      // フォールバック②：そのまま（最終）
+      img.src = "image/" + encodeURIComponent(base) + ".png";
+    };
+    img.src = "image/" + encodeURIComponent(normalizedSpace.replace(/ /g, "")) + ".png";
+  };
+
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+    <td></td>
+    <td>${e.name}</td>
+    <td>${e.count}</td>
+    <td>${e.first}</td>
+  `;
+
+  tr.children[0].appendChild(img);
+
+  tbody.appendChild(tr);
+});
 }
 
 function toggleSort() {
