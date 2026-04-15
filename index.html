@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 <style>
 body { font-family: sans-serif; padding:20px; }
 select, button { margin-right:10px; }
@@ -46,10 +46,9 @@ let desc = true;
   function normalize(str) {
   return str
     .replace(/\r?\n/g, "")
-    .replace(/[ 　]+/g, "") // ← 半角＆全角スペース削除
+    .replace(/[ 　]+/g, "") // 比較用だけ
     .trim();
 }
-
 async function init() {
   enemiesData = await fetch("enemies.json").then(r=>r.json());
   stagesData = await fetch("stages.json").then(r=>r.json());
@@ -76,11 +75,9 @@ function load() {
 
     const key = normalize(enemyName);
 
-    // 表示用（スペース統一：半角1個にする）
     const displayName = enemyName
       .replace(/\r?\n/g, "")
-      .replace(/[ 　]+/g, " ")
-      .trim();
+      .trim(); // ← スペース消さない！！
 
     if (!map[key]) {
       map[key] = {
