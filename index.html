@@ -72,24 +72,29 @@ function load() {
   if (!isTarget) return;
 
   ch.stages.forEach(st => {
-    if (st.enemies.map(normalize).includes(normalize(name))) {
-      if (!map[name]) {
-        map[name] = {
-          count: 0,
-          first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
-        };
-      }
-      map[name].count++;
-    });
+  st.enemies.forEach(enemyName => {
+
+    const key = normalize(enemyName);
+
+    if (!map[key]) {
+      map[key] = {
+        name: enemyName.trim(), // 表示用（スペース残す）
+        count: 0,
+        first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+      };
+    }
+
+    map[key].count++;
   });
+});
 
 });
   
-  let list = Object.keys(map).map(name => ({
-    name,
-    count: map[name].count,
-    first: map[name].first
-  }));
+  let list = Object.keys(map).map(key => ({
+  name: map[key].name,
+  count: map[key].count,
+  first: map[key].first
+}));
 
   list.sort((a,b)=> desc ? b.count-a.count : a.count-b.count);
 
