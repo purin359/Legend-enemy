@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧１</title>
+<title>敵出現一覧</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -118,9 +118,8 @@ function load() {
 
 // ▼画像用
 const fileName = baseName
-  .replace(/[ 　]+/g, "")   // スペース削除
-  .replace(/:/g, " ");      // : → 半角スペース
-
+  .replace(/[：:]/g, " ")   // ← ★ここ重要（全角＋半角対応）
+  .replace(/[ 　]+/g, "");  // スペース削除
 const img = document.createElement("img");
 img.src = "image/" + encodeURIComponent(fileName) + ".png";
 
