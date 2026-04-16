@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -53,6 +53,7 @@ function normalize(str) {
   async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
   load();
+    addExtraEnemies(map, mode);
 }
 
 function load() {
@@ -89,6 +90,31 @@ function load() {
         map[key].count++;
       });
     });
+
+    function addExtraEnemies(map, mode) {
+
+  const extra = {
+    "N": ["E026"],
+    "NA": ["E068","E069"]
+  };
+
+  if (!extra[mode]) return;
+
+  extra[mode].forEach(id => {
+    const enemy = enemiesData[id];
+    if (!enemy) return;
+
+    const key = normalize(enemy.name);
+
+    if (!map[key]) {
+      map[key] = {
+        name: enemy.name,
+        count: 0,
+        first: "-"
+      };
+    }
+  });
+}
 
   });
 
