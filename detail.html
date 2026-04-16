@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細</title>
+<title>敵詳細１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -65,6 +65,8 @@ async function load() {
   stagesData.forEach(ch => {
 
     const isTarget =
+  (mode === "ALL") ||
+
   (mode === "N" && (
     (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
     || ch.chapterId === "E026"
@@ -77,6 +79,7 @@ async function load() {
   )) ||
 
   (mode === "ND" && ch.chapterId.startsWith("ND"));
+    
     if (!isTarget) return;
 
     ch.stages.forEach(st => {
