@@ -59,6 +59,13 @@ async function init() {
   enemiesData = await fetch("enemies.json").then(r=>r.json());
   stagesData = await fetch("stages.json").then(r=>r.json());
 
+  // ▼ mode復元
+  const params = new URLSearchParams(location.search);
+  const mode = params.get("mode");
+  if (mode) {
+    document.getElementById("mode").value = mode;
+  }
+
   // 順番記録
   let i = 0;
   for (let key in enemiesData) {
@@ -66,9 +73,9 @@ async function init() {
   }
 
   changeSort();
-  load();
+  load()
 }
-
+  
 // 比較専用（スペース無視）
 function normalize(str) {
   return str
