@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細１</title>
+<title>敵詳細</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -105,6 +105,9 @@ async function load() {
         const td = document.createElement("td");
 
         st.enemies.forEach(enemyName => {
+
+  // ▼ カンバン娘は画像表示しない
+  if (normalize(enemyName) === normalize("カンバン娘")) return;
 
   const baseName = enemyName
     .replace(/\r?\n/g, "")
