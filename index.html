@@ -25,13 +25,15 @@ th { cursor:pointer; }
   <option value="ND" selected>レジェンド0</option>
 </select>
 
-<button onclick="setAsc()">昇順</button>
-<button onclick="setDesc()">降順</button>
-
 <select id="sort" onchange="changeSort()">
-  <option value="count" selected>登場回数順</option>
+  <option value="count">登場回数</option>
   <option value="first">初出ステージ順</option>
   <option value="order">図鑑順</option>
+</select>
+
+<select id="order" onchange="changeOrder()">
+  <option value="desc">降順</option>
+  <option value="asc">昇順</option>
 </select>
 
 <table>
@@ -120,6 +122,7 @@ function load() {
       });
     });
 
+    changeSort();
   });
 
 let list = Object.values(map).map(e => {
@@ -232,6 +235,17 @@ function goDetail(name) {
 
   function changeSort() {
   sortMode = document.getElementById("sort").value;
+
+  // ▼ 回数以外は昇降非表示
+  const order = document.getElementById("order");
+  order.style.display = (sortMode === "count") ? "inline-block" : "none";
+
+  load();
+}
+
+function changeOrder() {
+  const val = document.getElementById("order").value;
+  desc = (val === "desc");
   load();
 }
 
