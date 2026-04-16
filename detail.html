@@ -93,16 +93,17 @@ async function load() {
         const table = document.createElement("table");
 table.className = "stageTable";
 
-// ▼ モードごとに色変更
-if (mode === "NA") {
-  table.style.backgroundColor = "#ccff99";
-  table.style.border = "2px solid #99cc66";
-}
+// ▼ ALLモードのときだけ色分け
+if (mode === "ALL") {
 
-if (mode === "ND") {
-  table.style.backgroundColor = "#001f3f";
-  table.style.color = "white";
-  table.style.border = "2px solid #003366";
+  if (ch.chapterId.startsWith("NA") || ch.chapterId === "E068" || ch.chapterId === "E069") {
+    table.style.backgroundColor = "#ccff99"; // 真レジェンド（黄緑）
+  }
+
+  else if (ch.chapterId.startsWith("ND")) {
+    table.style.backgroundColor = "#001f3f"; // レジェンド0（紺）
+    table.style.color = "white";
+  }
 }
 
         // ステージ
