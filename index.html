@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -112,13 +112,19 @@ function load() {
 
   list.forEach(e => {
 
-  const safeName = e.name
-    .replace(/\r?\n/g, "")
-    .trim();
+  const baseName = e.name
+  .replace(/\r?\n/g, "")
+  .trim();
 
-  const img = document.createElement("img");
-  img.src = "image/" + encodeURIComponent(safeName) + ".png";
-  img.onerror = () => img.src = "image/noimage.png";
+// ▼画像用
+const fileName = baseName
+  .replace(/[ 　]+/g, "")   // スペース削除
+  .replace(/:/g, " ");      // : → 半角スペース
+
+const img = document.createElement("img");
+img.src = "image/" + encodeURIComponent(fileName) + ".png";
+
+img.onerror = () => img.src = "image/noimage.png";
 
   // ★ここ重要（確実に動くクリック）
   img.addEventListener("click", () => {
@@ -168,20 +174,6 @@ function goDetail(name) {
 
   location.href = url.toString();
 }
-
-  const baseName = e.name
-  .replace(/\r?\n/g, "")
-  .trim();
-
-// ▼画像用（スペース削除＋記号統一）
-const fileName = baseName
-  .replace(/[ 　]+/g, "")   // スペース削除
-  .replace(/:/g, " ");      // : → 半角スペース
-
-const img = document.createElement("img");
-img.src = "image/" + encodeURIComponent(fileName) + ".png";
-
-img.onerror = () => img.src = "image/noimage.png";
 
 init();
 </script>
