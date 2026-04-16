@@ -73,13 +73,11 @@ function load() {
 
         const key = normalize(enemyName);
 
-        const displayName = enemyName
-          .replace(/\r?\n/g, "")
-          .trim();
+        const displayName = enemyName;
 
         if (!map[key]) {
           map[key] = {
-            name: displayName,
+            name: enemyName,
             count: 0,
             first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
           };
