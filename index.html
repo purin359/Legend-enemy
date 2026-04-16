@@ -59,13 +59,6 @@ async function init() {
   enemiesData = await fetch("enemies.json").then(r=>r.json());
   stagesData = await fetch("stages.json").then(r=>r.json());
 
-  // ▼ mode復元
-  const params = new URLSearchParams(location.search);
-  const mode = params.get("mode");
-  if (mode) {
-    document.getElementById("mode").value = mode;
-  }
-
   // 順番記録
   let i = 0;
   for (let key in enemiesData) {
