@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細</title>
+<title>敵詳細１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -106,23 +106,21 @@ async function load() {
 
         st.enemies.forEach(enemyName => {
 
-          const baseName = e.name
-  .replace(/\r?\n/g, "")
-  .trim();
+  const baseName = enemyName
+    .replace(/\r?\n/g, "")
+    .trim();
 
-// ▼画像用
-const fileName = baseName
-  .replace(/[ 　]+/g, "")   // スペース削除
-  .replace(/:/g, " ");      // : → 半角スペース
+  const fileName = baseName
+    .replace(/[：:]/g, "")
+    .replace(/[ 　]+/g, "");
 
-const img = document.createElement("img");
-img.src = "image/" + encodeURIComponent(fileName) + ".png";
+  const img = document.createElement("img");
+  img.src = "image/" + encodeURIComponent(fileName) + ".png";
+  img.onerror = () => img.src = "image/noimage.png";
 
-img.onerror = () => img.src = "image/noimage.png";
-
-          td.appendChild(img);
-        });
-
+  td.appendChild(img);
+});
+        
         tr2.appendChild(th);
         tr2.appendChild(td);
 
