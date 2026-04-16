@@ -41,6 +41,7 @@ th { cursor:pointer; }
 <script>
 let stagesData = [];
 let desc = true;
+let enemiesData = {};
 
 // 比較専用（スペース無視）
 function normalize(str) {
@@ -50,9 +51,22 @@ function normalize(str) {
     .trim();
 }
 
-async function init() {
+  async function init() {
+  enemiesData = await fetch("enemies.json").then(r=>r.json());
   stagesData = await fetch("stages.json").then(r=>r.json());
   load();
+}
+
+  function getEnemyName(enemyName) {
+  const key = normalize(enemyName);
+
+  for (const id in enemiesData) {
+    if (normalize(enemiesData[id].name) === key) {
+      return enemiesData[id].name; // ← 正式名称
+    }
+  }
+
+  return enemyName; // 見つからなければそのまま
 }
 
 function load() {
@@ -80,7 +94,7 @@ function load() {
 
         if (!map[key]) {
           map[key] = {
-            name: displayName,
+            name: getEnemyName(enemyName),
             count: 0,
             first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
           };
