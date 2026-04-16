@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧１</title>
+<title>敵出現一覧</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -27,6 +27,10 @@ th { cursor:pointer; }
 
 <button onclick="toggleSort()">並び順切替</button>
 
+<button onclick="toggleSort()">回数昇降切替</button>
+<button onclick="setSort('first')">初出順</button>
+<button onclick="setSort('order')">図鑑順</button>
+
 <table>
 <thead>
 <tr>
@@ -43,10 +47,19 @@ th { cursor:pointer; }
 let stagesData = [];
 let desc = true;
 let enemiesData = {};
+let sortMode = "count";
+let orderMap = {};
 
 async function init() {
   enemiesData = await fetch("enemies.json").then(r=>r.json());
   stagesData = await fetch("stages.json").then(r=>r.json());
+
+  // 順番記録
+  let i = 0;
+  for (let key in enemiesData) {
+    orderMap[enemiesData[key].name] = i++;
+  }
+
   load();
 }
 
@@ -106,9 +119,46 @@ function load() {
 
   });
 
-  let list = Object.values(map);
+let list = Object.values(map).map(e => {
 
-  list.sort((a,b)=> desc ? b.count-a.count : a.count-b.count);
+  // "N000-0" → 数値化
+  const match = e.first.match(/([A-Z]+)(\d+)-(\d+)/);
+
+  let firstNum = 999999;
+
+  if (match) {
+    const prefix = match[1];
+    const chap = parseInt(match[2]);
+    const stage = parseInt(match[3]);
+
+    // 種類ごとに重み
+    const base =
+      prefix === "N"  ? 0 :
+      prefix === "NA" ? 100000 :
+      prefix === "ND" ? 200000 :
+      prefix === "E"  ? 300000 : 400000;
+
+    firstNum = base + chap * 100 + stage;
+  }
+
+  return { ...e, firstNum };
+});
+  
+  list.sort((a, b) => {
+
+  if (sortMode === "count") {
+    return desc ? b.count - a.count : a.count - b.count;
+  }
+
+  if (sortMode === "first") {
+    return a.firstNum - b.firstNum;
+  }
+
+  if (sortMode === "order") {
+    return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
+  }
+
+});
 
   const tbody = document.getElementById("table");
   tbody.innerHTML = "";
@@ -175,6 +225,11 @@ function goDetail(name) {
   url.searchParams.set("mode", mode);
 
   location.href = url.toString();
+}
+
+  function setSort(mode) {
+  sortMode = mode;
+  load();
 }
 
 init();
