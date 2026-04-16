@@ -25,11 +25,14 @@ th { cursor:pointer; }
   <option value="ND" selected>レジェンド0</option>
 </select>
 
-<button onclick="toggleSort()">並び順切替</button>
+<button onclick="setAsc()">昇順</button>
+<button onclick="setDesc()">降順</button>
 
-<button onclick="toggleSort()">回数昇降切替</button>
-<button onclick="setSort('first')">初出順</button>
-<button onclick="setSort('order')">図鑑順</button>
+<select id="sort" onchange="changeSort()">
+  <option value="count" selected>登場回数順</option>
+  <option value="first">初出ステージ順</option>
+  <option value="order">図鑑順</option>
+</select>
 
 <table>
 <thead>
@@ -144,14 +147,14 @@ let list = Object.values(map).map(e => {
   return { ...e, firstNum };
 });
   
-  list.sort((a, b) => {
+ list.sort((a, b) => {
 
   if (sortMode === "count") {
     return desc ? b.count - a.count : a.count - b.count;
   }
 
   if (sortMode === "first") {
-    return a.firstNum - b.firstNum;
+    return a.firstNum - b.firstNum; // 固定（昇順のみ）
   }
 
   if (sortMode === "order") {
@@ -227,8 +230,18 @@ function goDetail(name) {
   location.href = url.toString();
 }
 
-  function setSort(mode) {
-  sortMode = mode;
+  function changeSort() {
+  sortMode = document.getElementById("sort").value;
+  load();
+}
+
+  function setAsc() {
+  desc = false;
+  load();
+}
+
+function setDesc() {
+  desc = true;
   load();
 }
 
