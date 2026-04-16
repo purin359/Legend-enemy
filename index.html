@@ -65,6 +65,7 @@ async function init() {
     orderMap[enemiesData[key].name] = i++;
   }
 
+  changeSort();
   load();
 }
 
@@ -122,7 +123,6 @@ function load() {
       });
     });
 
-    changeSort();
   });
 
 let list = Object.values(map).map(e => {
