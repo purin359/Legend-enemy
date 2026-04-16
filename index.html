@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -64,9 +64,18 @@ function load() {
   stagesData.forEach(ch => {
 
     const isTarget =
-      (mode === "N"  && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND")) ||
-      (mode === "NA" && ch.chapterId.startsWith("NA")) ||
-      (mode === "ND" && ch.chapterId.startsWith("ND"));
+  (mode === "N" && (
+    (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+    || ch.chapterId === "E026"
+  )) ||
+
+  (mode === "NA" && (
+    ch.chapterId.startsWith("NA")
+    || ch.chapterId === "E068"
+    || ch.chapterId === "E069"
+  )) ||
+
+  (mode === "ND" && ch.chapterId.startsWith("ND"));
 
     if (!isTarget) return;
 
@@ -91,8 +100,6 @@ function load() {
         map[key].count++;
       });
     });
-
-    addExtraEnemies(map, mode);
 
   });
 
@@ -145,31 +152,6 @@ function load() {
 
   tbody.appendChild(tr);
 });
-}
-
-  function addExtraEnemies(map, mode) {
-
-  const extra = {
-    "N": ["E026"],
-    "NA": ["E068","E069"]
-  };
-
-  if (!extra[mode]) return;
-
-  extra[mode].forEach(id => {
-    const enemy = enemiesData[id];
-    if (!enemy) return;
-
-    const key = normalize(enemy.name);
-
-    if (!map[key]) {
-      map[key] = {
-        name: enemy.name,
-        count: 0,
-        first: "-"
-      };
-    }
-  });
 }
 
 function toggleSort() {
