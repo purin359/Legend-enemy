@@ -106,13 +106,19 @@ async function load() {
 
         st.enemies.forEach(enemyName => {
 
-          const safeName = enemyName
-            .replace(/\r?\n/g, "")
-            .trim();
+          const baseName = e.name
+  .replace(/\r?\n/g, "")
+  .trim();
 
-          const img = document.createElement("img");
-          img.src = "image/" + encodeURIComponent(safeName) + ".png";
-          img.onerror = () => img.src = "image/noimage.png";
+// ▼画像用
+const fileName = baseName
+  .replace(/[ 　]+/g, "")   // スペース削除
+  .replace(/:/g, " ");      // : → 半角スペース
+
+const img = document.createElement("img");
+img.src = "image/" + encodeURIComponent(fileName) + ".png";
+
+img.onerror = () => img.src = "image/noimage.png";
 
           td.appendChild(img);
         });
