@@ -1457,26 +1457,26 @@
   "E291": {
     "name": "わんこ城(仮)",
     "type": ["城"],
-    "image": "image/わんこ城.png"
+    "image": "image/わんこ城(仮).png"
   },
   "E292": {
     "name": "呪いのわんこ城(仮)",
     "type": ["城"],
-    "image": "image/呪いのわんこ城.png"
+    "image": "image/呪いのわんこ城(仮).png"
   },
   "E293": {
     "name": "烈波城(仮)",
     "type": ["城"],
-    "image": "image/烈波城.png"
+    "image": "image/烈波城(仮).png"
   },
   "E294": {
     "name": "悪魔城(仮)",
     "type": ["城"],
-    "image": "image/悪魔城.png"
+    "image": "image/悪魔城(仮).png"
   },
   "E295": {
     "name": "起源の覚醒の城(仮)",
     "type": ["城"],
-    "image": "image/起源の覚醒の城.png"
+    "image": "image/起源の覚醒の城(仮).png"
   }
 }
