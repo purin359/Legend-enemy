@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧１</title>
+<title>敵出現一覧</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -41,7 +41,6 @@ th { cursor:pointer; }
 <script>
 let stagesData = [];
 let desc = true;
-let enemiesData = {};
 
 // 比較専用（スペース無視）
 function normalize(str) {
@@ -52,21 +51,8 @@ function normalize(str) {
 }
 
   async function init() {
-  enemiesData = await fetch("enemies.json").then(r=>r.json());
   stagesData = await fetch("stages.json").then(r=>r.json());
   load();
-}
-
-  function getEnemyName(enemyName) {
-  const key = normalize(enemyName);
-
-  for (const id in enemiesData) {
-    if (normalize(enemiesData[id].name) === key) {
-      return enemiesData[id].name; // ← 正式名称
-    }
-  }
-
-  return enemyName; // 見つからなければそのまま
 }
 
 function load() {
@@ -94,7 +80,7 @@ function load() {
 
         if (!map[key]) {
           map[key] = {
-            name: getEnemyName(enemyName),
+            name: enemyName,
             count: 0,
             first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
           };
