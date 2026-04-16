@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>敵出現一覧１</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -19,6 +19,7 @@ th { cursor:pointer; }
 <h2>敵出現一覧</h2>
 
 <select id="mode" onchange="load()">
+  <option value="ALL">全て</option>
   <option value="N">レジェンド</option>
   <option value="NA">真レジェンド</option>
   <option value="ND">レジェンド0</option>
@@ -64,6 +65,8 @@ function load() {
   stagesData.forEach(ch => {
 
     const isTarget =
+  (mode === "ALL") ||
+
   (mode === "N" && (
     (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
     || ch.chapterId === "E026"
