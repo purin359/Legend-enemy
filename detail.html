@@ -91,7 +91,19 @@ async function load() {
         const li = document.createElement("li");
 
         const table = document.createElement("table");
-        table.className = "stageTable";
+table.className = "stageTable";
+
+// ▼ モードごとに色変更
+if (mode === "NA") {
+  table.style.backgroundColor = "#ccff99";
+  table.style.border = "2px solid #99cc66";
+}
+
+if (mode === "ND") {
+  table.style.backgroundColor = "#001f3f";
+  table.style.color = "white";
+  table.style.border = "2px solid #003366";
+}
 
         // ステージ
         const tr1 = document.createElement("tr");
