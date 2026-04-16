@@ -37,7 +37,8 @@ img {
 </style>
 </head>
 <body>
-
+<button onclick="goList()">← 一覧に戻る</button>
+  
 <h2 id="title"></h2>
 <p id="count"></p>
 
@@ -159,6 +160,16 @@ if (mode === "ALL") {
 }
 
 load();
+
+  function goList() {
+  const params = new URLSearchParams(location.search);
+  const mode = params.get("mode") || "ALL";
+
+  const url = new URL("index.html", location.href);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
+}
 </script>
 
 </body>
