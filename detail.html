@@ -65,10 +65,18 @@ async function load() {
   stagesData.forEach(ch => {
 
     const isTarget =
-      (mode === "N"  && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND")) ||
-      (mode === "NA" && ch.chapterId.startsWith("NA")) ||
-      (mode === "ND" && ch.chapterId.startsWith("ND"));
+  (mode === "N" && (
+    (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+    || ch.chapterId === "E026"
+  )) ||
 
+  (mode === "NA" && (
+    ch.chapterId.startsWith("NA")
+    || ch.chapterId === "E068"
+    || ch.chapterId === "E069"
+  )) ||
+
+  (mode === "ND" && ch.chapterId.startsWith("ND"));
     if (!isTarget) return;
 
     ch.stages.forEach(st => {
