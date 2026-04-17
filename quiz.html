@@ -128,7 +128,7 @@ img {
   <br><br>
 
   <button onclick="check()">回答</button>
-  <button onclick="nextQuiz()">次の問題</button>
+  <button onclick="skipQuiz()">次の問題</button>
 
   <div id="result"></div>
 
@@ -381,6 +381,25 @@ function loadBest() {
       String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角→半角
     .replace(/[ 　]/g, "")
     .trim();
+}
+
+  function skipQuiz() {
+
+  const result = document.getElementById("result");
+
+  // ▼ 未回答 or 間違い扱い
+  result.textContent =
+    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+  result.style.color = "red";
+
+  // ▼ 連続リセット
+  correct = 0;
+  justCorrect = false;
+
+  updateScore();
+
+  // ▼ 少し待って次へ
+  setTimeout(nextQuiz, 800);
 }
   
 init();
