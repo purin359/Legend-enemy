@@ -40,6 +40,10 @@ img {
 
 <h2 id="title"></h2>
 <p id="count"></p>
+  <label>
+  <input type="checkbox" id="showKanban" onchange="load()">
+  カンバン娘を表示
+</label>
 
 <ul id="list"></ul>
 
@@ -120,10 +124,12 @@ if (mode === "ALL") {
 
         const td = document.createElement("td");
 
+        const showKanban = document.getElementById("showKanban").checked;
+
         st.enemies.forEach(enemyName => {
 
   // ▼ カンバン娘は画像表示しない
-  if (normalize(enemyName) === normalize("カンバン娘")) return;
+  if (!showKanban && normalize(enemyName) === normalize("カンバン娘")) return;
 
   const baseName = enemyName
     .replace(/\r?\n/g, "")
