@@ -442,8 +442,14 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  // ▼ 未回答なら判定する
-  if (!answered && !wasWrong) {
+  // ▼ 不正解後は何もせず次へ
+  if (wasWrong) {
+    nextQuiz();
+    return;
+  }
+
+  // ▼ 未回答なら判定
+  if (!answered) {
 
     const input = document.getElementById("answer").value;
     const inputNorm = normalize(input);
@@ -478,7 +484,7 @@ function loadBest() {
     }
   }
 
-  // ▼ それ以外（スキップ or 不正解後）
+  // ▼ それ以外（純粋スキップ）
   result.textContent =
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
@@ -491,8 +497,7 @@ function loadBest() {
   updateScore();
 
   setTimeout(nextQuiz, 800);
-}
-  
+}  
   function showHint() {
 
   const mode = document.getElementById("mode").value;
