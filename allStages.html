@@ -28,6 +28,16 @@ body {
   background: #f0f0f0;
 }
 
+  h3 {
+  margin: 0 0 10px 0;
+  padding: 5px;
+  background: #eee;
+}
+
+.stageRow {
+  margin-bottom: 10px;
+}
+
 img {
   width: 45px;
   margin-right: 5px;
@@ -95,61 +105,62 @@ async function load() {
 
     if (!isTarget) return;
 
-    ch.stages.forEach(st => {
+    const chapterBox = document.createElement("div");
+chapterBox.style.border = "2px solid #ccc";
+chapterBox.style.padding = "10px";
+chapterBox.style.marginBottom = "20px";
 
-      const table = document.createElement("table");
-      table.className = "stageTable";
+// ▼ 章タイトル
+const title = document.createElement("h3");
+title.textContent = ch.chapterName;
+chapterBox.appendChild(title);
 
-      // ステージ名
-      const tr1 = document.createElement("tr");
-      tr1.innerHTML = `
-        <th>ステージ</th>
-        <td>${ch.chapterName}-${st.stageName}</td>
-      `;
+// ▼ ステージまとめ
+ch.stages.forEach(st => {
 
-      // 敵
-      const tr2 = document.createElement("tr");
-      const th = document.createElement("th");
-      th.textContent = "出現する敵";
+  const row = document.createElement("div");
+  row.style.marginBottom = "8px";
 
-      const td = document.createElement("td");
+  // ステージ名
+  const stageName = document.createElement("div");
+  stageName.textContent = st.stageName;
 
-      st.enemies.forEach(enemyName => {
+  // 敵
+  const enemyBox = document.createElement("div");
 
-        // ▼ カンバン娘除外（表示だけ）
-        if (enemyName === "カンバン娘") return;
+  st.enemies.forEach(enemyName => {
 
-        const baseName = enemyName
-          .replace(/\r?\n/g, "")
-          .trim();
+    if (enemyName === "カンバン娘") return;
 
-        const fileName = baseName
-          .replace(/[：:]/g, " ")
-          .replace(/[ 　]+/g, "");
+    const baseName = enemyName.replace(/\r?\n/g, "").trim();
 
-        const img = document.createElement("img");
-        img.src = "image/" + encodeURIComponent(fileName) + ".png";
-        img.onerror = () => img.src = "image/noimage.png";
+    const fileName = baseName
+      .replace(/[：:]/g, " ")
+      .replace(/[ 　]+/g, "");
 
-        img.addEventListener("click", () => {
-  const url = new URL("detail.html", location.href);
-  url.searchParams.set("name", enemyName);
-  url.searchParams.set("mode", mode);
-  location.href = url;
-});
+    const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(fileName) + ".png";
+    img.onerror = () => img.src = "image/noimage.png";
 
-        td.appendChild(img);
-      });
-
-      tr2.appendChild(th);
-      tr2.appendChild(td);
-
-      table.appendChild(tr1);
-      table.appendChild(tr2);
-
-      list.appendChild(table);
+    // クリックで詳細
+    img.addEventListener("click", () => {
+      const url = new URL("detail.html", location.href);
+      url.searchParams.set("name", enemyName);
+      url.searchParams.set("mode", mode);
+      location.href = url;
     });
 
+    enemyBox.appendChild(img);
+  });
+
+  row.appendChild(stageName);
+  row.appendChild(enemyBox);
+
+  chapterBox.appendChild(row);
+});
+
+list.appendChild(chapterBox);
+    
   });
 }
 
