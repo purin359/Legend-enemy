@@ -438,7 +438,7 @@ function updateScore() {
 
 function saveBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode;
+  const key = "quizBest_" + mode + "_" + gameMode;
 
   localStorage.setItem(key, JSON.stringify({
     score: bestScore,
@@ -448,8 +448,8 @@ function saveBest() {
 
 function loadBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode;
-
+  const key = "quizBest_" + mode + "_" + gameMode;
+  
   const data = localStorage.getItem(key);
 
   if (data) {
@@ -687,7 +687,7 @@ function formatTime(sec) {
 
   function saveCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode;
+  const key = "complete_" + mode + "_" + gameMode;
 
   const data = localStorage.getItem(key);
 
