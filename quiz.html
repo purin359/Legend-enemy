@@ -91,7 +91,7 @@ button:hover {
   <h2>ステージ当てクイズ</h2>
 
   <div class="topBar">
-    <select id="mode" onchange="nextQuiz()">
+    <select id="mode" onchange="changeMode()">
       <option value="ALL">全て</option>
       <option value="N">レジェンド</option>
       <option value="NA">真レジェンド</option>
@@ -139,13 +139,16 @@ function normalize(str) {
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
-  // Enterキー対応
+  loadScore(); // ←追加
+
   document.getElementById("answer").addEventListener("keydown", e => {
     if (e.key === "Enter") check();
   });
 
+  updateScore(); // ←表示更新
   nextQuiz();
 }
+  
 function isTargetChapter(ch, mode) {
   return (
     (mode === "ALL") ||
@@ -230,11 +233,41 @@ function check() {
 
   updateScore();
 }
+  
 function updateScore() {
   document.getElementById("score").textContent =
     `${correct} / ${total}`;
+
+  saveScore(); // ←追加
 }
 
+  function saveScore() {
+  localStorage.setItem("quizScore", JSON.stringify({
+    correct,
+    total
+  }));
+}
+
+function loadScore() {
+  const data = localStorage.getItem("quizScore");
+  if (data) {
+    const obj = JSON.parse(data);
+    correct = obj.correct;
+    total = obj.total;
+  }
+}
+
+  function changeMode() {
+  // スコアリセット
+  correct = 0;
+  total = 0;
+
+  saveScore(); // ←リセットも保存
+  updateScore();
+
+  nextQuiz();
+}
+  
 init();
 </script>
 
