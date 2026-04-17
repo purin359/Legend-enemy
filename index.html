@@ -18,6 +18,8 @@ th { cursor:pointer; }
 
 <h2>敵出現一覧</h2>
 
+  <input id="searchBox" placeholder="敵名で検索" oninput="load()">
+
 <select id="mode" onchange="load()">
   <option value="ALL">全て</option>
   <option value="N">レジェンド</option>
@@ -124,9 +126,20 @@ function load() {
 
   });
 
-let list = Object.values(map).map(e => {
+let list = Object.values(map);
 
-  // "N000-0" → 数値化
+const search = document.getElementById("searchBox").value.trim();
+
+if (search) {
+  const keyword = normalize(search);
+
+  list = list.filter(e =>
+    normalize(e.name).includes(keyword)
+  );
+}
+
+list = list.map(e => {
+
   const match = e.first.match(/([A-Z]+)(\d+)-(\d+)/);
 
   let firstNum = 999999;
@@ -136,7 +149,6 @@ let list = Object.values(map).map(e => {
     const chap = parseInt(match[2]);
     const stage = parseInt(match[3]);
 
-    // 種類ごとに重み
     const base =
       prefix === "N"  ? 0 :
       prefix === "NA" ? 100000 :
