@@ -96,6 +96,10 @@ img {
 .suggestItem:hover {
   background: #eaf4ff;
 }
+
+  .container {
+  position: relative;
+}
   
 </style>
 </head>
@@ -135,6 +139,7 @@ let current = null;
 let correct = 0;      // 連続正解数
 let bestScore = 0;    // 最高記録
 let justCorrect = false;
+let stageList = [];
 
 // 画像用
 function getFileName(name) {
@@ -157,20 +162,7 @@ async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
   const mode = document.getElementById("mode").value;
-  
-  let stageList = [];
-
-function buildStageList(mode) {
-  stageList = [];
-
-  stagesData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
-    ch.stages.forEach(st => {
-      stageList.push(st.stageName);
-    });
-  });
-}
+buildStageList(mode);
 
   loadBest();
 
@@ -349,18 +341,16 @@ function loadBest() {
 }
   
   function buildStageList(mode) {
-  const list = document.getElementById("stageList");
-  list.innerHTML = "";
-
-  const names = new Set();
+  stageList = [];
 
   stagesData.forEach(ch => {
     if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
-      names.add(st.stageName);
+      stageList.push(st.stageName);
     });
   });
+}
 
   names.forEach(name => {
     const option = document.createElement("option");
