@@ -56,6 +56,12 @@ function normalize(str) {
 }
 
 async function load() {
+  const params = new URLSearchParams(location.search);
+const modeParam = params.get("mode");
+if (modeParam) {
+  document.getElementById("mode").value = modeParam;
+}
+  
   const mode = document.getElementById("mode").value;
   const stagesData = await fetch("stages.json").then(r=>r.json());
 
@@ -117,6 +123,13 @@ async function load() {
         const img = document.createElement("img");
         img.src = "image/" + encodeURIComponent(fileName) + ".png";
         img.onerror = () => img.src = "image/noimage.png";
+
+        img.addEventListener("click", () => {
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("name", enemyName);
+  url.searchParams.set("mode", mode);
+  location.href = url;
+});
 
         td.appendChild(img);
       });
