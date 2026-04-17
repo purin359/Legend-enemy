@@ -340,10 +340,18 @@ function check() {
 
   updateScore();
 }  
+  
 function updateScore() {
+
+  const bestText =
+    bestScore === 0
+      ? "なし"
+      : `${bestScore}（ヒント: ${bestHint}）`;
+
   document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestScore}（ヒント: ${bestHint}）`;
+    `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestText}`;
 }
+  
   function saveScore() {
   const mode = document.getElementById("mode").value;
   const key = "quizScore_" + mode;
