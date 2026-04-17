@@ -48,6 +48,8 @@ img {
 <div id="list"></div>
 
 <script>
+let initialized = false;
+  
 function normalize(str) {
   return str
     .replace(/\r?\n/g, "")
@@ -56,12 +58,17 @@ function normalize(str) {
 }
 
 async function load() {
-  const params = new URLSearchParams(location.search);
-const modeParam = params.get("mode");
-if (modeParam) {
-  document.getElementById("mode").value = modeParam;
-}
-  
+
+  // ▼ 最初の1回だけURL反映
+  if (!initialized) {
+    const params = new URLSearchParams(location.search);
+    const modeParam = params.get("mode");
+    if (modeParam) {
+      document.getElementById("mode").value = modeParam;
+    }
+    initialized = true;
+  }
+
   const mode = document.getElementById("mode").value;
   const stagesData = await fetch("stages.json").then(r=>r.json());
 
