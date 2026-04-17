@@ -156,6 +156,7 @@ let hintTotal = 0;    // このゲーム中のヒント合計
 let bestHint = 9999;
 let answered = false;   // 回答済みか
 let lastResult = null;  // "ok" or "ng"
+let wasWrong = false;
 
 // 画像用
 function getFileName(name) {
@@ -245,10 +246,8 @@ function nextQuiz() {
   }
 
   justCorrect = false;
-
-  // ▼ 状態リセット
-  answered = false;
-  lastResult = null;
+  answered = false;   // ←追加
+  wasWrong = false;   // ←追加
 
   updateScore();
 
@@ -300,21 +299,17 @@ function check() {
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
-  const nameOK =
-    inputNorm === normalize(current.stageName);
-
+  const nameOK = inputNorm === normalize(current.stageName);
   const idText = `${current.chapterId}-${current.stageId}`;
-  const idOK =
-    inputNorm === normalize(idText);
+  const idOK = inputNorm === normalize(idText);
 
   const ok = nameOK || idOK;
 
   const result = document.getElementById("result");
 
-  answered = true; // ←追加
+  answered = true;
 
   if (ok) {
-
     result.textContent = "正解！ 🎉";
     result.style.color = "green";
 
@@ -330,7 +325,9 @@ function check() {
     }
 
     justCorrect = true;
-    lastResult = "ok"; // ←追加
+    wasWrong = false;
+
+    setTimeout(nextQuiz, 800);
 
   } else {
     result.textContent =
@@ -340,12 +337,11 @@ function check() {
     correct = 0;
     hintTotal = 0;
 
-    lastResult = "ng"; // ←追加
+    wasWrong = true;
   }
 
   updateScore();
-}
-  
+}  
 function updateScore() {
   document.getElementById("score").textContent =
     `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestScore}（ヒント: ${bestHint}）`;
@@ -447,24 +443,54 @@ function loadBest() {
   const result = document.getElementById("result");
 
   // ▼ 未回答なら判定する
-  if (!answered) {
-    check();
+  if (!answered && !wasWrong) {
+
+    const input = document.getElementById("answer").value;
+    const inputNorm = normalize(input);
+
+    const nameOK = inputNorm === normalize(current.stageName);
+    const idText = `${current.chapterId}-${current.stageId}`;
+    const idOK = inputNorm === normalize(idText);
+
+    const ok = nameOK || idOK;
+
+    if (ok) {
+      result.textContent = "正解！ 🎉";
+      result.style.color = "green";
+
+      correct++;
+
+      if (
+        correct > bestScore ||
+        (correct === bestScore && hintTotal < bestHint)
+      ) {
+        bestScore = correct;
+        bestHint = hintTotal;
+        saveBest();
+      }
+
+      justCorrect = true;
+      wasWrong = false;
+
+      updateScore();
+      setTimeout(nextQuiz, 800);
+      return;
+    }
   }
 
-  // ▼ 正解済み → そのまま次へ
-  if (lastResult === "ok") {
-    nextQuiz();
-    return;
-  }
+  // ▼ それ以外（スキップ or 不正解後）
+  result.textContent =
+    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+  result.style.color = "red";
 
-  // ▼ 不正解済み → そのまま次へ（何もしない）
-  if (lastResult === "ng") {
-    nextQuiz();
-    return;
-  }
+  correct = 0;
+  hintTotal = 0;
 
-  // ▼ 念のため
-  nextQuiz();
+  wasWrong = true;
+
+  updateScore();
+
+  setTimeout(nextQuiz, 800);
 }
   
   function showHint() {
