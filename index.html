@@ -36,6 +36,8 @@ th { cursor:pointer; }
   <option value="asc">昇順</option>
 </select>
 
+  <button onclick="goAllStages()">全ステージ一覧へ</button>
+
 <table>
 <thead>
 <tr>
@@ -257,6 +259,15 @@ function changeOrder() {
 function setDesc() {
   desc = true;
   load();
+}
+
+  function goAllStages() {
+  const mode = document.getElementById("mode").value;
+
+  const url = new URL("allStages.html", location.href);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
 }
 
 init();
