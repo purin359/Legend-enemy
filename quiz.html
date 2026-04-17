@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -349,13 +349,6 @@ function loadBest() {
     ch.stages.forEach(st => {
       stageList.push(st.stageName);
     });
-  });
-}
-
-  names.forEach(name => {
-    const option = document.createElement("option");
-    option.value = name;
-    list.appendChild(option);
   });
 }
 
