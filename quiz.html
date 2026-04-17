@@ -85,9 +85,11 @@ button:hover {
 }
 
   input {
-  font-size: 16px;
-  padding: 8px;
+  font-size: 16px;          /* ←ズーム防止 */
+  transform: scale(0.9);    /* ←見た目だけ縮小 */
+  transform-origin: left top;
 }
+  
 </style>
 </head>
 <body>
