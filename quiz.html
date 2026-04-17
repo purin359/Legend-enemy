@@ -101,6 +101,16 @@ img {
   position: relative;
 }
 
+  .topBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hintBtn {
+  margin-left: auto; /* ←これで右端に飛ぶ */
+}
+
   
 </style>
 </head>
@@ -119,6 +129,7 @@ img {
     </select>
 
     <div id="score">0 / 0</div>
+    <button class="hintBtn" onclick="showHint()">ヒント</button>
   </div>
 
   <div id="enemies"></div>
@@ -129,7 +140,6 @@ img {
 
   <button onclick="check()">回答</button>
   <button onclick="skipQuiz()">次の問題</button>
-　　　　　　　　　　　　　　　　　　　　　　　　<button onclick="showHint()">ヒント</button>
 
   <div id="result"></div>
 
@@ -359,9 +369,24 @@ function loadBest() {
   const data = localStorage.getItem(key);
 
   if (data) {
-    const obj = JSON.parse(data);
-    bestScore = obj.score;
-    bestHint = obj.hint;
+    try {
+      const obj = JSON.parse(data);
+
+      // ▼ 新形式
+      if (typeof obj === "object") {
+        bestScore = obj.score ?? 0;
+        bestHint = obj.hint ?? 9999;
+      }
+      // ▼ 旧形式（数値だけ）
+      else {
+        bestScore = Number(obj) || 0;
+        bestHint = 9999;
+      }
+
+    } catch {
+      bestScore = 0;
+      bestHint = 9999;
+    }
   } else {
     bestScore = 0;
     bestHint = 9999;
