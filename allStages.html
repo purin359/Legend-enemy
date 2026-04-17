@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>全ステージ一覧１</title>
+<title>全ステージ一覧</title>
 
 <style>
 body {
@@ -10,12 +10,6 @@ body {
   max-width: 1400px;
   margin: auto;
   padding: 20px;
-}
-
-  .stageTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 15px;
 }
 
 .stageTable th, .stageTable td {
@@ -93,103 +87,88 @@ async function load() {
 
   stagesData.forEach(ch => {
 
-    const isTarget =
-      (mode === "ALL") ||
+  const isTarget =
+    (mode === "ALL") ||
 
-      (mode === "N" && (
-        (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
-        || ch.chapterId === "E026"
-      )) ||
+    (mode === "N" && (
+      (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+      || ch.chapterId === "E026"
+    )) ||
 
-      (mode === "NA" && (
-        ch.chapterId.startsWith("NA")
-        || ch.chapterId === "E068"
-        || ch.chapterId === "E069"
-      )) ||
+    (mode === "NA" && (
+      ch.chapterId.startsWith("NA")
+      || ch.chapterId === "E068"
+      || ch.chapterId === "E069"
+    )) ||
 
-      (mode === "ND" && ch.chapterId.startsWith("ND"));
+    (mode === "ND" && ch.chapterId.startsWith("ND"));
 
-    if (!isTarget) return;
+  if (!isTarget) return;
 
-    const chapterBox = document.createElement("div");
-chapterBox.style.border = "2px solid #ccc";
-chapterBox.style.padding = "10px";
-chapterBox.style.marginBottom = "20px";
+  // ▼ 章BOX（これ1個だけ）
+  const chapterBox = document.createElement("div");
+  chapterBox.style.border = "2px solid #ccc";
+  chapterBox.style.padding = "10px";
+  chapterBox.style.marginBottom = "20px";
 
-// ▼ 章タイトル
-const title = document.createElement("h3");
-title.textContent = ch.chapterName;
-chapterBox.appendChild(title);
+  // ▼ 章名
+  const title = document.createElement("h3");
+  title.textContent = ch.chapterName;
+  chapterBox.appendChild(title);
 
-// ▼ ステージまとめ
-const chapterBox = document.createElement("div");
-chapterBox.style.border = "2px solid #ccc";
-chapterBox.style.padding = "10px";
-chapterBox.style.marginBottom = "20px";
+  // ▼ ステージ
+  ch.stages.forEach(st => {
 
-// ▼ 章名
-const title = document.createElement("h3");
-title.textContent = ch.chapterName;
-chapterBox.appendChild(title);
+    const table = document.createElement("table");
+    table.className = "stageTable";
 
-// ▼ ステージ（今までのやつをそのまま使う）
-ch.stages.forEach(st => {
+    const tr1 = document.createElement("tr");
+    tr1.innerHTML = `
+      <th>ステージ</th>
+      <td>${st.stageName}</td>
+    `;
 
-  const table = document.createElement("table");
-  table.className = "stageTable";
+    const tr2 = document.createElement("tr");
+    const th = document.createElement("th");
+    th.textContent = "出現する敵";
 
-  // ステージ名
-  const tr1 = document.createElement("tr");
-  tr1.innerHTML = `
-    <th>ステージ</th>
-    <td>${st.stageName}</td>
-  `;
+    const td = document.createElement("td");
 
-  // 敵
-  const tr2 = document.createElement("tr");
-  const th = document.createElement("th");
-  th.textContent = "出現する敵";
+    st.enemies.forEach(enemyName => {
 
-  const td = document.createElement("td");
+      if (enemyName === "カンバン娘") return;
 
-  st.enemies.forEach(enemyName => {
+      const baseName = enemyName.replace(/\r?\n/g, "").trim();
 
-    if (enemyName === "カンバン娘") return;
+      const fileName = baseName
+        .replace(/[：:]/g, " ")
+        .replace(/[ 　]+/g, "");
 
-    const baseName = enemyName.replace(/\r?\n/g, "").trim();
+      const img = document.createElement("img");
+      img.src = "image/" + encodeURIComponent(fileName) + ".png";
+      img.onerror = () => img.src = "image/noimage.png";
 
-    const fileName = baseName
-      .replace(/[：:]/g, " ")
-      .replace(/[ 　]+/g, "");
+      img.addEventListener("click", () => {
+        const url = new URL("detail.html", location.href);
+        url.searchParams.set("name", enemyName);
+        url.searchParams.set("mode", mode);
+        location.href = url;
+      });
 
-    const img = document.createElement("img");
-    img.src = "image/" + encodeURIComponent(fileName) + ".png";
-    img.onerror = () => img.src = "image/noimage.png";
-
-    img.addEventListener("click", () => {
-      const url = new URL("detail.html", location.href);
-      url.searchParams.set("name", enemyName);
-      url.searchParams.set("mode", mode);
-      location.href = url;
+      td.appendChild(img);
     });
 
-    td.appendChild(img);
+    tr2.appendChild(th);
+    tr2.appendChild(td);
+
+    table.appendChild(tr1);
+    table.appendChild(tr2);
+
+    chapterBox.appendChild(table);
   });
 
-  tr2.appendChild(th);
-  tr2.appendChild(td);
-
-  table.appendChild(tr1);
-  table.appendChild(tr2);
-
-  // 🔥 ここが重要（listじゃなくchapterに入れる）
-  chapterBox.appendChild(table);
+  list.appendChild(chapterBox);
 });
-
-// 最後にまとめて追加
-list.appendChild(chapterBox);
-    
-  });
 }
 
 load();
