@@ -227,6 +227,23 @@ function updateScore() {
     `${correct} / ${total}`;
 }
 
+  // 正解で色変更
+  if (ok) {
+  result.style.color = "green";
+} else {
+  result.style.color = "red";
+}
+
+  // Enterキー対応
+  document.getElementById("answer").addEventListener("keydown", e => {
+  if (e.key === "Enter") check();
+});
+
+  // 正解したら次へ
+  if (ok) {
+  setTimeout(nextQuiz, 800);
+}
+
 init();
 </script>
 
