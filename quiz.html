@@ -264,11 +264,6 @@ buildStageList(mode);
   document.getElementById("timer").style.display = "none";
 }
 
-  if (gameMode === "complete") {
-  resetTimer();
-  startTimer();
-}
-
   updateScore();
   nextQuiz();
 }
@@ -670,7 +665,7 @@ function formatTime(sec) {
   return list;
 }
 
-  function changePlayMode() {
+ function changePlayMode() {
   gameMode = document.getElementById("playMode").value;
 
   pool = [];
@@ -678,23 +673,23 @@ function formatTime(sec) {
 
   stopTimer();
   timer = 0;
+  document.getElementById("timer").textContent = "00:00";
 
   const timerEl = document.getElementById("timer");
-  timerEl.textContent = "00:00";
 
   if (gameMode === "endless") {
     timerEl.style.display = "none";
   } else {
     timerEl.style.display = "block";
+
+    // 🔥ここで開始
+    startTimer();
   }
 
-  // ▼ 追加
   loadBest();
   updateScore();
-
   nextQuiz();
 }
-
   function saveCompleteRecord() {
   const mode = document.getElementById("mode").value;
   const key = "complete_" + mode + "_" + gameMode;
