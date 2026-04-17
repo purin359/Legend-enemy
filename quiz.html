@@ -156,7 +156,7 @@ img {
     <option value="ND">レジェンド0</option>
   </select>
 
-  <select id="playMode" onchange="changeGameMode()">
+  <select id="playMode" onchange="changePlayMode()">
     <option value="endless">エンドレス</option>
     <option value="complete">コンプリート</option>
   </select>
@@ -296,14 +296,10 @@ function nextQuiz() {
 
   const mode = document.getElementById("mode").value;
 
-  // ▼ 初回生成
-  if (pool.length === 0) {
+  if (gameMode === "complete" && remaining.length === 0 && pool.length === 0) {
     pool = buildPool(mode);
-
-    if (gameMode === "complete") {
-      remaining = [...pool];
-      startTimer();
-    }
+    remaining = [...pool];
+    startTimer();
   }
 
   // ▼ コンプリート終了判定
@@ -610,6 +606,7 @@ function loadBest() {
 
   timerId = setInterval(() => {
     const sec = Math.floor((Date.now() - startTime) / 1000);
+    timer = sec;
 
     const m = String(Math.floor(sec / 60)).padStart(2, "0");
     const s = String(sec % 60).padStart(2, "0");
@@ -648,15 +645,15 @@ function formatTime(sec) {
   return list;
 }
 
-  function changeGameMode() {
-  gameMode = document.getElementById("gameMode").value;
+  function changePlayMode() {
+  gameMode = document.getElementById("playMode").value;
 
   pool = [];
   remaining = [];
 
   stopTimer();
   timer = 0;
-  document.getElementById("timer").textContent = "0:00";
+  document.getElementById("timer").textContent = "00:00";
 
   nextQuiz();
 }
