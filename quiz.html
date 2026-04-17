@@ -76,6 +76,26 @@ img {
 
   background: #eaf4ff;         /* ←色で囲む */
 }
+
+  #suggest {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  position: absolute;
+  width: calc(100% - 32px);
+  z-index: 10;
+}
+
+.suggestItem {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestItem:hover {
+  background: #eaf4ff;
+}
   
 </style>
 </head>
@@ -98,8 +118,8 @@ img {
 
   <div id="enemies"></div>
 
-  <input id="answer" list="stageList" placeholder="ステージ名を入力">
-<datalist id="stageList"></datalist>
+  <input id="answer" placeholder="ステージ名を入力" autocomplete="off">
+<div id="suggest"></div>
   <br><br>
 
   <button onclick="check()">回答</button>
@@ -137,13 +157,50 @@ async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
   const mode = document.getElementById("mode").value;
-  buildStageList(mode); // ←これ追加
+  
+  let stageList = [];
+
+function buildStageList(mode) {
+  stageList = [];
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      stageList.push(st.stageName);
+    });
+  });
+}
 
   loadBest();
 
-  document.getElementById("answer").addEventListener("keydown", e => {
-    if (e.key === "Enter") check();
+  document.getElementById("answer").addEventListener("input", () => {
+  const input = document.getElementById("answer").value;
+  const suggest = document.getElementById("suggest");
+
+  suggest.innerHTML = "";
+
+  if (!input) return;
+
+  const keyword = normalizeSearch(input);
+
+  const results = stageList.filter(name =>
+    normalizeSearch(name).includes(keyword)
+  ).slice(0, 20); // 最大20件
+
+  results.forEach(name => {
+    const div = document.createElement("div");
+    div.className = "suggestItem";
+    div.textContent = name;
+
+    div.onclick = () => {
+      document.getElementById("answer").value = name;
+      suggest.innerHTML = "";
+    };
+
+    suggest.appendChild(div);
   });
+});
 
   updateScore();
   nextQuiz();
@@ -285,12 +342,12 @@ function loadBest() {
   loadBest();
 
   const mode = document.getElementById("mode").value;
-  buildStageList(mode); // ←これ追加
+  buildStageList(mode); // ←重要
 
   updateScore();
   nextQuiz();
 }
-
+  
   function buildStageList(mode) {
   const list = document.getElementById("stageList");
   list.innerHTML = "";
@@ -310,6 +367,19 @@ function loadBest() {
     option.value = name;
     list.appendChild(option);
   });
+}
+
+  function normalizeSearch(str) {
+  return str
+    .toLowerCase()
+    .replace(/[ぁ-ん]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) + 0x60)) // ひら→カタ
+    .replace(/[ァ-ヶ]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)) // カタ→ひら（統一）
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角→半角
+    .replace(/[ 　]/g, "")
+    .trim();
 }
   
 init();
