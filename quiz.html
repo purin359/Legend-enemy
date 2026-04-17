@@ -285,24 +285,16 @@ function isTargetChapter(ch, mode) {
 
 function nextQuiz() {
 
-  if (!justCorrect) {
-    correct = 0;
-    hintTotal = 0;
-  }
-
-  justCorrect = false;
-  answered = false;
-  wasWrong = false;
-
   const mode = document.getElementById("mode").value;
 
-  if (gameMode === "complete" && remaining.length === 0 && pool.length === 0) {
+  // 🔥 初期化
+  if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
     remaining = [...pool];
     startTimer();
   }
 
-  // ▼ コンプリート終了判定
+  // 🔥 終了判定
   if (gameMode === "complete" && remaining.length === 0) {
     stopTimer();
 
@@ -312,7 +304,7 @@ function nextQuiz() {
     saveCompleteRecord();
     return;
   }
-
+  
   let q;
 
   if (gameMode === "complete") {
