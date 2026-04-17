@@ -1,1 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ステージ当てクイズ</title>
 
+<style>
+body { font-family: sans-serif; padding:20px; text-align:center; }
+
+#enemies img {
+  width:60px;
+  margin:5px;
+}
+
+input { padding:5px; width:250px; }
+button { padding:5px 10px; margin:5px; }
+
+#result { margin-top:10px; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<h2>ステージ当てクイズ</h2>
+
+<div id="enemies"></div>
+
+<input id="answer" placeholder="ステージ名を入力">
+<br>
+<button onclick="check()">回答</button>
+<button onclick="nextQuiz()">次の問題</button>
+
+<div id="result"></div>
+
+<script>
+let stagesData = [];
+let current = null;
+
+// 画像用変換
+function getFileName(name) {
+  return name
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+}
+
+// 正規化（比較用）
+function normalize(str) {
+  return str
+    .replace(/\r?\n/g, "")
+    .replace(/[ 　]+/g, "")
+    .trim();
+}
+
+async function init() {
+  stagesData = await fetch("stages.json").then(r=>r.json());
+  nextQuiz();
+}
+
+function nextQuiz() {
+
+  document.getElementById("result").textContent = "";
+  document.getElementById("answer").value = "";
+
+  // ランダム章
+  const ch = stagesData[Math.floor(Math.random() * stagesData.length)];
+
+  // ランダムステージ
+  const st = ch.stages[Math.floor(Math.random() * ch.stages.length)];
+
+  current = {
+    answer: st.stageName,
+    chapter: ch.chapterName
+  };
+
+  const enemiesDiv = document.getElementById("enemies");
+  enemiesDiv.innerHTML = "";
+
+  st.enemies.forEach(enemy => {
+
+    if (enemy === "カンバン娘") return;
+
+    const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+    img.onerror = () => img.src = "image/noimage.png";
+
+    enemiesDiv.appendChild(img);
+  });
+}
+
+function check() {
+  const input = document.getElementById("answer").value;
+
+  const ok = normalize(input) === normalize(current.answer);
+
+  const result = document.getElementById("result");
+
+  if (ok) {
+    result.textContent = "正解！ 🎉";
+  } else {
+    result.textContent =
+      `不正解！ 正解：${current.chapter} - ${current.answer}`;
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
