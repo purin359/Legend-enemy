@@ -612,10 +612,12 @@ function loadBest() {
 
   timerId = setInterval(() => {
     const sec = Math.floor((Date.now() - startTime) / 1000);
-const m = String(Math.floor(sec / 60)).padStart(2, "0");
-const s = String(sec % 60).padStart(2, "0");
 
-document.getElementById("timer").textContent = `${m}:${s}`;
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+
+    document.getElementById("timer").textContent = `${m}:${s}`;
+  }, 1000); 
 }
 
 function stopTimer() {
