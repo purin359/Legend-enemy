@@ -107,8 +107,31 @@ img {
   gap: 10px;
 }
 
+.topBar1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ヒントを右端へ */
 .hintBtn {
-  margin-left: auto; /* ←これで右端に飛ぶ */
+  margin-left: auto;
+}
+
+.topBar2 {
+  display: flex;
+  margin-top: 6px;
+}
+
+/* スコアは左 */
+#score {
+  font-size: 16px;
+}
+
+/* タイマーを右端へ */
+#timer {
+  margin-left: auto;
+  font-size: 16px;
 }
 
   .scoreRow {
@@ -125,25 +148,26 @@ img {
 
   <h2>ステージ当てクイズ</h2>
 
-  <div class="topBar">
-    <select id="mode" onchange="changeMode()">
-      <option value="ALL">全て</option>
-      <option value="N">レジェンド</option>
-      <option value="NA">真レジェンド</option>
-      <option value="ND">レジェンド0</option>
-    </select>
+  <div class="topBar1">
+  <select id="mode" onchange="changeMode()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
 
-    <select id="gameMode" onchange="changeGameMode()">
-      <option value="endless">エンドレス</option>
-      <option value="complete">コンプリート</option>
-    </select>
+  <select id="playMode" onchange="changePlayMode()">
+    <option value="endless">エンドレス</option>
+    <option value="complete">コンプリート</option>
+  </select>
 
-    <button class="hintBtn" onclick="showHint()">ヒント</button>　<br>
+  <button class="hintBtn" onclick="showHint()">ヒント</button>
+</div>
 
-    <div class="scoreRow">
-      <div id="score"></div>
-      <div id="timer"></div>
-    </div>
+<div class="topBar2">
+  <div id="score"></div>
+  <div id="timer"></div>
+</div>
     
   </div>
 
