@@ -130,7 +130,7 @@ function normalize(str) {
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
-  loadScore(); // ←これでOK
+  loadScore();
 
   document.getElementById("answer").addEventListener("keydown", e => {
     if (e.key === "Enter") check();
@@ -189,18 +189,26 @@ function nextQuiz() {
   updateScore();
 
   const enemiesDiv = document.getElementById("enemies");
-  enemiesDiv.innerHTML = "";
+enemiesDiv.innerHTML = "";
 
-  q.enemies.forEach(enemy => {
+// ▼ 追加（枠）
+const box = document.createElement("div");
+box.className = "enemyBox";
 
-    if (enemy === "カンバン娘") return;
+q.enemies.forEach(enemy => {
 
-    const img = document.createElement("img");
-    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
-    img.onerror = () => img.src = "image/noimage.png";
+  if (enemy === "カンバン娘") return;
 
-    enemiesDiv.appendChild(img);
-  });
+  const img = document.createElement("img");
+  img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+  img.onerror = () => img.src = "image/noimage.png";
+
+  // ▼ ここ変更
+  box.appendChild(img);
+});
+
+// ▼ 最後に入れる
+enemiesDiv.appendChild(box);
 }
 
 function check() {
