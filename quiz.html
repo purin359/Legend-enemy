@@ -138,9 +138,14 @@ function normalize(str) {
 
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
+
+  // Enterキー対応
+  document.getElementById("answer").addEventListener("keydown", e => {
+    if (e.key === "Enter") check();
+  });
+
   nextQuiz();
 }
-
 function isTargetChapter(ch, mode) {
   return (
     (mode === "ALL") ||
@@ -213,35 +218,21 @@ function check() {
 
   if (ok) {
     result.textContent = "正解！ 🎉";
+    result.style.color = "green";
     correct++;
+
+    setTimeout(nextQuiz, 800);
   } else {
     result.textContent =
       `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
+    result.style.color = "red";
   }
 
   updateScore();
 }
-
 function updateScore() {
   document.getElementById("score").textContent =
     `${correct} / ${total}`;
-}
-
-  // 正解で色変更
-  if (ok) {
-  result.style.color = "green";
-} else {
-  result.style.color = "red";
-}
-
-  // Enterキー対応
-  document.getElementById("answer").addEventListener("keydown", e => {
-  if (e.key === "Enter") check();
-});
-
-  // 正解したら次へ
-  if (ok) {
-  setTimeout(nextQuiz, 800);
 }
 
 init();
