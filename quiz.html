@@ -342,14 +342,8 @@ function check() {
 }  
   
 function updateScore() {
-
-  const bestText =
-    bestScore === 0
-      ? "なし"
-      : `${bestScore}（ヒント: ${bestHint}）`;
-
   document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestText}`;
+    `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestScore}（ヒント: ${bestHint}）`;
 }
   
   function saveScore() {
@@ -382,24 +376,28 @@ function loadBest() {
     try {
       const obj = JSON.parse(data);
 
-      // ▼ 新形式
       if (typeof obj === "object") {
         bestScore = obj.score ?? 0;
-        bestHint = obj.hint ?? 9999;
-      }
-      // ▼ 旧形式（数値だけ）
-      else {
+
+        // 🔥 ここが重要
+        if (bestScore === 0) {
+          bestHint = 0;
+        } else {
+          bestHint = obj.hint ?? 0;
+        }
+
+      } else {
         bestScore = Number(obj) || 0;
-        bestHint = 9999;
+        bestHint = 0;
       }
 
     } catch {
       bestScore = 0;
-      bestHint = 9999;
+      bestHint = 0;
     }
   } else {
     bestScore = 0;
-    bestHint = 9999;
+    bestHint = 0;
   }
 }
 
