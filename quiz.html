@@ -295,8 +295,16 @@ function nextQuiz() {
   }
 
   // 🔥 終了判定
-  if (gameMode === "complete" && remaining.length === 0) {
-    stopTimer();
+  // 初回だけ生成
+if (gameMode === "complete" && pool.length === 0) {
+  pool = buildPool(mode);
+  remaining = [...pool];
+}
+
+// 🔥 問題表示時に毎回タイマー再開
+if (gameMode === "complete") {
+  startTimer();
+}
 
     document.getElementById("result").textContent =
       `🎉 クリア！ タイム: ${formatTime(timer)}`;
@@ -374,15 +382,21 @@ function check() {
     setTimeout(nextQuiz, 800);
 
   } else {
-    result.textContent =
-      `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
-    result.style.color = "red";
+    } else {
+  result.textContent =
+    `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
+  result.style.color = "red";
 
-    correct = 0;
-    hintTotal = 0;
+  correct = 0;
+  hintTotal = 0;
 
-    wasWrong = true;
+  wasWrong = true;
+
+  // 🔥 追加（コンプリート時だけ止める）
+  if (gameMode === "complete") {
+    stopTimer();
   }
+}
 
   updateScore();
 }  
@@ -546,6 +560,11 @@ function loadBest() {
   result.textContent =
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
+
+   // 🔥 タイマー停止
+if (gameMode === "complete") {
+  stopTimer();
+}
 
   correct = 0;
   hintTotal = 0;
