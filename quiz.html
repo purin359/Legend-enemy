@@ -264,6 +264,11 @@ buildStageList(mode);
   document.getElementById("timer").style.display = "none";
 }
 
+  if (gameMode === "complete") {
+  resetTimer();
+  startTimer();
+}
+
   updateScore();
   nextQuiz();
 }
@@ -311,10 +316,8 @@ function nextQuiz() {
   // 🔥 問題出す時にタイマー再開
   if (gameMode === "complete") {
 
-    timer = 0;
   document.getElementById("timer").textContent = "00:00";
     
-    startTimer();
   }
 
   let q;
@@ -701,6 +704,12 @@ function formatTime(sec) {
   if (!data || timer < Number(data)) {
     localStorage.setItem(key, timer);
   }
+}
+
+  function resetTimer() {
+  stopTimer();
+  timer = 0;
+  document.getElementById("timer").textContent = "00:00";
 }
   
 init();
