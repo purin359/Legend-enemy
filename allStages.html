@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>全ステージ一覧</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  max-width: 1400px;
+  margin: auto;
+  padding: 20px;
+}
+
+.stageTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+.stageTable th, .stageTable td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.stageTable th {
+  width: 120px;
+  background: #f0f0f0;
+}
+
+img {
+  width: 45px;
+  margin-right: 5px;
+}
+</style>
+</head>
+<body>
+
+<h2>全ステージ一覧</h2>
+
+<select id="mode" onchange="load()">
+  <option value="ALL">全て</option>
+  <option value="N">レジェンド</option>
+  <option value="NA">真レジェンド</option>
+  <option value="ND">レジェンド0</option>
+</select>
+
+<div id="list"></div>
+
+<script>
+function normalize(str) {
+  return str
+    .replace(/\r?\n/g, "")
+    .replace(/[ 　]+/g, "")
+    .trim();
+}
+
+async function load() {
+  const mode = document.getElementById("mode").value;
+  const stagesData = await fetch("stages.json").then(r=>r.json());
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  stagesData.forEach(ch => {
+
+    const isTarget =
+      (mode === "ALL") ||
+
+      (mode === "N" && (
+        (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+        || ch.chapterId === "E026"
+      )) ||
+
+      (mode === "NA" && (
+        ch.chapterId.startsWith("NA")
+        || ch.chapterId === "E068"
+        || ch.chapterId === "E069"
+      )) ||
+
+      (mode === "ND" && ch.chapterId.startsWith("ND"));
+
+    if (!isTarget) return;
+
+    ch.stages.forEach(st => {
+
+      const table = document.createElement("table");
+      table.className = "stageTable";
+
+      // ステージ名
+      const tr1 = document.createElement("tr");
+      tr1.innerHTML = `
+        <th>ステージ</th>
+        <td>${ch.chapterName}-${st.stageName}</td>
+      `;
+
+      // 敵
+      const tr2 = document.createElement("tr");
+      const th = document.createElement("th");
+      th.textContent = "出現する敵";
+
+      const td = document.createElement("td");
+
+      st.enemies.forEach(enemyName => {
+
+        // ▼ カンバン娘除外（表示だけ）
+        if (enemyName === "カンバン娘") return;
+
+        const baseName = enemyName
+          .replace(/\r?\n/g, "")
+          .trim();
+
+        const fileName = baseName
+          .replace(/[：:]/g, " ")
+          .replace(/[ 　]+/g, "");
+
+        const img = document.createElement("img");
+        img.src = "image/" + encodeURIComponent(fileName) + ".png";
+        img.onerror = () => img.src = "image/noimage.png";
+
+        td.appendChild(img);
+      });
+
+      tr2.appendChild(th);
+      tr2.appendChild(td);
+
+      table.appendChild(tr1);
+      table.appendChild(tr2);
+
+      list.appendChild(table);
+    });
+
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
