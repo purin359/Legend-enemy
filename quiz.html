@@ -240,10 +240,13 @@ function nextQuiz() {
 
     ch.stages.forEach(st => {
       pool.push({
-        stageName: st.stageName,
-        chapterName: ch.chapterName,
-        enemies: st.enemies
-      });
+  stageName: st.stageName,
+  chapterName: ch.chapterName,
+  chapterId: ch.chapterId,
+  stageId: st.stageId,
+  enemies: st.enemies
+});
+      
     });
   });
 
@@ -271,7 +274,19 @@ function nextQuiz() {
   
 function check() {
   const input = document.getElementById("answer").value;
-  const ok = normalize(input) === normalize(current.stageName);
+  const inputNorm = normalize(input);
+
+// ▼ ステージ名
+const nameOK =
+  inputNorm === normalize(current.stageName);
+
+// ▼ ステージID（ND001-1 形式）
+const idText = `${current.chapterId}-${current.stageId}`;
+const idOK =
+  inputNorm === normalize(idText);
+
+// ▼ どっちか合ってればOK
+const ok = nameOK || idOK;
 
   const result = document.getElementById("result");
 
