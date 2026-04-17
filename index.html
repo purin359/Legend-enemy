@@ -31,11 +31,8 @@ th { cursor:pointer; }
   <option value="order">図鑑順</option>
 </select>
 
-<select id="order" onchange="changeOrder()">
-  <option value="desc">降順</option>
-  <option value="asc">昇順</option>
-</select>
-
+<button id="orderBtn" onclick="toggleOrder()">降順</button>
+  
   <button onclick="goAllStages()">全ステージ一覧へ</button>
 
 <table>
@@ -239,9 +236,9 @@ function goDetail(name) {
   sortMode = document.getElementById("sort").value;
 
   // ▼ 回数以外は昇降非表示
-  const order = document.getElementById("order");
-  order.style.display = (sortMode === "count") ? "inline-block" : "none";
-
+  const btn = document.getElementById("orderBtn");
+btn.style.display = (sortMode === "count") ? "inline-block" : "none";
+    
   load();
 }
 
@@ -268,6 +265,15 @@ function setDesc() {
   url.searchParams.set("mode", mode);
 
   location.href = url.toString();
+}
+
+  function toggleOrder() {
+  desc = !desc;
+
+  const btn = document.getElementById("orderBtn");
+  btn.textContent = desc ? "降順" : "昇順";
+
+  load();
 }
 
 init();
