@@ -287,24 +287,15 @@ function nextQuiz() {
 
   const mode = document.getElementById("mode").value;
 
-  // 🔥 初期化
+  // 🔥 初回生成
   if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
     remaining = [...pool];
-    startTimer();
   }
 
-  // 🔥 終了判定
-  // 初回だけ生成
-if (gameMode === "complete" && pool.length === 0) {
-  pool = buildPool(mode);
-  remaining = [...pool];
-}
-
-// 🔥 問題表示時に毎回タイマー再開
-if (gameMode === "complete") {
-  startTimer();
-}
+  // 🔥 クリア判定
+  if (gameMode === "complete" && remaining.length === 0) {
+    stopTimer();
 
     document.getElementById("result").textContent =
       `🎉 クリア！ タイム: ${formatTime(timer)}`;
@@ -312,19 +303,26 @@ if (gameMode === "complete") {
     saveCompleteRecord();
     return;
   }
-  
+
+  // 🔥 問題出す時にタイマー再開
+  if (gameMode === "complete") {
+    startTimer();
+  }
+
   let q;
 
   if (gameMode === "complete") {
     const i = Math.floor(Math.random() * remaining.length);
-    q = remaining.splice(i, 1)[0]; // 🔥取り出して削除
+    q = remaining.splice(i, 1)[0];
   } else {
+    if (pool.length === 0) {
+      pool = buildPool(mode);
+    }
     q = pool[Math.floor(Math.random() * pool.length)];
   }
 
   current = q;
 
-  // ▼描画（そのまま）
   const enemiesDiv = document.getElementById("enemies");
   enemiesDiv.innerHTML = "";
 
@@ -345,6 +343,9 @@ if (gameMode === "complete") {
 
   document.getElementById("answer").value = "";
   document.getElementById("result").textContent = "";
+
+  answered = false;
+  wasWrong = false;
 }
   
 function check() {
@@ -382,7 +383,6 @@ function check() {
     setTimeout(nextQuiz, 800);
 
   } else {
-    } else {
   result.textContent =
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
@@ -392,7 +392,6 @@ function check() {
 
   wasWrong = true;
 
-  // 🔥 追加（コンプリート時だけ止める）
   if (gameMode === "complete") {
     stopTimer();
   }
