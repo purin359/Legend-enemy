@@ -154,6 +154,8 @@ let justCorrect = false;
 let stageList = [];
 let hintTotal = 0;    // このゲーム中のヒント合計
 let bestHint = 9999;
+let answered = false;   // 回答済みか
+let lastResult = null;  // "ok" or "ng"
 
 // 画像用
 function getFileName(name) {
@@ -242,9 +244,11 @@ function nextQuiz() {
     hintTotal = 0;
   }
 
-  document.getElementById("suggest").innerHTML = "";
-
   justCorrect = false;
+
+  // ▼ 状態リセット
+  answered = false;
+  lastResult = null;
 
   updateScore();
 
@@ -307,12 +311,12 @@ function check() {
 
   const result = document.getElementById("result");
 
+  answered = true; // ←追加
+
   if (ok) {
 
     result.textContent = "正解！ 🎉";
     result.style.color = "green";
-
-    document.getElementById("suggest").innerHTML = "";
 
     correct++;
 
@@ -326,8 +330,7 @@ function check() {
     }
 
     justCorrect = true;
-
-    setTimeout(nextQuiz, 800);
+    lastResult = "ok"; // ←追加
 
   } else {
     result.textContent =
@@ -336,10 +339,12 @@ function check() {
 
     correct = 0;
     hintTotal = 0;
+
+    lastResult = "ng"; // ←追加
   }
 
   updateScore();
-}  
+}
   
 function updateScore() {
   document.getElementById("score").textContent =
@@ -437,20 +442,29 @@ function loadBest() {
     .trim();
 }
 
-  function skipQuiz() {
+ function skipQuiz() {
 
   const result = document.getElementById("result");
 
-  result.textContent =
-    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
-  result.style.color = "red";
+  // ▼ 未回答なら判定する
+  if (!answered) {
+    check();
+  }
 
-  correct = 0;
-  hintTotal = 0; // ←ここも🔥
+  // ▼ 正解済み → そのまま次へ
+  if (lastResult === "ok") {
+    nextQuiz();
+    return;
+  }
 
-  updateScore();
+  // ▼ 不正解済み → そのまま次へ（何もしない）
+  if (lastResult === "ng") {
+    nextQuiz();
+    return;
+  }
 
-  setTimeout(nextQuiz, 800);
+  // ▼ 念のため
+  nextQuiz();
 }
   
   function showHint() {
