@@ -486,7 +486,11 @@ function loadBest() {
   loadBest();
 
   const mode = document.getElementById("mode").value;
-  buildStageList(mode); // ←重要
+  buildStageList(mode);
+
+  // 🔥これ追加
+  pool = [];
+  remaining = [];
 
   updateScore();
   nextQuiz();
