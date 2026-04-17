@@ -606,13 +606,16 @@ function loadBest() {
 }
 
   function startTimer() {
-  clearInterval(timerId);
   startTime = Date.now();
 
+  if (timerId) clearInterval(timerId);
+
   timerId = setInterval(() => {
-    timer = Math.floor((Date.now() - startTime) / 1000);
-    document.getElementById("timer").textContent = formatTime(timer);
-  }, 1000);
+    const sec = Math.floor((Date.now() - startTime) / 1000);
+const m = String(Math.floor(sec / 60)).padStart(2, "0");
+const s = String(sec % 60).padStart(2, "0");
+
+document.getElementById("timer").textContent = `${m}:${s}`;
 }
 
 function stopTimer() {
