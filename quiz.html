@@ -139,13 +139,13 @@ function normalize(str) {
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
-  loadScore(); // ←追加
+  loadScore(); // ←これでOK
 
   document.getElementById("answer").addEventListener("keydown", e => {
     if (e.key === "Enter") check();
   });
 
-  updateScore(); // ←表示更新
+  updateScore();
   nextQuiz();
 }
   
@@ -242,29 +242,33 @@ function updateScore() {
 }
 
   function saveScore() {
-  localStorage.setItem("quizScore", JSON.stringify({
+  const mode = document.getElementById("mode").value;
+  const key = "quizScore_" + mode;
+
+  localStorage.setItem(key, JSON.stringify({
     correct,
     total
   }));
 }
 
 function loadScore() {
-  const data = localStorage.getItem("quizScore");
+  const mode = document.getElementById("mode").value;
+  const key = "quizScore_" + mode;
+
+  const data = localStorage.getItem(key);
   if (data) {
     const obj = JSON.parse(data);
     correct = obj.correct;
     total = obj.total;
+  } else {
+    correct = 0;
+    total = 0;
   }
 }
 
   function changeMode() {
-  // スコアリセット
-  correct = 0;
-  total = 0;
-
-  saveScore(); // ←リセットも保存
+  loadScore(); // ←モードに応じて読み込み
   updateScore();
-
   nextQuiz();
 }
   
