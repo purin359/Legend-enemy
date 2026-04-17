@@ -45,6 +45,7 @@ img {
 </style>
 </head>
 <body>
+<button onclick="goBack()">戻る</button>
 
 <h2>全ステージ一覧</h2>
 
@@ -179,6 +180,10 @@ async function load() {
 }
 
 load();
+
+  function goBack() {
+  history.back();
+}
 </script>
 
 </body>
