@@ -294,6 +294,8 @@ const ok = nameOK || idOK;
     result.textContent = "正解！ 🎉";
     result.style.color = "green";
 
+    document.getElementById("suggest").innerHTML = "";
+
     correct++;
 
     if (correct > bestScore) {
