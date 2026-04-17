@@ -22,6 +22,15 @@ button { padding:5px 10px; margin:5px; }
 
 <h2>ステージ当てクイズ</h2>
 
+<select id="mode" onchange="nextQuiz()">
+  <option value="ALL">全て</option>
+  <option value="N">レジェンド</option>
+  <option value="NA">真レジェンド</option>
+  <option value="ND">レジェンド0</option>
+</select>
+
+<p id="score">0 / 0</p>
+
 <div id="enemies"></div>
 
 <input id="answer" placeholder="ステージ名を入力">
@@ -35,7 +44,10 @@ button { padding:5px 10px; margin:5px; }
 let stagesData = [];
 let current = null;
 
-// 画像用変換
+let correct = 0;
+let total = 0;
+
+// 画像用
 function getFileName(name) {
   return name
     .replace(/\r?\n/g, "")
@@ -44,7 +56,7 @@ function getFileName(name) {
     .replace(/[ 　]+/g, "");
 }
 
-// 正規化（比較用）
+// 比較用
 function normalize(str) {
   return str
     .replace(/\r?\n/g, "")
@@ -57,26 +69,58 @@ async function init() {
   nextQuiz();
 }
 
+function isTargetChapter(ch, mode) {
+  return (
+    (mode === "ALL") ||
+
+    (mode === "N" && (
+      (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+      || ch.chapterId === "E026"
+    )) ||
+
+    (mode === "NA" && (
+      ch.chapterId.startsWith("NA")
+      || ch.chapterId === "E068"
+      || ch.chapterId === "E069"
+    )) ||
+
+    (mode === "ND" && ch.chapterId.startsWith("ND"))
+  );
+}
+
 function nextQuiz() {
+
+  const mode = document.getElementById("mode").value;
 
   document.getElementById("result").textContent = "";
   document.getElementById("answer").value = "";
 
-  // ランダム章
-  const ch = stagesData[Math.floor(Math.random() * stagesData.length)];
+  let pool = [];
 
-  // ランダムステージ
-  const st = ch.stages[Math.floor(Math.random() * ch.stages.length)];
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
 
-  current = {
-    answer: st.stageName,
-    chapter: ch.chapterName
-  };
+    ch.stages.forEach(st => {
+      pool.push({
+        stageName: st.stageName,
+        chapterName: ch.chapterName,
+        enemies: st.enemies
+      });
+    });
+  });
+
+  // ランダム
+  const q = pool[Math.floor(Math.random() * pool.length)];
+
+  current = q;
+
+  total++;
+  updateScore();
 
   const enemiesDiv = document.getElementById("enemies");
   enemiesDiv.innerHTML = "";
 
-  st.enemies.forEach(enemy => {
+  q.enemies.forEach(enemy => {
 
     if (enemy === "カンバン娘") return;
 
@@ -91,16 +135,24 @@ function nextQuiz() {
 function check() {
   const input = document.getElementById("answer").value;
 
-  const ok = normalize(input) === normalize(current.answer);
+  const ok = normalize(input) === normalize(current.stageName);
 
   const result = document.getElementById("result");
 
   if (ok) {
     result.textContent = "正解！ 🎉";
+    correct++;
   } else {
     result.textContent =
-      `不正解！ 正解：${current.chapter} - ${current.answer}`;
+      `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   }
+
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById("score").textContent =
+    `${correct} / ${total}`;
 }
 
 init();
