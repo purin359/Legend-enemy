@@ -152,7 +152,7 @@ let correct = 0;      // 連続正解数
 let bestScore = 0;    // 最高記録
 let justCorrect = false;
 let stageList = [];
-let hintCount = 0;
+let hintTotal = 0;    // このゲーム中のヒント合計
 let bestHint = 9999;
 
 // 画像用
@@ -235,11 +235,10 @@ function nextQuiz() {
 
   if (!justCorrect) {
     correct = 0;
+    hintTotal = 0;
   }
 
   justCorrect = false;
-
-  hintCount = 0;
 
   updateScore();
 
@@ -306,42 +305,39 @@ const ok = nameOK || idOK;
   const result = document.getElementById("result");
 
   if (ok) {
-    result.textContent = "正解！ 🎉";
-    result.style.color = "green";
 
-    document.getElementById("suggest").innerHTML = "";
+  correct++;
 
-    correct++;
-
-    if (
+  if (
     correct > bestScore ||
-    (correct === bestScore && hintCount < bestHint)
+    (correct === bestScore && hintTotal < bestHint)
   ) {
     bestScore = correct;
-    bestHint = hintCount;
+    bestHint = hintTotal;
     saveBest();
   }
 
   justCorrect = true;
-    
-    setTimeout(nextQuiz, 800);
+
+  setTimeout(nextQuiz, 800);
+}
 
   } else {
-    result.textContent =
-      `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
-    result.style.color = "red";
+  result.textContent =
+    `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
+  result.style.color = "red";
 
-    correct = 0;
-  }
-
+  correct = 0;
+  hintTotal = 0; // ←ここ重要🔥
+}
+  
   updateScore();
 }  
   
 function updateScore() {
   document.getElementById("score").textContent =
-    `連続: ${correct} / 最高: ${bestScore}（ヒント: ${hintCount}）`;
+    `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestScore}（ヒント: ${bestHint}）`;
 }
-
   function saveScore() {
   const mode = document.getElementById("mode").value;
   const key = "quizScore_" + mode;
@@ -433,21 +429,18 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  // ▼ 未回答 or 間違い扱い
   result.textContent =
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  // ▼ 連続リセット
   correct = 0;
-  justCorrect = false;
+  hintTotal = 0; // ←ここも🔥
 
   updateScore();
 
-  // ▼ 少し待って次へ
   setTimeout(nextQuiz, 800);
 }
-
+  
   function showHint() {
 
   const mode = document.getElementById("mode").value;
@@ -478,7 +471,7 @@ function loadBest() {
   result.textContent = hint;
   result.style.color = "blue";
 
-  hintCount++;
+  hintTotal++; // ←ここ変更🔥
   updateScore();
 }
   
