@@ -12,28 +12,18 @@ body {
   padding: 20px;
 }
 
-.stageTable {
+  .stageTable {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
-.stageTable th, .stageTable td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
-
-.stageTable th {
-  width: 120px;
-  background: #f0f0f0;
-}
-
-  h3 {
+h3 {
   margin: 0 0 10px 0;
   padding: 5px;
   background: #eee;
 }
-
+  
 .stageRow {
   margin-bottom: 10px;
 }
@@ -116,17 +106,35 @@ title.textContent = ch.chapterName;
 chapterBox.appendChild(title);
 
 // ▼ ステージまとめ
+const chapterBox = document.createElement("div");
+chapterBox.style.border = "2px solid #ccc";
+chapterBox.style.padding = "10px";
+chapterBox.style.marginBottom = "20px";
+
+// ▼ 章名
+const title = document.createElement("h3");
+title.textContent = ch.chapterName;
+chapterBox.appendChild(title);
+
+// ▼ ステージ（今までのやつをそのまま使う）
 ch.stages.forEach(st => {
 
-  const row = document.createElement("div");
-  row.style.marginBottom = "8px";
+  const table = document.createElement("table");
+  table.className = "stageTable";
 
   // ステージ名
-  const stageName = document.createElement("div");
-  stageName.textContent = st.stageName;
+  const tr1 = document.createElement("tr");
+  tr1.innerHTML = `
+    <th>ステージ</th>
+    <td>${st.stageName}</td>
+  `;
 
   // 敵
-  const enemyBox = document.createElement("div");
+  const tr2 = document.createElement("tr");
+  const th = document.createElement("th");
+  th.textContent = "出現する敵";
+
+  const td = document.createElement("td");
 
   st.enemies.forEach(enemyName => {
 
@@ -142,7 +150,6 @@ ch.stages.forEach(st => {
     img.src = "image/" + encodeURIComponent(fileName) + ".png";
     img.onerror = () => img.src = "image/noimage.png";
 
-    // クリックで詳細
     img.addEventListener("click", () => {
       const url = new URL("detail.html", location.href);
       url.searchParams.set("name", enemyName);
@@ -150,15 +157,20 @@ ch.stages.forEach(st => {
       location.href = url;
     });
 
-    enemyBox.appendChild(img);
+    td.appendChild(img);
   });
 
-  row.appendChild(stageName);
-  row.appendChild(enemyBox);
+  tr2.appendChild(th);
+  tr2.appendChild(td);
 
-  chapterBox.appendChild(row);
+  table.appendChild(tr1);
+  table.appendChild(tr2);
+
+  // 🔥 ここが重要（listじゃなくchapterに入れる）
+  chapterBox.appendChild(table);
 });
 
+// 最後にまとめて追加
 list.appendChild(chapterBox);
     
   });
