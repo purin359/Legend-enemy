@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ</title>
+<title>ステージ当てクイズ１</title>
 
 <style>
 body {
@@ -675,12 +675,15 @@ function formatTime(sec) {
   const timerEl = document.getElementById("timer");
   timerEl.textContent = "00:00";
 
-  // ▼ ここ追加
   if (gameMode === "endless") {
     timerEl.style.display = "none";
   } else {
     timerEl.style.display = "block";
   }
+
+  // ▼ 追加
+  loadBest();
+  updateScore();
 
   nextQuiz();
 }
