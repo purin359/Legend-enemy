@@ -180,6 +180,10 @@ buildStageList(mode);
 
   loadBest();
 
+  document.getElementById("answer").addEventListener("keydown", e => {
+  if (e.key === "Enter") check();
+});
+
   document.getElementById("answer").addEventListener("input", () => {
   const input = document.getElementById("answer").value;
   const suggest = document.getElementById("suggest");
@@ -238,6 +242,8 @@ function nextQuiz() {
     hintTotal = 0;
   }
 
+  document.getElementById("suggest").innerHTML = "";
+
   justCorrect = false;
 
   updateScore();
@@ -290,50 +296,50 @@ function check() {
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
-// ▼ ステージ名
-const nameOK =
-  inputNorm === normalize(current.stageName);
+  const nameOK =
+    inputNorm === normalize(current.stageName);
 
-// ▼ ステージID（ND001-1 形式）
-const idText = `${current.chapterId}-${current.stageId}`;
-const idOK =
-  inputNorm === normalize(idText);
+  const idText = `${current.chapterId}-${current.stageId}`;
+  const idOK =
+    inputNorm === normalize(idText);
 
-// ▼ どっちか合ってればOK
-const ok = nameOK || idOK;
+  const ok = nameOK || idOK;
 
   const result = document.getElementById("result");
 
   if (ok) {
 
-  correct++;
+    result.textContent = "正解！ 🎉";
+    result.style.color = "green";
 
-  if (
-    correct > bestScore ||
-    (correct === bestScore && hintTotal < bestHint)
-  ) {
-    bestScore = correct;
-    bestHint = hintTotal;
-    saveBest();
-  }
+    document.getElementById("suggest").innerHTML = "";
 
-  justCorrect = true;
+    correct++;
 
-  setTimeout(nextQuiz, 800);
-}
+    if (
+      correct > bestScore ||
+      (correct === bestScore && hintTotal < bestHint)
+    ) {
+      bestScore = correct;
+      bestHint = hintTotal;
+      saveBest();
+    }
+
+    justCorrect = true;
+
+    setTimeout(nextQuiz, 800);
 
   } else {
-  result.textContent =
-    `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
-  result.style.color = "red";
+    result.textContent =
+      `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
+    result.style.color = "red";
 
-  correct = 0;
-  hintTotal = 0; // ←ここ重要🔥
-}
-  
+    correct = 0;
+    hintTotal = 0;
+  }
+
   updateScore();
 }  
-  
 function updateScore() {
   document.getElementById("score").textContent =
     `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestScore}（ヒント: ${bestHint}）`;
