@@ -38,6 +38,8 @@ img {
 </head>
 <body>
 
+<button onclick="goBack()">戻る</button>
+
 <h2 id="title"></h2>
 <p id="count"></p>
   <label>
@@ -166,6 +168,10 @@ if (mode === "ALL") {
 }
 
 load();
+
+  function goBack() {
+  history.back();
+}
 
 </script>
 
