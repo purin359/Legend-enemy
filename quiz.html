@@ -7,89 +7,63 @@
 <style>
 body {
   font-family: sans-serif;
-  background: #f5f7fa;
-  margin: 0;
-  padding: 20px;
-  text-align: center;
-}
-
-/* 全体カード */
-.container {
-  max-width: 800px;
+  padding: 16px;
+  max-width: 600px;
   margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* タイトル */
 h2 {
-  margin-top: 0;
+  font-size: 22px;
+  margin-bottom: 12px;
 }
 
-/* 上部バー */
-.topBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-/* スコア */
-#score {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-/* 敵表示 */
-#enemies {
-  background: #eef3ff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
-
-#enemies img {
-  width: 50px;
-  margin: 6px;
-}
-
-/* 入力 */
+/* 入力欄 */
 input {
-  padding: 8px;
-  width: 70%;
-  border-radius: 6px;
+  font-size: 16px;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  margin-bottom: 10px;
 }
 
 /* ボタン */
 button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  background: #4a90e2;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #357bd8;
-}
-
-/* 結果 */
-#result {
-  margin-top: 10px;
-  font-size: 18px;
-}
-
-  input {
   font-size: 16px;
-  transform: scale(0.9);
-  transform-origin: left center;
-  width: calc(100% / 0.9); /* ←これが超重要 */
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  margin: 5px 5px 10px 0;
 }
-  
+
+/* セレクト */
+select {
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+
+/* テーブル */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* 画像 */
+img {
+  width: 50px;
+}  
 </style>
 </head>
 <body>
