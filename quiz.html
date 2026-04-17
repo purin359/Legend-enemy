@@ -111,8 +111,9 @@ img {
 let stagesData = [];
 let current = null;
 
-let correct = 0;
-let total = 0;
+let correct = 0;      // 連続正解数
+let bestScore = 0;    // 最高記録
+let justCorrect = false;
 
 // 画像用
 function getFileName(name) {
@@ -134,7 +135,7 @@ function normalize(str) {
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
-  loadScore();
+  loadBest(); // ←変更
 
   document.getElementById("answer").addEventListener("keydown", e => {
     if (e.key === "Enter") check();
@@ -165,6 +166,14 @@ function isTargetChapter(ch, mode) {
 
 function nextQuiz() {
 
+  if (!justCorrect) {
+    correct = 0;
+  }
+
+  justCorrect = false;
+
+  updateScore();
+
   const mode = document.getElementById("mode").value;
 
   document.getElementById("result").textContent = "";
@@ -184,54 +193,53 @@ function nextQuiz() {
     });
   });
 
-  // ランダム
   const q = pool[Math.floor(Math.random() * pool.length)];
-
   current = q;
 
-  total++;
-  updateScore();
-
   const enemiesDiv = document.getElementById("enemies");
-enemiesDiv.innerHTML = "";
+  enemiesDiv.innerHTML = "";
 
-// ▼ 追加（枠）
-const box = document.createElement("div");
-box.className = "enemyBox";
+  const box = document.createElement("div");
+  box.className = "enemyBox";
 
-q.enemies.forEach(enemy => {
+  q.enemies.forEach(enemy => {
+    if (enemy === "カンバン娘") return;
 
-  if (enemy === "カンバン娘") return;
+    const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+    img.onerror = () => img.src = "image/noimage.png";
 
-  const img = document.createElement("img");
-  img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
-  img.onerror = () => img.src = "image/noimage.png";
+    box.appendChild(img);
+  });
 
-  // ▼ ここ変更
-  box.appendChild(img);
-});
-
-// ▼ 最後に入れる
-enemiesDiv.appendChild(box);
+  enemiesDiv.appendChild(box);
 }
-
+  
 function check() {
   const input = document.getElementById("answer").value;
-
   const ok = normalize(input) === normalize(current.stageName);
 
   const result = document.getElementById("result");
 
   if (ok) {
-    result.textContent = "正解！ 🎉";
-    result.style.color = "green";
-    correct++;
+  correct++;
 
-    setTimeout(nextQuiz, 800);
+  if (correct > bestScore) {
+    bestScore = correct;
+    saveBest();
+  }
+
+  justCorrect = true; // ←これ追加
+
+  setTimeout(nextQuiz, 800);
+}
+
   } else {
     result.textContent =
       `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
     result.style.color = "red";
+
+    correct = 0; // ←リセット
   }
 
   updateScore();
@@ -239,9 +247,7 @@ function check() {
   
 function updateScore() {
   document.getElementById("score").textContent =
-    `${correct} / ${total}`;
-
-  saveScore(); // ←追加
+    `連続: ${correct} / 最高: ${bestScore}`;
 }
 
   function saveScore() {
@@ -254,26 +260,28 @@ function updateScore() {
   }));
 }
 
-function loadScore() {
+function saveBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizScore_" + mode;
+  const key = "quizBest_" + mode;
+
+  localStorage.setItem(key, bestScore);
+}
+
+function loadBest() {
+  const mode = document.getElementById("mode").value;
+  const key = "quizBest_" + mode;
 
   const data = localStorage.getItem(key);
-  if (data) {
-    const obj = JSON.parse(data);
-    correct = obj.correct;
-    total = obj.total;
-  } else {
-    correct = 0;
-    total = 0;
-  }
+  bestScore = data ? Number(data) : 0;
 }
 
   function changeMode() {
-  loadScore(); // ←モードに応じて読み込み
+  correct = 0;
+  loadBest();
   updateScore();
   nextQuiz();
 }
+
   
 init();
 </script>
