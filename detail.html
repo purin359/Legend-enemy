@@ -64,6 +64,7 @@ async function load() {
 
   const stagesData = await fetch("stages.json").then(r=>r.json());
   const ul = document.getElementById("list");
+  ul.innerHTML = "";
 
   let total = 0;
 
