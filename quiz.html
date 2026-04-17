@@ -5,41 +5,113 @@
 <title>ステージ当てクイズ</title>
 
 <style>
-body { font-family: sans-serif; padding:20px; text-align:center; }
-
-#enemies img {
-  width:60px;
-  margin:5px;
+body {
+  font-family: sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
 }
 
-input { padding:5px; width:250px; }
-button { padding:5px 10px; margin:5px; }
+/* 全体カード */
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-#result { margin-top:10px; font-weight:bold; }
+/* タイトル */
+h2 {
+  margin-top: 0;
+}
+
+/* 上部バー */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* スコア */
+#score {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 敵表示 */
+#enemies {
+  background: #eef3ff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+#enemies img {
+  width: 70px;
+  margin: 6px;
+}
+
+/* 入力 */
+input {
+  padding: 8px;
+  width: 70%;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ボタン */
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #4a90e2;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #357bd8;
+}
+
+/* 結果 */
+#result {
+  margin-top: 10px;
+  font-size: 18px;
+}
 </style>
 </head>
 <body>
 
-<h2>ステージ当てクイズ</h2>
+<div class="container">
 
-<select id="mode" onchange="nextQuiz()">
-  <option value="ALL">全て</option>
-  <option value="N">レジェンド</option>
-  <option value="NA">真レジェンド</option>
-  <option value="ND">レジェンド0</option>
-</select>
+  <h2>ステージ当てクイズ</h2>
 
-<p id="score">0 / 0</p>
+  <div class="topBar">
+    <select id="mode" onchange="nextQuiz()">
+      <option value="ALL">全て</option>
+      <option value="N">レジェンド</option>
+      <option value="NA">真レジェンド</option>
+      <option value="ND">レジェンド0</option>
+    </select>
 
-<div id="enemies"></div>
+    <div id="score">0 / 0</div>
+  </div>
 
-<input id="answer" placeholder="ステージ名を入力">
-<br>
-<button onclick="check()">回答</button>
-<button onclick="nextQuiz()">次の問題</button>
+  <div id="enemies"></div>
 
-<div id="result"></div>
+  <input id="answer" placeholder="ステージ名を入力">
+  <br><br>
 
+  <button onclick="check()">回答</button>
+  <button onclick="nextQuiz()">次の問題</button>
+
+  <div id="result"></div>
+
+</div>
 <script>
 let stagesData = [];
 let current = null;
