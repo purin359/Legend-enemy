@@ -556,7 +556,8 @@ function loadBest() {
   // ▼ 不正解後は何もせず次へ
   if (wasWrong) {
 
-  resetRound(); // ←これ追加🔥
+  resetCompleteProgress();
+  wasWrong = false;
 
   if (gameMode === "complete") {
     resetTimer(); 
@@ -773,7 +774,6 @@ function unlockButtons() {
 }
 
   function handleWrong() {
-  resetRound();
   wasWrong = true;
 
   if (gameMode === "complete") {
@@ -781,6 +781,14 @@ function unlockButtons() {
   }
 
   updateScore();
+}
+
+  function resetCompleteProgress() {
+  if (gameMode === "complete") {
+    remainCount = totalCount;
+  }
+
+  resetRound();
 }
   
 init();
