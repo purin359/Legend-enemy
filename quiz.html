@@ -528,9 +528,6 @@ function loadBest() {
   pool = [];
   remaining = [];
 
-  totalCount = 0;
-  remainCount = 0;
-  initCompleteCount(mode);
   updateScore();
   nextQuiz();
 }
@@ -621,6 +618,7 @@ function loadBest() {
       updateScore();
       lockButtons();
       setTimeout(nextQuiz, 800);
+    }
       return;
     }
   }
