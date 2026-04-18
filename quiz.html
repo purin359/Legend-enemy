@@ -120,7 +120,17 @@ img {
 
 .topBar2 {
   display: flex;
-  margin-top: 6px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.leftBox {
+  display: flex;
+  flex-direction: column;
+}
+
+#remaining {
+  font-size: 16px;
 }
 
 /* スコアは左 */
@@ -165,8 +175,11 @@ img {
 </div>
 
 <div class="topBar2">
-  <div id="score"></div>
-  <div id="timer"></div>
+  <div class="leftBox">
+    <div id="score"></div>
+    <div id="timer"></div>
+  </div>
+  <div id="remaining"></div>
 </div>
 
   <div id="enemies"></div>
@@ -426,6 +439,13 @@ function updateScore() {
     if (bestTime) {
       bestText += ` / 最速: ${formatTime(Number(bestTime))}`;
     }
+
+    const remainText =
+  gameMode === "complete"
+    ? `残り: ${remaining.length}`
+    : "";
+
+document.getElementById("remaining").textContent = remainText;
   }
 
   document.getElementById("score").textContent =
