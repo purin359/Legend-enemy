@@ -216,7 +216,6 @@ let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
-let remainCount = 0;  // 残り問題数
 
 // 画像用
 function getFileName(name) {
@@ -389,8 +388,6 @@ function check() {
   answered = true;
 
   if (ok) {
-  remainCount--;
-
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
 
@@ -439,7 +436,7 @@ function updateScore() {
 
     const remainText =
   gameMode === "complete" && totalCount > 0
-    ? `残り: ${remainCount} / ${totalCount}`
+    ? `残り: ${remaining.length} / ${totalCount}`
     : "";
 
     document.getElementById("remaining").textContent = remainText;
@@ -559,10 +556,6 @@ function loadBest() {
   resetCompleteProgress();
   wasWrong = false;
 
-  if (gameMode === "complete") {
-    resetTimer(); 
-  }
-
   updateScore(); // ←表示更新も必須
 
   nextQuiz();
@@ -582,7 +575,6 @@ function loadBest() {
     const ok = nameOK || idOK;
 
     if (ok) {
-      remainCount--;
       result.textContent = "正解！ 🎉";
       result.style.color = "green";
 
@@ -785,7 +777,13 @@ function unlockButtons() {
 
   function resetCompleteProgress() {
   if (gameMode === "complete") {
-    remainCount = totalCount;
+    const mode = document.getElementById("mode").value;
+
+    pool = buildPool(mode);
+    remaining = [...pool]; // ←これで完全復元
+
+    stopTimer();
+    resetTimer();
   }
 
   resetRound();
