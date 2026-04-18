@@ -215,6 +215,8 @@ let remaining = [];   // コンプリート用（残り問題）
 let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
+let totalCount = 0;   // 総問題数
+let remainCount = 0;  // 残り問題数
 
 // 画像用
 function getFileName(name) {
@@ -313,6 +315,9 @@ function nextQuiz() {
   if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
     remaining = [...pool];
+
+    totalCount = pool.length;
+  remainCount = totalCount;
   }
 
   // 🔥 クリア判定
@@ -387,6 +392,7 @@ function check() {
   answered = true;
 
   if (ok) {
+    remainCount--;
     result.textContent = "正解！ 🎉";
     result.style.color = "green";
 
@@ -442,7 +448,7 @@ function updateScore() {
 
     const remainText =
   gameMode === "complete"
-    ? `残り: ${remaining.length}`
+    ? `残り: ${remainCount} / ${totalCount}`
     : "";
 
 document.getElementById("remaining").textContent = remainText;
@@ -520,6 +526,8 @@ function loadBest() {
   pool = [];
   remaining = [];
 
+  totalCount = 0;
+remainCount = 0;
   updateScore();
   nextQuiz();
 }
@@ -722,6 +730,8 @@ function formatTime(sec) {
     startTimer();
   }
 
+   totalCount = 0;
+remainCount = 0;
   loadBest();
   updateScore();
   nextQuiz();
