@@ -308,9 +308,11 @@ function nextQuiz() {
     return;
   }
 
-  // 🔥 問題出す時にタイマー再開
-  if (gameMode === "complete") {
-
+ // 🔥 問題出す時にタイマー再開
+if (gameMode === "complete") {
+  startTimer(); // ←これに変更
+}
+  
   document.getElementById("timer").textContent = "00:00";
     
   }
@@ -622,8 +624,8 @@ if (gameMode === "complete") {
 }
 
   function startTimer() {
-  startTime = Date.now() - timer * 1000;
-    
+  startTime = Date.now() - timer * 1000; // ←超重要
+
   if (timerId) clearInterval(timerId);
 
   timerId = setInterval(() => {
@@ -634,7 +636,7 @@ if (gameMode === "complete") {
     const s = String(sec % 60).padStart(2, "0");
 
     document.getElementById("timer").textContent = `${m}:${s}`;
-  }, 1000); 
+  }, 1000);
 }
 
 function stopTimer() {
@@ -673,6 +675,7 @@ function formatTime(sec) {
   pool = [];
   remaining = [];
 
+  // 🔥 完全リセット
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
@@ -684,7 +687,7 @@ function formatTime(sec) {
   } else {
     timerEl.style.display = "block";
 
-    // 🔥ここで開始
+    // 🔥ここ超重要
     startTimer();
   }
 
@@ -692,6 +695,7 @@ function formatTime(sec) {
   updateScore();
   nextQuiz();
 }
+  
   function saveCompleteRecord() {
   const mode = document.getElementById("mode").value;
   const key = "complete_" + mode + "_" + gameMode;
