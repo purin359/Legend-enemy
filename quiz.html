@@ -315,9 +315,6 @@ function nextQuiz() {
   if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
     remaining = [...pool];
-
-    totalCount = pool.length;
-  remainCount = totalCount;
   }
 
   // 🔥 クリア判定
@@ -447,11 +444,9 @@ function updateScore() {
     }
 
     const remainText =
-  gameMode === "complete"
+  gameMode === "complete" && totalCount > 0
     ? `残り: ${remainCount} / ${totalCount}`
     : "";
-
-document.getElementById("remaining").textContent = remainText;
   }
 
   document.getElementById("score").textContent =
@@ -527,7 +522,8 @@ function loadBest() {
   remaining = [];
 
   totalCount = 0;
-remainCount = 0;
+  remainCount = 0;
+  initCompleteCount(mode);
   updateScore();
   nextQuiz();
 }
@@ -730,8 +726,9 @@ function formatTime(sec) {
     startTimer();
   }
 
-   totalCount = 0;
-remainCount = 0;
+  totalCount = 0;
+  remainCount = 0;
+  initCompleteCount(mode);
   loadBest();
   updateScore();
   nextQuiz();
@@ -762,6 +759,13 @@ remainCount = 0;
 function unlockButtons() {
   document.getElementById("checkBtn").disabled = false;
   document.getElementById("skipBtn").disabled = false;
+}
+
+  function initCompleteCount(mode) {
+  const list = buildPool(mode);
+
+  totalCount = list.length;
+  remainCount = totalCount;
 }
   
 init();
