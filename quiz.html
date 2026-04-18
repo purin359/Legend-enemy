@@ -175,8 +175,8 @@ img {
 <div id="suggest"></div>
   <br><br>
 
-  <button onclick="check()">回答</button>
-  <button onclick="skipQuiz()">次の問題</button>
+  <button id="checkBtn" onclick="check()">回答</button>
+<button id="skipBtn" onclick="skipQuiz()">次の問題</button>
 
   <div id="result"></div>
 
@@ -350,6 +350,8 @@ if (gameMode === "complete") {
 
   answered = false;
   wasWrong = false;
+
+  unlockButtons();
 }
   
 function check() {
@@ -386,6 +388,7 @@ function check() {
     justCorrect = true;
     wasWrong = false;
 
+    lockButtons();
     setTimeout(nextQuiz, 800);
 
   } else {
@@ -563,6 +566,7 @@ function loadBest() {
       wasWrong = false;
 
       updateScore();
+      lockButtons();
       setTimeout(nextQuiz, 800);
       return;
     }
@@ -711,6 +715,16 @@ function formatTime(sec) {
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
+}
+
+  function lockButtons() {
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("skipBtn").disabled = true;
+}
+
+function unlockButtons() {
+  document.getElementById("checkBtn").disabled = false;
+  document.getElementById("skipBtn").disabled = false;
 }
   
 init();
