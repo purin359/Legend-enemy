@@ -563,6 +563,8 @@ function loadBest() {
   if (wasWrong) {
     if (gameMode === "complete") {
   resetTimer(); 
+  totalCount = 0;
+  remainCount = 0;
 }
     nextQuiz();
     return;
