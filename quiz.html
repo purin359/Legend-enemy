@@ -389,44 +389,39 @@ function check() {
   answered = true;
 
   if (ok) {
-    remainCount--;
-    result.textContent = "正解！ 🎉";
-    result.style.color = "green";
+  remainCount--;
 
-    document.getElementById("suggest").innerHTML = "";
+  result.textContent = "正解！ 🎉";
+  result.style.color = "green";
 
-    correct++;
+  document.getElementById("suggest").innerHTML = "";
 
-    if (
-      correct > bestScore ||
-      (correct === bestScore && hintTotal < bestHint)
-    ) {
-      bestScore = correct;
-      bestHint = hintTotal;
-      saveBest();
-    }
+  correct++;
 
-    justCorrect = true;
-    wasWrong = false;
+  if (
+    correct > bestScore ||
+    (correct === bestScore && hintTotal < bestHint)
+  ) {
+    bestScore = correct;
+    bestHint = hintTotal;
+    saveBest();
+  }
 
-    lockButtons();
-    setTimeout(nextQuiz, 800);
+  justCorrect = true;
+  wasWrong = false;
 
-  } else {
+  lockButtons();
+  updateScore(); // ←これ重要
+
+  setTimeout(nextQuiz, 800);
+
+} else {
   result.textContent =
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  resetRound(); // ←これに統一🔥
-
-  wasWrong = true;
-
-  if (gameMode === "complete") {
-    stopTimer();
+  handleWrong();
   }
-}
-
-  updateScore();
 }  
   
 function updateScore() {
@@ -616,17 +611,7 @@ function loadBest() {
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-   // タイマーリセット
-if (gameMode === "complete") {
-  resetTimer();
-}
-
-  correct = 0;
-  hintTotal = 0;
-
-  wasWrong = true;
-
-  updateScore();
+   handleWrong();
 
   setTimeout(nextQuiz, 800);
 }  
@@ -780,6 +765,17 @@ function unlockButtons() {
   function resetRound() {
   correct = 0;
   hintTotal = 0;
+}
+
+  function handleWrong() {
+  resetRound();
+  wasWrong = true;
+
+  if (gameMode === "complete") {
+    stopTimer();
+  }
+
+  updateScore();
 }
   
 init();
