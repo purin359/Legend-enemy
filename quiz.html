@@ -618,7 +618,6 @@ function loadBest() {
       updateScore();
       lockButtons();
       setTimeout(nextQuiz, 800);
-    }
       return;
     }
   }
@@ -636,6 +635,7 @@ if (gameMode === "complete") {
 handleWrong();
 
 setTimeout(nextQuiz, 800);
+} 
   
   function showHint() {
 
