@@ -308,12 +308,10 @@ function nextQuiz() {
     return;
   }
 
- // 🔥 問題出す時にタイマー再開
+// 🔥 問題出す時にタイマー再開
 if (gameMode === "complete") {
-  startTimer(); // ←これに変更
+  startTimer();
 }
-  
-  document.getElementById("timer").textContent = "00:00";
     
   }
 
