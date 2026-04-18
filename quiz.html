@@ -447,6 +447,8 @@ function updateScore() {
   gameMode === "complete" && totalCount > 0
     ? `残り: ${remainCount} / ${totalCount}`
     : "";
+
+    document.getElementById("remaining").textContent = remainText;
   }
 
   document.getElementById("score").textContent =
