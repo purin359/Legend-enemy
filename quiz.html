@@ -228,9 +228,10 @@ buildStageList(mode);
 
   loadBest();
 
-  document.getElementById("answer").addEventListener("keydown", e => {
-  if (e.key === "Enter") check();
-});
+  // 一旦消し
+  // document.getElementById("answer").addEventListener("keydown", e => {
+  // if (e.key === "Enter") check();
+// });
 
   document.getElementById("answer").addEventListener("input", () => {
   const input = document.getElementById("answer").value;
