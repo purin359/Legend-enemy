@@ -561,14 +561,21 @@ function loadBest() {
 
   // ▼ 不正解後は何もせず次へ
   if (wasWrong) {
-    if (gameMode === "complete") {
-  resetTimer(); 
-  remainCount = 0;
-}
-    nextQuiz();
-    return;
+
+  // 🔥 これ追加
+  correct = 0;
+  hintTotal = 0;
+
+  if (gameMode === "complete") {
+    resetTimer(); 
   }
 
+  updateScore(); // ←これも重要
+
+  nextQuiz();
+  return;
+}
+   
   // ▼ 未回答なら判定
   if (!answered) {
 
