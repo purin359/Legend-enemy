@@ -312,8 +312,6 @@ function nextQuiz() {
 if (gameMode === "complete") {
   startTimer();
 }
-    
-  }
 
   let q;
 
@@ -639,6 +637,7 @@ if (gameMode === "complete") {
 
 function stopTimer() {
   clearInterval(timerId);
+  timerId = null; // ←これ必須
 }
 
 function formatTime(sec) {
