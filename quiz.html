@@ -581,6 +581,7 @@ function loadBest() {
     const ok = nameOK || idOK;
 
     if (ok) {
+      remainCount--;
       result.textContent = "正解！ 🎉";
       result.style.color = "green";
 
