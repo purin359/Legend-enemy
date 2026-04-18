@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -319,10 +319,11 @@ function nextQuiz() {
 
   // 初回生成
   if (gameMode === "complete" && pool.length === 0) {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-  }
+  const mode = document.getElementById("mode").value;
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
+}
 
   // クリア判定
   if (gameMode === "complete" && remaining.length === 0) {
@@ -624,21 +625,19 @@ function loadBest() {
     }
   }
 
-  // ▼ それ以外（純粋スキップ）
-  result.textContent =
-    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
-  result.style.color = "red";
+ // ▼ 純粋スキップ
+result.textContent =
+  `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+result.style.color = "red";
 
-   wasWrong = true;
-
-   if (gameMode === "complete") {
-  resetTimer();
+// 🔥 完全リセット
+if (gameMode === "complete") {
+  resetCompleteProgress();  // ←これが本体
 }
 
-   handleWrong();
+handleWrong();
 
-  setTimeout(nextQuiz, 800);
-}  
+setTimeout(nextQuiz, 800);
   
   function showHint() {
 
@@ -724,13 +723,16 @@ function formatTime(sec) {
  function changePlayMode() {
   gameMode = document.getElementById("playMode").value;
 
-  pool = [];
-  remaining = [];
-
-  // 🔥 完全リセット
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
+
+  const mode = document.getElementById("mode").value;
+
+  // 🔥 先にプール作る
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
 
   const timerEl = document.getElementById("timer");
 
@@ -738,15 +740,9 @@ function formatTime(sec) {
     timerEl.style.display = "none";
   } else {
     timerEl.style.display = "block";
-
-    // 🔥ここ超重要
     startTimer();
   }
 
-  totalCount = 0;
-  remainCount = 0;
-  const mode = document.getElementById("mode").value;
-  initCompleteCount(mode);
   loadBest();
   updateScore();
   nextQuiz();
