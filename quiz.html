@@ -525,6 +525,9 @@ function loadBest() {
 
   // ▼ 不正解後は何もせず次へ
   if (wasWrong) {
+    if (gameMode === "complete") {
+  resetTimer(); 
+}
     nextQuiz();
     return;
   }
