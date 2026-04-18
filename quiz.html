@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -321,6 +321,7 @@ function nextQuiz() {
   if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
     remaining = [...pool];
+    totalCount = remaining.length;
   }
 
   // クリア判定
@@ -339,9 +340,8 @@ function nextQuiz() {
   let q;
 
   if (gameMode === "complete") {
-  const i = Math.floor(Math.random() * remaining.length);
-  q = remaining[i]; // ←削除しない
-}
+    const i = Math.floor(Math.random() * remaining.length);
+    q = remaining[i];
   } else {
     if (pool.length === 0) {
       pool = buildPool(mode);
