@@ -629,6 +629,12 @@ function loadBest() {
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
+   wasWrong = true;
+
+   if (gameMode === "complete") {
+  resetTimer();
+}
+
    handleWrong();
 
   setTimeout(nextQuiz, 800);
