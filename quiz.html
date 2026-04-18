@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -316,37 +316,30 @@ function nextQuiz() {
 
   const mode = document.getElementById("mode").value;
 
-  // 🔥 初回生成
+  // 初回生成
   if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
     remaining = [...pool];
   }
 
-  // 🔥 クリア判定
+  // クリア判定
   if (gameMode === "complete" && remaining.length === 0) {
     stopTimer();
-
     document.getElementById("result").textContent =
       `🎉 クリア！ タイム: ${formatTime(timer)}`;
-
     saveCompleteRecord();
     return;
   }
 
-// 🔥 問題出す時にタイマー再開
-if (gameMode === "complete") {
-  startTimer();
-}
+  if (gameMode === "complete") {
+    startTimer();
+  }
 
   let q;
 
   if (gameMode === "complete") {
-  remaining = remaining.filter(st =>
-    !(st.stageName === current.stageName &&
-      st.chapterId === current.chapterId &&
-      st.stageId === current.stageId)
-  );
-}
+    const i = Math.floor(Math.random() * remaining.length);
+    q = remaining[i]; // ←ここ重要（削除しない）
   } else {
     if (pool.length === 0) {
       pool = buildPool(mode);
