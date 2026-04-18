@@ -398,9 +398,9 @@ function check() {
 
   wasWrong = true;
 
-  if (gameMode === "complete") {
-    stopTimer();
-  }
+ if (gameMode === "complete") {
+  stopTimer();
+}
 }
 
   updateScore();
@@ -570,9 +570,9 @@ function loadBest() {
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-   // 🔥 タイマー停止
+   // タイマーリセット
 if (gameMode === "complete") {
-  stopTimer();
+  resetTimer();
 }
 
   correct = 0;
