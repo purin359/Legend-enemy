@@ -290,6 +290,10 @@ function isTargetChapter(ch, mode) {
 
     (mode === "ND" && ch.chapterId.startsWith("ND"))
   );
+
+  if (gameMode === "complete") {
+  resetTimer(); // ←変更
+}
 }
 
 function nextQuiz() {
