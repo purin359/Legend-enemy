@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ1</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -741,6 +741,9 @@ function formatTime(sec) {
     startTimer();
   }
 
+   pool = buildPool(mode);
+remaining = [...pool];
+totalCount = remaining.length;
   loadBest();
   updateScore();
   nextQuiz();
