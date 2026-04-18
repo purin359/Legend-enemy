@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ</title>
+<title>ステージ当てクイズ１</title>
 
 <style>
 body {
@@ -287,6 +287,7 @@ buildStageList(mode);
   const mode = document.getElementById("mode").value;
   pool = buildPool(mode);
   remaining = [...pool];
+  totalCount = remaining.length;
 }
 
 updateScore();
@@ -338,8 +339,9 @@ function nextQuiz() {
   let q;
 
   if (gameMode === "complete") {
-    const i = Math.floor(Math.random() * remaining.length);
-    q = remaining[i]; // ←ここ重要（削除しない）
+  const i = Math.floor(Math.random() * remaining.length);
+  q = remaining[i]; // ←削除しない
+}
   } else {
     if (pool.length === 0) {
       pool = buildPool(mode);
@@ -391,6 +393,14 @@ function check() {
   answered = true;
 
   if (ok) {
+
+  if (gameMode === "complete") {
+    remaining = remaining.filter(st =>
+      !(st.stageName === current.stageName &&
+        st.chapterId === current.chapterId &&
+        st.stageId === current.stageId)
+    );
+  }
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
 
@@ -558,6 +568,11 @@ function loadBest() {
 
   resetCompleteProgress();
   wasWrong = false;
+
+    if (gameMode === "complete") {
+    resetTimer(); // ←これ追加
+  }
+
 
   updateScore(); // ←表示更新も必須
 
@@ -785,15 +800,14 @@ function unlockButtons() {
   updateScore();
 }
 
-  function resetCompleteProgress() {
+ function resetCompleteProgress() {
   if (gameMode === "complete") {
     const mode = document.getElementById("mode").value;
 
     pool = buildPool(mode);
-    remaining = [...pool]; // ←これで完全復元
+    remaining = [...pool];
 
-    stopTimer();
-    resetTimer();
+    resetTimer(); // ←stopTimerいらない
   }
 
   resetRound();
