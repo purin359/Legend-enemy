@@ -156,10 +156,10 @@ img {
     <option value="ND">レジェンド0</option>
   </select>
 
-  <!-- <select id="playMode" onchange="changePlayMode()"> -->
-    <!-- <option value="endless">エンドレスモード</option> -->
-    <!-- <option value="complete">コンプリートモード</option> -->
-  <!-- </select> -->
+  <select id="playMode" onchange="changePlayMode()">
+    <option value="endless">エンドレスモード</option>
+    <option value="complete">コンプリートモード</option>
+  </select>
 
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
@@ -228,10 +228,9 @@ buildStageList(mode);
 
   loadBest();
 
-  // 一旦消し
-  // document.getElementById("answer").addEventListener("keydown", e => {
-  // if (e.key === "Enter") check();
-// });
+  document.getElementById("answer").addEventListener("keydown", e => {
+  if (e.key === "Enter") check();
+});
 
   document.getElementById("answer").addEventListener("input", () => {
   const input = document.getElementById("answer").value;
@@ -623,8 +622,8 @@ if (gameMode === "complete") {
 }
 
   function startTimer() {
-  startTime = Date.now();
-
+  startTime = Date.now() - timer * 1000;
+    
   if (timerId) clearInterval(timerId);
 
   timerId = setInterval(() => {
