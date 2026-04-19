@@ -587,11 +587,12 @@ function loadBest() {
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  // 🔥 リセット予約だけ
-  needReset = true;
+  // 🔥 ここ超重要
+  answered = true;     // ←これ追加
+  wasWrong = true;     // ←これも追加
 
-  // ❌ これ消す
-  // resetCompleteProgress();
+  // 🔥 リセット予約
+  needReset = true;
 
   updateScore();
 
