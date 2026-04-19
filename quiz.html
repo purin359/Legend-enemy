@@ -216,6 +216,7 @@ let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
+let needReset = false;
 
 // 画像用
 function getFileName(name) {
@@ -314,6 +315,12 @@ function isTargetChapter(ch, mode) {
 }
 
 function nextQuiz() {
+
+  if (needReset) {
+    correct = 0;
+    hintTotal = 0;
+    needReset = false;
+  }
 
   const mode = document.getElementById("mode").value;
 
@@ -798,8 +805,8 @@ function unlockButtons() {
   function handleWrong() {
   wasWrong = true;
 
-  // 🔥 連続リセット（これが本体）
-  correct = 0;
+  // 🔥 即リセットしない
+  needReset = true;
 
   if (gameMode === "complete") {
     stopTimer();
