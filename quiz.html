@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -448,6 +448,9 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
+  answered = true;   // ←これ重要
+  wasWrong = true;   // ←これも重要
+    
   handleWrong();
 
   // 🔥 これ追加（必須）
@@ -587,12 +590,15 @@ function loadBest() {
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  // 🔥 ここ超重要
-  answered = true;     // ←これ追加
-  wasWrong = true;     // ←これも追加
+  // 🔥 状態を完全に「不正解扱い」にする
+  answered = true;
+  wasWrong = true;
 
-  // 🔥 リセット予約
+  // 🔥 次の問題でリセット
   needReset = true;
+
+  // 🔥 ボタン無効化（連打防止）
+  lockButtons();
 
   updateScore();
 
@@ -755,17 +761,18 @@ function unlockButtons() {
   }
 }
 
-  function handleWrong() {
-  wasWrong = true;
-
-  // 🔥 即リセットしない
-  needReset = true;
+ if (needReset) {
+  correct = 0;
+  hintTotal = 0;
 
   if (gameMode === "complete") {
-    stopTimer();
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+    resetTimer();
   }
 
-  updateScore();
+  needReset = false;
 }
 
  function resetCompleteProgress() {
