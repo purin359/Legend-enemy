@@ -65,11 +65,20 @@ img {
   width: 50px;
 }  
 
-  .enemyItem {
+  .enemyItem.covered img {
+  width: 44px;
+  height: 44px;
+}
+
+.enemyItem {
   position: relative;
   width: 50px;
   height: 50px;
-  overflow: hidden; /* ←これ追加（超重要） */
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
   
   display: flex;
@@ -489,10 +498,13 @@ q.enemies.forEach((enemy, index) => {
   wrap.appendChild(img);
 
   if (hideMode === "hidden" && hiddenIndexes.includes(index)) {
-    const colors = getAttributeColors(enemy);
-    const cover = createEnemyCover(colors);
-    wrap.appendChild(cover);
-  }
+
+  wrap.classList.add("covered"); // ←これ追加
+
+  const colors = getAttributeColors(enemy);
+  const cover = createEnemyCover(colors);
+  wrap.appendChild(cover);
+}
 
   box.appendChild(wrap);
 });
@@ -1109,11 +1121,11 @@ function getSameStageLabels(current) {
     "浮き": "#9ccc65",
     "黒": "#222222",
     "メタル": "#9e9e9e",
-    "天使": "#fdd835",
+    "天使": "#fff200",
     "エイリアン": "#4fc3f7",
     "ゾンビ": "#8e24aa",
-    "悪魔": "#283593",
-    "古代種": "#2e7d32",
+    "悪魔": "#5f97b8",
+    "古代種": "#556b3f",
     "無属性": "#ffffff"
   };
 
