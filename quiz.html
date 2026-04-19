@@ -464,7 +464,8 @@ function updateScore() {
     ? `残り: ${remaining.length} / ${totalCount}`
     : "";
 
-    document.getElementById("remaining").textContent = remainText;
+   document.getElementById("remaining").textContent =
+  `残り: ${remaining.length} / ${totalCount}`;
   }
 
   document.getElementById("score").textContent =
@@ -648,8 +649,6 @@ if (gameMode === "endless") {
   resetEndlessScore();
 }
 
-handleWrong();
-
 setTimeout(nextQuiz, 800);
  }
   
@@ -825,11 +824,19 @@ function unlockButtons() {
 
     pool = buildPool(mode);
     remaining = [...pool];
+    totalCount = remaining.length;
 
-    resetTimer(); // ←stopTimerいらない
+    resetTimer();
   }
 
+  correct = 0;
+  hintTotal = 0;
+  wasWrong = false;
+  answered = false;
+
   resetRound();
+
+  updateScore(); // 🔥これ必須
 }
 
   function resetEndlessScore() {
