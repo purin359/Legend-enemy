@@ -666,7 +666,7 @@ const idOK = inputNorm === normalize(idText);
   }
 
  // ▼ 純粋スキップ
-const answerText = getSameStages(current).join(" / ");
+const answerText = getSameStages(current).join(<br>);
 
 result.textContent =
   `スキップ！ 正解：${current.chapterName} - ${answerText}`;
