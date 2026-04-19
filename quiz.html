@@ -468,7 +468,7 @@ function updateScore() {
   const bestTime = localStorage.getItem("complete_" + mode + "_complete");
 
   if (bestTime !== null) {
-    bestText += ` / 最速: ${formatTime(Number(bestTime))}`;
+    bestText += ` タイム: ${formatTime(Number(bestTime))}`;
   }
 
   document.getElementById("remaining").textContent =
@@ -477,7 +477,7 @@ function updateScore() {
   document.getElementById("remaining").textContent = "";
 }
   document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） タイム: ${bestText}`;
+    `連続: ${correct}（ヒント: ${hintTotal}） /最速: ${bestText}`;
 }
   
   function saveScore() {
