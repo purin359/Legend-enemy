@@ -602,7 +602,11 @@ function updateScore() {
   let bestText = `${bestScore}（ヒント: ${bestHint}）`;
 
   if (gameMode === "complete") {
-  const bestTime = localStorage.getItem("complete_" + mode + "_complete");
+  const bestTimeKey = hideMode === "normal"
+  ? "complete_" + mode + "_" + gameMode
+  : "complete_" + mode + "_" + gameMode + "_hidden";
+
+const bestTime = localStorage.getItem(bestTimeKey);
 
   if (bestTime !== null) {
     bestText += ` タイム: ${formatTime(Number(bestTime))}`;
@@ -769,6 +773,7 @@ function loadBest() {
 
   updateScore();
 }
+  
   function startTimer() {
   startTime = Date.now() - timer * 1000; // ←超重要
 
@@ -855,7 +860,9 @@ totalCount = remaining.length;
   
   function saveCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode;
+  const key = hideMode === "normal"
+    ? "complete_" + mode + "_" + gameMode
+    : "complete_" + mode + "_" + gameMode + "_hidden";
 
   const data = localStorage.getItem(key);
 
@@ -863,7 +870,7 @@ totalCount = remaining.length;
     localStorage.setItem(key, timer);
   }
 }
-
+  
   function resetTimer() {
   stopTimer();
   timer = 0;
@@ -967,14 +974,18 @@ function showNextButton() {
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
       if (getEnemyKey(st.enemies) === key) {
-        list.push(st.stageName);
+        if (Array.isArray(st.stageName)) {
+          list.push(...st.stageName);
+        } else {
+          list.push(st.stageName);
+        }
       }
     });
   });
 
   return [...new Set(list)];
 }
-
+  
   function getAvailableStages(current) {
   const all = getSameStages(current);
 
@@ -996,7 +1007,13 @@ function getSameStageLabels(current) {
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
       if (getEnemyKey(st.enemies) === key) {
-        list.push(`${ch.chapterName} - ${st.stageName}`);
+        if (Array.isArray(st.stageName)) {
+          st.stageName.forEach(name => {
+            list.push(`${ch.chapterName} - ${name}`);
+          });
+        } else {
+          list.push(`${ch.chapterName} - ${st.stageName}`);
+        }
       }
     });
   });
@@ -1041,9 +1058,11 @@ function getSameStageLabels(current) {
 
   function isNewCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode;
-  const data = localStorage.getItem(key);
+  const key = hideMode === "normal"
+    ? "complete_" + mode + "_" + gameMode
+    : "complete_" + mode + "_" + gameMode + "_hidden";
 
+  const data = localStorage.getItem(key);
   return !data || timer < Number(data);
 }
 
@@ -1052,6 +1071,7 @@ function getSameStageLabels(current) {
 
   correct = 0;
   hintTotal = 0;
+  usedAnswersByGroup = {};
 
   if (gameMode === "complete") {
     resetTimer();
