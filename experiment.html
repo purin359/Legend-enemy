@@ -490,7 +490,6 @@ result.textContent =
 
   wasWrong = true;
 
- 　 lockButtons();
     showNextButton();
 }
 }
@@ -775,13 +774,18 @@ function unlockButtons() {
   function showCheckButton() {
   document.getElementById("checkBtn").style.display = "inline-block";
   document.getElementById("nextBtn").style.display = "none";
+
+  document.getElementById("checkBtn").disabled = false;
+  document.getElementById("nextBtn").disabled = false;
 }
 
 function showNextButton() {
   document.getElementById("checkBtn").style.display = "none";
   document.getElementById("nextBtn").style.display = "inline-block";
-}
 
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("nextBtn").disabled = false;
+}
   function initCompleteCount(mode) {
   const list = buildPool(mode);
 
