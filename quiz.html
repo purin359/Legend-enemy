@@ -342,6 +342,7 @@ function nextQuiz() {
     document.getElementById("result").textContent =
       `🎉 クリア！ タイム: ${formatTime(timer)}`;
     saveCompleteRecord();
+    unlockButtons();
     return;
   }
 
