@@ -216,7 +216,6 @@ let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
-let needReset = false;
 
 // 画像用
 function getFileName(name) {
@@ -318,27 +317,13 @@ function nextQuiz() {
 
   const mode = document.getElementById("mode").value;
 
-  // 🔥 リセットはここだけ
- if (needReset) {
-  correct = 0;
-  hintTotal = 0;
-
-  if (gameMode === "complete") {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-    resetTimer();
-  }
-
-  needReset = false;
-}
-  
   // 初回生成
   if (gameMode === "complete" && pool.length === 0) {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-  }
+  const mode = document.getElementById("mode").value;
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
+}
 
   // クリア判定
   if (gameMode === "complete" && remaining.length === 0) {
@@ -349,7 +334,6 @@ function nextQuiz() {
     return;
   }
 
-  // 🔥 リセット後にタイマー開始
   if (gameMode === "complete") {
     startTimer();
   }
@@ -447,13 +431,9 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  answered = true;
-  wasWrong = true;
-  needReset = true;
-
-  setTimeout(nextQuiz, 800);
-}
-}
+  handleWrong();
+  }
+}  
   
 function updateScore() {
 
@@ -537,7 +517,6 @@ function loadBest() {
 
   function changeMode() {
   correct = 0;
-  hintTotal = 0;
 
   resetTimer();
   loadBest();
@@ -545,10 +524,9 @@ function loadBest() {
   const mode = document.getElementById("mode").value;
   buildStageList(mode);
 
-  // 🔥 プール再生成（これが超重要）
-  pool = buildPool(mode);
-  remaining = [...pool];
-  totalCount = remaining.length;
+  // 🔥これ追加
+  pool = [];
+  remaining = [];
 
   updateScore();
   nextQuiz();
@@ -583,19 +561,81 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  result.textContent =
-    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
-  result.style.color = "red";
+  // ▼ 不正解後は何もせず次へ
+  if (wasWrong) {
 
-  // 🔥 不正解扱い
-  answered = true;
-  wasWrong = true;
-  needReset = true;
+  resetCompleteProgress();
+  wasWrong = false;
 
-  lockButtons();
+    if (gameMode === "complete") {
+    resetTimer(); // ←これ追加
+  }
 
-  setTimeout(nextQuiz, 800);
+
+  updateScore(); // ←表示更新も必須
+
+  nextQuiz();
+  return;
 }
+   
+  // ▼ 未回答なら判定
+  if (!answered) {
+
+    const input = document.getElementById("answer").value;
+    const inputNorm = normalize(input);
+
+    const nameOK = inputNorm === normalize(current.stageName);
+    const idText = `${current.chapterId}-${current.stageId}`;
+    const idOK = inputNorm === normalize(idText);
+
+    const ok = nameOK || idOK;
+
+    if (ok) {
+  if (gameMode === "complete") {
+    remaining = remaining.filter(st =>
+      !(st.stageName === current.stageName &&
+        st.chapterId === current.chapterId &&
+        st.stageId === current.stageId)
+    );
+  }
+      result.textContent = "正解！ 🎉";
+      result.style.color = "green";
+
+      correct++;
+
+      if (
+        correct > bestScore ||
+        (correct === bestScore && hintTotal < bestHint)
+      ) {
+        bestScore = correct;
+        bestHint = hintTotal;
+        saveBest();
+      }
+
+      justCorrect = true;
+      wasWrong = false;
+
+      updateScore();
+      lockButtons();
+      setTimeout(nextQuiz, 800);
+      return;
+    }
+  }
+
+ // ▼ 純粋スキップ
+result.textContent =
+  `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+result.style.color = "red";
+
+// 🔥 完全リセット
+if (gameMode === "complete") {
+  resetCompleteProgress();  // ←これが本体
+}
+
+handleWrong();
+
+setTimeout(nextQuiz, 800);
+ }
   
   function showHint() {
 
@@ -753,18 +793,14 @@ function unlockButtons() {
   }
 }
 
- if (needReset) {
-  correct = 0;
-  hintTotal = 0;
+  function handleWrong() {
+  wasWrong = true;
 
   if (gameMode === "complete") {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-    resetTimer();
+    stopTimer();
   }
 
-  needReset = false;
+  updateScore();
 }
 
  function resetCompleteProgress() {
