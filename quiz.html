@@ -631,20 +631,23 @@ function loadBest() {
     }
   }
 
- // ▼ 純粋スキップ
+// ▼ 純粋スキップ
 result.textContent =
   `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
 result.style.color = "red";
 
-// 🔥 完全リセット
+// 🔥 必ずリセット予約
+needReset = true;
+
+// コンプリートなら追加処理
 if (gameMode === "complete") {
-  resetCompleteProgress();  // ←これが本体
+  resetCompleteProgress();
 }
 
-handleWrong();
+// ❗ handleWrongは呼ばなくてもOK（呼んでもOK）
+updateScore();
 
 setTimeout(nextQuiz, 800);
-} 
   
   function showHint() {
 
