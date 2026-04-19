@@ -401,9 +401,9 @@ function check() {
 
   const sameStages = getSameStages(current);
 
-const nameOK = sameStages.some(name =>
-  inputNorm === normalize(name)
-);
+  const nameOK = sameStages.some(name =>
+    inputNorm === normalize(name)
+  );
 
   const idText = `${current.chapterId}-${current.stageId}`;
   const idOK = inputNorm === normalize(idText);
@@ -413,7 +413,7 @@ const nameOK = sameStages.some(name =>
   const result = document.getElementById("result");
 
   answered = true;
-
+  
   if (ok) {
 
   if (gameMode === "complete") {
@@ -448,10 +448,10 @@ const nameOK = sameStages.some(name =>
   setTimeout(nextQuiz, 800);
 
 } else {
-  const answerText = getSameStages(current).join(" \n ");
+  const answerText = getSameStageLabels(current).join("\n");
 
-  result.textContent =
-    `不正解！ 正解：${current.chapterName} - ${answerText}`;
+result.textContent =
+  `不正解！ 正解：${answerText}`;
   result.style.color = "red";
 
   wasWrong = true;
@@ -624,9 +624,9 @@ function loadBest() {
   if (!answered) {
 
     const input = document.getElementById("answer").value;
-    const inputNorm = normalize(input);
+const inputNorm = normalize(input);
 
-    const sameStages = getSameStages(current);
+const sameStages = getSameStages(current);
 
 const nameOK = sameStages.some(name =>
   inputNorm === normalize(name)
@@ -635,7 +635,7 @@ const nameOK = sameStages.some(name =>
 const idText = `${current.chapterId}-${current.stageId}`;
 const idOK = inputNorm === normalize(idText);
 
-    const ok = nameOK || idOK;
+const ok = nameOK || idOK;
 
     if (ok) {
   if (gameMode === "complete") {
@@ -670,10 +670,10 @@ const idOK = inputNorm === normalize(idText);
   }
 
  // ▼ 純粋スキップ
-const answerText = getSameStages(current).join( \n );
+const answerText = getSameStageLabels(current).join("\n");
 
 result.textContent =
-  `スキップ！ 正解：${current.chapterName} - ${answerText}`;
+  `スキップ！ 正解：${answerText}`;
 result.style.color = "red";
 
 setTimeout(() => {
@@ -897,6 +897,36 @@ function unlockButtons() {
 }
 
   function getSameStageLabels(current) {
+  const key = getEnemyKey(current.enemies);
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (getEnemyKey(st.enemies) === key) {
+        list.push(`${ch.chapterName} - ${st.stageName}`);
+      }
+    });
+  });
+
+  return [...new Set(list)];
+}
+
+  function getSameStages(current) {
+  const key = getEnemyKey(current.enemies);
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (getEnemyKey(st.enemies) === key) {
+        list.push(st.stageName);
+      }
+    });
+  });
+
+  return [...new Set(list)];
+}
+
+function getSameStageLabels(current) {
   const key = getEnemyKey(current.enemies);
   const list = [];
 
