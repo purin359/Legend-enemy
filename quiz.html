@@ -395,7 +395,14 @@ function check() {
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
-  const nameOK = inputNorm === normalize(current.stageName);
+  const sameStages = getSameStages(current);
+
+const nameOK = sameStages.some(name =>
+  inputNorm === normalize(name)
+);
+
+const idText = `${current.chapterId}-${current.stageId}`;
+const idOK = inputNorm === normalize(idText);
   const idText = `${current.chapterId}-${current.stageId}`;
   const idOK = inputNorm === normalize(idText);
 
@@ -439,8 +446,10 @@ function check() {
   setTimeout(nextQuiz, 800);
 
 } else {
+  const answerText = getSameStages(current).join(" / ");
+
   result.textContent =
-    `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
+    `不正解！ 正解：${current.chapterName} - ${answerText}`;
   result.style.color = "red";
 
   wasWrong = true;
@@ -457,7 +466,7 @@ function check() {
     nextQuiz();
   }, 800);
 }
-}  
+}
   
 function updateScore() {
 
@@ -611,9 +620,14 @@ function loadBest() {
     const input = document.getElementById("answer").value;
     const inputNorm = normalize(input);
 
-    const nameOK = inputNorm === normalize(current.stageName);
-    const idText = `${current.chapterId}-${current.stageId}`;
-    const idOK = inputNorm === normalize(idText);
+    const sameStages = getSameStages(current);
+
+const nameOK = sameStages.some(name =>
+  inputNorm === normalize(name)
+);
+
+const idText = `${current.chapterId}-${current.stageId}`;
+const idOK = inputNorm === normalize(idText);
 
     const ok = nameOK || idOK;
 
@@ -650,8 +664,10 @@ function loadBest() {
   }
 
  // ▼ 純粋スキップ
+const answerText = getSameStages(current).join(" / ");
+
 result.textContent =
-  `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+  `スキップ！ 正解：${current.chapterName} - ${answerText}`;
 result.style.color = "red";
 
 setTimeout(() => {
@@ -864,6 +880,29 @@ function unlockButtons() {
   wasWrong = false;
   answered = false;
   updateScore();
+}
+
+  function getEnemyKey(enemies) {
+  return enemies
+    .filter(e => e !== "カンバン娘")
+    .map(e => e.trim())
+    .sort()
+    .join("|");
+}
+
+  function getSameStages(current) {
+  const key = getEnemyKey(current.enemies);
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (getEnemyKey(st.enemies) === key) {
+        list.push(st.stageName);
+      }
+    });
+  });
+
+  return list;
 }
   
 init();
