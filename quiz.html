@@ -316,32 +316,30 @@ function isTargetChapter(ch, mode) {
 
 function nextQuiz() {
 
+  const mode = document.getElementById("mode").value;
+
+  // 🔥 リセットは1回だけ＆最優先
   if (needReset) {
 
-  correct = 0;
-  hintTotal = 0;
+    correct = 0;
+    hintTotal = 0;
 
-  // 🔥 コンプリート時はここで再生成
-  if (gameMode === "complete") {
-    const mode = document.getElementById("mode").value;
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-    resetTimer();
+    if (gameMode === "complete") {
+      pool = buildPool(mode);
+      remaining = [...pool];
+      totalCount = remaining.length;
+      resetTimer();
+    }
+
+    needReset = false;
   }
-
-  needReset = false;
-}
-
-  const mode = document.getElementById("mode").value;
 
   // 初回生成
   if (gameMode === "complete" && pool.length === 0) {
-  const mode = document.getElementById("mode").value;
-  pool = buildPool(mode);
-  remaining = [...pool];
-  totalCount = remaining.length;
-}
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  }
 
   // クリア判定
   if (gameMode === "complete" && remaining.length === 0) {
@@ -352,6 +350,7 @@ function nextQuiz() {
     return;
   }
 
+  // 🔥 リセット後にタイマー開始
   if (gameMode === "complete") {
     startTimer();
   }
