@@ -401,8 +401,6 @@ const nameOK = sameStages.some(name =>
   inputNorm === normalize(name)
 );
 
-const idText = `${current.chapterId}-${current.stageId}`;
-const idOK = inputNorm === normalize(idText);
   const idText = `${current.chapterId}-${current.stageId}`;
   const idOK = inputNorm === normalize(idText);
 
@@ -897,12 +895,16 @@ function unlockButtons() {
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
       if (getEnemyKey(st.enemies) === key) {
-        list.push(st.stageName);
+        if (Array.isArray(st.stageName)) {
+          list.push(...st.stageName);
+        } else {
+          list.push(st.stageName);
+        }
       }
     });
   });
 
-  return list;
+  return [...new Set(list)];
 }
   
 init();
