@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)１</title>
+<title>ステージ当てクイズ(実験用)</title>
 
 <style>
 body {
@@ -490,16 +490,7 @@ result.textContent =
 
   wasWrong = true;
 
-  setTimeout(() => {
-    if (gameMode === "endless") {
-      resetEndlessScore();
-    }
-
-    if (gameMode === "complete") {
-      resetCompleteProgress();
-    }
-
-  }, 800);
+ 　 lockButtons();
     showNextButton();
 }
 }
@@ -773,12 +764,12 @@ totalCount = remaining.length;
 
   function lockButtons() {
   document.getElementById("checkBtn").disabled = true;
-  document.getElementById("skipBtn").disabled = true;
+  document.getElementById("nextBtn").disabled = true;
 }
 
 function unlockButtons() {
   document.getElementById("checkBtn").disabled = false;
-  document.getElementById("skipBtn").disabled = false;
+  document.getElementById("nextBtn").disabled = false;
 }
 
   function showCheckButton() {
@@ -854,21 +845,6 @@ function showNextButton() {
     .map(e => e.trim())
     .sort()
     .join("|");
-}
-
-  function getSameStageLabels(current) {
-  const key = getEnemyKey(current.enemies);
-  const list = [];
-
-  stagesData.forEach(ch => {
-    ch.stages.forEach(st => {
-      if (getEnemyKey(st.enemies) === key) {
-        list.push(`${ch.chapterName} - ${st.stageName}`);
-      }
-    });
-  });
-
-  return [...new Set(list)];
 }
 
   function getSameStages(current) {
