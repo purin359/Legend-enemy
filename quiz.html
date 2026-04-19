@@ -433,16 +433,17 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  wasWrong = true; // ←これ追加（重要）
+  wasWrong = true;
 
   setTimeout(() => {
     if (gameMode === "endless") {
-      resetEndlessScore(); // ←ここでリセット
+      resetEndlessScore();
     }
 
     if (gameMode === "complete") {
-  resetCompleteProgress();  // ←これが本体
-}
+      resetCompleteProgress();
+    }
+
     nextQuiz();
   }, 800);
 }
@@ -577,21 +578,17 @@ function loadBest() {
 
   // 🔥ミス後スキップは必ずここで統一リセット
   if (wasWrong) {
-
-    if (gameMode === "endless") {
-      resetEndlessScore();
-    }
-
-    if (gameMode === "complete") {
-      resetCompleteProgress();
-      resetTimer();
-    }
-
-    wasWrong = false;
-    updateScore();
-    nextQuiz();
-    return;
+  if (gameMode === "endless") {
+    resetEndlessScore();
   }
+
+  if (gameMode === "complete") {
+    resetCompleteProgress();
+  }
+
+  nextQuiz();
+  return;
+}
    
   // ▼ 未回答なら判定
   if (!answered) {
@@ -642,7 +639,17 @@ result.textContent =
   `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
 result.style.color = "red";
 
-setTimeout(nextQuiz, 800);
+setTimeout(() => {
+  if (gameMode === "endless") {
+    resetEndlessScore();
+  }
+
+  if (gameMode === "complete") {
+    resetCompleteProgress();
+  }
+
+  nextQuiz();
+}, 800);
  }
   
   function showHint() {
@@ -834,11 +841,12 @@ function unlockButtons() {
   updateScore(); // 🔥これ必須
 }
 
-  function resetEndlessScore() {
+ function resetEndlessScore() {
   correct = 0;
   hintTotal = 0;
   wasWrong = false;
   answered = false;
+  updateScore();
 }
   
 init();
