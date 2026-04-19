@@ -65,6 +65,51 @@ img {
   width: 50px;
 }  
 
+  .enemyItem {
+  position: relative;
+  width: 50px;
+  height: 50px;
+}
+
+.enemyItem img {
+  width: 50px;
+  height: 50px;
+  display: block;
+}
+
+.enemyCover {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.enemyCoverPart {
+  box-sizing: border-box;
+}
+
+.enemyCover.one .enemyCoverPart {
+  width: 100%;
+  height: 100%;
+}
+
+.enemyCover.two .enemyCoverPart {
+  width: 50%;
+  height: 100%;
+}
+
+.enemyCover.three .enemyCoverPart {
+  width: 33.3333%;
+  height: 100%;
+}
+
+.enemyCover.six .enemyCoverPart {
+  width: 33.3333%;
+  height: 50%;
+}
+  
   .enemyBox {
   border: none;                /* ←削除 */
   border-radius: 12px;
@@ -189,6 +234,11 @@ img {
     <option value="complete">コンプリートモード</option>
   </select>
 
+  <select id="hideMode" onchange="changeHideMode()">
+    <option value="normal">敵隠しなし</option>
+    <option value="hidden">敵隠しあり</option>
+  </select>
+
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
 
@@ -238,6 +288,8 @@ let timerId = null;
 let totalCount = 0;   // 総問題数
 let usedAnswersByGroup = {};
 let hintUsed = false;
+let enemiesMaster = {};
+let hideMode = "normal";
 
 // 画像用
 function getFileName(name) {
@@ -258,7 +310,17 @@ function normalize(str) {
 
 async function init() {
   usedAnswersByGroup = {};
-  stagesData = await fetch("stages.json").then(r=>r.json());
+  stagesData = await fetch("stages.json").then(r => r.json());
+
+const enemiesJson = await fetch("enemies.json").then(r => r.json());
+
+// 敵名 → データ の辞書を作る
+enemiesMaster = {};
+enemiesJson.forEach(enemy => {
+  enemiesMaster[enemy.name] = enemy;
+});
+
+hideMode = document.getElementById("hideMode").value;
 
   resetEndlessScore();
 
@@ -318,6 +380,7 @@ buildStageList(mode);
 updateScore();
 nextQuiz();
 showCheckButton();
+hideMode = document.getElementById("hideMode").value;
 }
   
 function isTargetChapter(ch, mode) {
@@ -395,16 +458,29 @@ function nextQuiz() {
   const box = document.createElement("div");
   box.className = "enemyBox";
 
-  q.enemies.forEach(enemy => {
-    if (enemy === "カンバン娘") return;
+  const hiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
 
-    const img = document.createElement("img");
-    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
-    img.onerror = () => img.src = "image/noimage.png";
+q.enemies.forEach((enemy, index) => {
+  if (enemy === "カンバン娘") return;
 
-    box.appendChild(img);
-  });
+  const wrap = document.createElement("div");
+  wrap.className = "enemyItem";
 
+  const img = document.createElement("img");
+  img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+  img.onerror = () => img.src = "image/noimage.png";
+
+  wrap.appendChild(img);
+
+  if (hideMode === "hidden" && hiddenIndexes.includes(index)) {
+    const colors = getAttributeColors(enemy);
+    const cover = createEnemyCover(colors);
+    wrap.appendChild(cover);
+  }
+
+  box.appendChild(wrap);
+});
+  
   enemiesDiv.appendChild(box);
 
   document.getElementById("answer").value = "";
@@ -544,7 +620,6 @@ function updateScore() {
   function saveScore() {
   const mode = document.getElementById("mode").value;
   const key = "quizScore_" + mode;
-
   localStorage.setItem(key, JSON.stringify({
     correct,
     total
@@ -553,7 +628,9 @@ function updateScore() {
 
 function saveBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode + "_" + gameMode;
+  const key = hideMode === "normal"
+  ? "quizBest_" + mode + "_" + gameMode
+  : "quizBest_" + mode + "_" + gameMode + "_hidden";
 
   localStorage.setItem(key, JSON.stringify({
     score: bestScore,
@@ -563,9 +640,17 @@ function saveBest() {
 
 function loadBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode + "_" + gameMode;
-  
-  const data = localStorage.getItem(key);
+
+  const key = hideMode === "normal"
+  ? "quizBest_" + mode + "_" + gameMode
+  : "quizBest_" + mode + "_" + gameMode + "_hidden";
+  let data = localStorage.getItem(key);
+
+  // 敵隠しなしは旧スコアを引き継ぐ
+  if (!data && hideMode === "normal") {
+    const oldKey = "quizBest_" + mode + "_" + gameMode;
+    data = localStorage.getItem(oldKey);
+  }
 
   if (data) {
     try {
@@ -573,14 +658,7 @@ function loadBest() {
 
       if (typeof obj === "object") {
         bestScore = obj.score ?? 0;
-
-        // 🔥 ここが重要
-        if (bestScore === 0) {
-          bestHint = 0;
-        } else {
-          bestHint = obj.hint ?? 0;
-        }
-
+        bestHint = bestScore === 0 ? 0 : (obj.hint ?? 0);
       } else {
         bestScore = Number(obj) || 0;
         bestHint = 0;
@@ -595,8 +673,9 @@ function loadBest() {
     bestHint = 0;
   }
 }
-
+  
   function changeMode() {
+  hideMode = document.getElementById("hideMode").value;
   correct = 0;
   hintTotal = 0;
 
@@ -738,6 +817,7 @@ function formatTime(sec) {
 }
 
  function changePlayMode() {
+  hideMode = document.getElementById("hideMode").value;
   gameMode = document.getElementById("playMode").value;
 
    resetEndlessScore();
@@ -965,6 +1045,115 @@ function getSameStageLabels(current) {
   const data = localStorage.getItem(key);
 
   return !data || timer < Number(data);
+}
+
+  function changeHideMode() {
+  hideMode = document.getElementById("hideMode").value;
+
+  correct = 0;
+  hintTotal = 0;
+
+  if (gameMode === "complete") {
+    resetTimer();
+  }
+
+  const mode = document.getElementById("mode").value;
+  pool = [];
+  remaining = [];
+  totalCount = 0;
+
+  loadBest();
+  updateScore();
+  nextQuiz();
+}
+  
+  function getAttributeColors(enemyName) {
+  const attrMap = {
+    "赤": "#e53935",
+    "浮き": "#9ccc65",
+    "黒": "#222222",
+    "メタル": "#9e9e9e",
+    "天使": "#fdd835",
+    "エイリアン": "#4fc3f7",
+    "ゾンビ": "#8e24aa",
+    "悪魔": "#283593",
+    "古代種": "#2e7d32",
+    "無属性": "#ffffff"
+  };
+
+  const ignoreAttrs = ["超獣", "超生命体", "超賢者", "怪人"];
+
+  const enemyData = enemiesMaster[enemyName];
+  if (!enemyData || !enemyData.type) {
+    return ["#ffffff"];
+  }
+
+  const types = enemyData.type
+    .split(",")
+    .map(s => s.trim())
+    .filter(s => s && !ignoreAttrs.includes(s));
+
+  const colors = types
+    .map(type => attrMap[type])
+    .filter(Boolean);
+
+  return colors.length ? colors : ["#ffffff"];
+}
+  
+  function shouldHideEnemy(totalCount, index, hiddenIndexes) {
+  return hiddenIndexes.includes(index);
+}
+
+function getHiddenIndexes(enemies) {
+  const validIndexes = enemies
+    .map((enemy, i) => enemy === "カンバン娘" ? -1 : i)
+    .filter(i => i !== -1);
+
+  if (validIndexes.length <= 1) return [];
+
+  const ratio = 0.3 + Math.random() * 0.2;
+  const hideCount = Math.max(1, Math.round(validIndexes.length * ratio));
+
+  const shuffled = [...validIndexes];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled.slice(0, hideCount);
+}
+
+  function createEnemyCover(colors) {
+  const cover = document.createElement("div");
+
+  let className = "one";
+  let useColors = [...colors];
+
+  if (useColors.length === 1) {
+    className = "one";
+  } else if (useColors.length === 2) {
+    className = "two";
+  } else if (useColors.length === 3) {
+    className = "three";
+  } else {
+    className = "six";
+
+    while (useColors.length < 6) {
+      useColors.push(useColors[useColors.length % colors.length]);
+    }
+    useColors = useColors.slice(0, 6);
+  }
+
+  cover.className = `enemyCover ${className}`;
+
+  useColors.forEach(color => {
+    const part = document.createElement("div");
+    part.className = "enemyCoverPart";
+    part.style.background = color;
+    cover.appendChild(part);
+  });
+
+  return cover;
 }
   
 init();
