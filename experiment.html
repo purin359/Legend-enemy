@@ -301,7 +301,7 @@ function getFileName(name) {
 
 // 比較用
 function normalizeName(str) {
-  return str
+  return String(str)
     .replace(/\r?\n/g, "")
     .replace(/[：:]/g, "")
     .replace(/[ 　]/g, "")
@@ -314,14 +314,11 @@ async function init() {
 
 const enemiesJson = await fetch("enemies.json").then(r => r.json());
 
-// 敵名 → データ の辞書を作る
 enemiesMaster = {};
 
 const enemyList = Array.isArray(enemiesJson)
   ? enemiesJson
-  : Array.isArray(enemiesJson.enemies)
-    ? enemiesJson.enemies
-    : [];
+  : Object.values(enemiesJson);
 
 enemyList.forEach(enemy => {
   enemiesMaster[normalizeName(enemy.name)] = enemy;
@@ -1116,7 +1113,7 @@ function getSameStageLabels(current) {
     return ["#ffffff"];
   }
 
-  const types = enemyData.type
+  const types = String(enemyData.type)
     .split(",")
     .map(s => s.trim())
     .filter(s => s && !ignoreAttrs.includes(s));
@@ -1126,7 +1123,8 @@ function getSameStageLabels(current) {
     .filter(Boolean);
 
   return colors.length ? colors : ["#ffffff"];
-}  
+}
+  
   function shouldHideEnemy(totalCount, index, hiddenIndexes) {
   return hiddenIndexes.includes(index);
 }
