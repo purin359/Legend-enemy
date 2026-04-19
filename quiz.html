@@ -456,21 +456,17 @@ function updateScore() {
   let bestText = `${bestScore}（ヒント: ${bestHint}）`;
 
   if (gameMode === "complete") {
-    const bestTime = localStorage.getItem("complete_" + mode);
+  const bestTime = localStorage.getItem("complete_" + mode + "_complete");
 
-    if (bestTime) {
-      bestText += ` / 最速: ${formatTime(Number(bestTime))}`;
-    }
-
-    const remainText =
-  gameMode === "complete" && totalCount > 0
-    ? `残り: ${remaining.length} / ${totalCount}`
-    : "";
-
-   document.getElementById("remaining").textContent =
-  `残り: ${remaining.length} / ${totalCount}`;
+  if (bestTime !== null) {
+    bestText += ` / 最速: ${formatTime(Number(bestTime))}`;
   }
 
+  document.getElementById("remaining").textContent =
+    `残り: ${remaining.length} / ${totalCount}`;
+} else {
+  document.getElementById("remaining").textContent = "";
+}
   document.getElementById("score").textContent =
     `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestText}`;
 }
