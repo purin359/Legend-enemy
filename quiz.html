@@ -437,6 +437,10 @@ function check() {
     if (gameMode === "endless") {
       resetEndlessScore(); // ←ここでリセット
     }
+
+    if (gameMode === "complete") {
+  resetCompleteProgress();  // ←これが本体
+}
     nextQuiz();
   }, 800);
 }
