@@ -1,1 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ステージ当てクイズ</title>
 
+<style>
+body {
+  font-family: sans-serif;
+  padding: 16px;
+  max-width: 600px;
+  margin: auto;
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+/* 入力欄 */
+input {
+  font-size: 16px;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+/* ボタン */
+button {
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  margin: 5px 5px 10px 0;
+}
+
+/* セレクト */
+select {
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+
+/* テーブル */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* 画像 */
+img {
+  width: 50px;
+}  
+
+  .enemyBox {
+  border: none;                /* ←削除 */
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+
+  background: #eaf4ff;         /* ←色で囲む */
+}
+
+  #suggest {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  position: absolute;
+  width: calc(100% - 32px);
+  z-index: 10;
+}
+
+.suggestItem {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestItem:hover {
+  background: #eaf4ff;
+}
+
+  .container {
+  position: relative;
+}
+
+  .topBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topBar1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ヒントを右端へ */
+.hintBtn {
+  margin-left: auto;
+}
+
+.topBar2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.leftBox {
+  display: flex;
+  flex-direction: column;
+}
+
+#remaining {
+  font-size: 16px;
+}
+
+/* スコアは左 */
+#score {
+  font-size: 16px;
+}
+
+/* タイマーを右端へ */
+#timer {
+  margin-left: auto;
+  font-size: 16px;
+}
+
+  .scoreRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+  .btnRow {
+  display: flex;
+  justify-content: center; /* ←中央揃え */
+  gap: 10px;               /* ←ボタン間の余白 */
+  margin-top: 10px;
+}
+
+  #result {
+  white-space: pre-line;
+}
+  
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h2>ステージ当てクイズ(レジェンド)</h2>
+
+  <div class="topBar1">
+  <select id="mode" onchange="changeMode()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <select id="playMode" onchange="changePlayMode()">
+    <option value="endless">エンドレスモード</option>
+    <option value="complete">コンプリートモード</option>
+  </select>
+
+  <button class="hintBtn" onclick="showHint()">ヒント</button>
+</div>
+
+<div class="topBar2">
+  <div class="leftBox">
+    <div id="score"></div>
+    <div id="timer"></div>
+  </div>
+  <div id="remaining"></div>
+</div>
+
+  <div id="enemies"></div>
+
+  <input id="answer" placeholder="ステージ名を入力" autocomplete="off">
+<div id="suggest"></div>
+  <br><br>
+
+  <div class="btnRow">
+  <button id="checkBtn" onclick="check()">回答</button>
+  <button id="skipBtn" onclick="skipQuiz()">次の問題</button>
+</div>
+
+  <div id="result"></div>
+
+</div>
+<script>
+let stagesData = [];
+let current = null;
+
+let correct = 0;      // 連続正解数
+let bestScore = 0;    // 最高記録
+let justCorrect = false;
+let stageList = [];
+let hintTotal = 0;    // このゲーム中のヒント合計
+let bestHint = 9999;
+let answered = false;   // 回答済みか
+let lastResult = null;  // "ok" or "ng"
+let wasWrong = false;
+let gameMode = "endless"; // "endless" or "complete"
+
+let pool = [];        // 出題候補
+let remaining = [];   // コンプリート用（残り問題）
+
+let startTime = 0;    // タイマー開始
+let timer = 0;        // 秒
+let timerId = null;
+let totalCount = 0;   // 総問題数
+
+// 画像用
+function getFileName(name) {
+  return name
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+}
+
+// 比較用
+function normalize(str) {
+  return str
+    .replace(/\r?\n/g, "")
+    .replace(/[ 　]+/g, "")
+    .trim();
+}
+
+async function init() {
+  stagesData = await fetch("stages.json").then(r=>r.json());
+
+  resetEndlessScore();
+
+  const mode = document.getElementById("mode").value;
+buildStageList(mode);
+
+  loadBest();
+
+  document.getElementById("answer").addEventListener("keydown", e => {
+  // 🔥 変換中は無視
+  if (e.isComposing || e.keyCode === 229) return;
+
+  if (e.key === "Enter") {
+    check();
+  }
+});
+
+  document.getElementById("answer").addEventListener("input", () => {
+  const input = document.getElementById("answer").value;
+  const suggest = document.getElementById("suggest");
+
+  suggest.innerHTML = "";
+
+  if (!input) return;
+
+  const keyword = normalizeSearch(input);
+
+  const results = stageList.filter(name =>
+    normalizeSearch(name).includes(keyword)
+  ).slice(0, 20); // 最大20件
+
+  results.forEach(name => {
+    const div = document.createElement("div");
+    div.className = "suggestItem";
+    div.textContent = name;
+
+    div.onclick = () => {
+      document.getElementById("answer").value = name;
+      suggest.innerHTML = "";
+    };
+
+    suggest.appendChild(div);
+  });
+});
+
+  if (gameMode === "endless") {
+  document.getElementById("timer").style.display = "none";
+}
+
+  if (gameMode === "complete") {
+  const mode = document.getElementById("mode").value;
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
+}
+
+updateScore();
+nextQuiz();
+}
+  
+function isTargetChapter(ch, mode) {
+  return (
+    (mode === "ALL") ||
+
+    (mode === "N" && (
+      (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+      || ch.chapterId === "E026"
+    )) ||
+
+    (mode === "NA" && (
+      ch.chapterId.startsWith("NA")
+      || ch.chapterId === "E068"
+      || ch.chapterId === "E069"
+    )) ||
+
+    (mode === "ND" && ch.chapterId.startsWith("ND"))
+  );
+}
+
+function nextQuiz() {
+
+  const mode = document.getElementById("mode").value;
+
+  // 初回生成
+  if (gameMode === "complete" && pool.length === 0) {
+  const mode = document.getElementById("mode").value;
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
+}
+
+  // クリア判定
+  if (gameMode === "complete" && remaining.length === 0) {
+    stopTimer();
+    document.getElementById("result").textContent =
+      `🎉 クリア！ タイム: ${formatTime(timer)}`;
+    saveCompleteRecord();
+    unlockButtons();
+    return;
+  }
+
+  if (gameMode === "complete") {
+    startTimer();
+  }
+
+  let q;
+
+  if (gameMode === "complete") {
+    const i = Math.floor(Math.random() * remaining.length);
+    q = remaining[i];
+  } else {
+    if (pool.length === 0) {
+      pool = buildPool(mode);
+    }
+    q = pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  current = q;
+
+  const enemiesDiv = document.getElementById("enemies");
+  enemiesDiv.innerHTML = "";
+
+  const box = document.createElement("div");
+  box.className = "enemyBox";
+
+  q.enemies.forEach(enemy => {
+    if (enemy === "カンバン娘") return;
+
+    const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+    img.onerror = () => img.src = "image/noimage.png";
+
+    box.appendChild(img);
+  });
+
+  enemiesDiv.appendChild(box);
+
+  document.getElementById("answer").value = "";
+  document.getElementById("result").textContent = "";
+
+  answered = false;
+  wasWrong = false;
+
+  unlockButtons();
+}
+  
+function check() {
+  const input = document.getElementById("answer").value;
+  const inputNorm = normalize(input);
+
+  const sameStages = getSameStages(current);
+
+  const nameOK = sameStages.some(name =>
+    inputNorm === normalize(name)
+  );
+
+  const idText = `${current.chapterId}-${current.stageId}`;
+  const idOK = inputNorm === normalize(idText);
+
+  const ok = nameOK || idOK;
+
+  const result = document.getElementById("result");
+
+  answered = true;
+  
+  if (ok) {
+
+  if (gameMode === "complete") {
+    remaining = remaining.filter(st =>
+      !(st.stageName === current.stageName &&
+        st.chapterId === current.chapterId &&
+        st.stageId === current.stageId)
+    );
+  }
+  result.textContent = "正解！ 🎉";
+  result.style.color = "green";
+
+  document.getElementById("suggest").innerHTML = "";
+
+  correct++;
+
+  if (
+    correct > bestScore ||
+    (correct === bestScore && hintTotal < bestHint)
+  ) {
+    bestScore = correct;
+    bestHint = hintTotal;
+    saveBest();
+  }
+
+  justCorrect = true;
+  wasWrong = false;
+
+  lockButtons();
+  updateScore(); // ←これ重要
+
+  setTimeout(nextQuiz, 800);
+
+} else {
+  const answerText = getSameStageLabels(current).join("\n");
+
+result.textContent =
+  `不正解！ 正解：${answerText}`;
+  result.style.color = "red";
+
+  wasWrong = true;
+
+  setTimeout(() => {
+    if (gameMode === "endless") {
+      resetEndlessScore();
+    }
+
+    if (gameMode === "complete") {
+      resetCompleteProgress();
+    }
+
+    nextQuiz();
+  }, 800);
+}
+}
+  
+function updateScore() {
+
+  const mode = document.getElementById("mode").value;
+
+  let bestText = `${bestScore}（ヒント: ${bestHint}）`;
+
+  if (gameMode === "complete") {
+  const bestTime = localStorage.getItem("complete_" + mode + "_complete");
+
+  if (bestTime !== null) {
+    bestText += ` タイム: ${formatTime(Number(bestTime))}`;
+  }
+
+  document.getElementById("remaining").textContent =
+    `残り: ${remaining.length} / ${totalCount}`;
+} else {
+  document.getElementById("remaining").textContent = "";
+}
+  document.getElementById("score").textContent =
+    `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
+}
+  
+  function saveScore() {
+  const mode = document.getElementById("mode").value;
+  const key = "quizScore_" + mode;
+
+  localStorage.setItem(key, JSON.stringify({
+    correct,
+    total
+  }));
+}
+
+function saveBest() {
+  const mode = document.getElementById("mode").value;
+  const key = "quizBest_" + mode + "_" + gameMode;
+
+  localStorage.setItem(key, JSON.stringify({
+    score: bestScore,
+    hint: bestHint
+  }));
+}
+
+function loadBest() {
+  const mode = document.getElementById("mode").value;
+  const key = "quizBest_" + mode + "_" + gameMode;
+  
+  const data = localStorage.getItem(key);
+
+  if (data) {
+    try {
+      const obj = JSON.parse(data);
+
+      if (typeof obj === "object") {
+        bestScore = obj.score ?? 0;
+
+        // 🔥 ここが重要
+        if (bestScore === 0) {
+          bestHint = 0;
+        } else {
+          bestHint = obj.hint ?? 0;
+        }
+
+      } else {
+        bestScore = Number(obj) || 0;
+        bestHint = 0;
+      }
+
+    } catch {
+      bestScore = 0;
+      bestHint = 0;
+    }
+  } else {
+    bestScore = 0;
+    bestHint = 0;
+  }
+}
+
+  function changeMode() {
+  correct = 0;
+  hintTotal = 0;
+
+  resetTimer();
+  loadBest();
+
+  const mode = document.getElementById("mode").value;
+  buildStageList(mode);
+
+  pool = [];
+  remaining = [];
+
+  if (gameMode === "complete") {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  } else {
+    totalCount = 0;
+    document.getElementById("remaining").textContent = "";
+  }
+
+  updateScore();
+  nextQuiz();
+}
+  
+  function buildStageList(mode) {
+  stageList = [];
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      if (Array.isArray(st.stageName)) {
+        stageList.push(...st.stageName);
+      } else {
+        stageList.push(st.stageName);
+      }
+    });
+  });
+}
+
+  function normalizeSearch(str) {
+  return str
+    .toLowerCase()
+    .replace(/[ぁ-ん]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) + 0x60)) // ひら→カタ
+    .replace(/[ァ-ヶ]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)) // カタ→ひら（統一）
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角→半角
+    .replace(/[ 　]/g, "")
+    .trim();
+}
+
+ function skipQuiz() {
+
+  const result = document.getElementById("result");
+
+  // 🔥ミス後スキップは必ずここで統一リセット
+  if (wasWrong) {
+  if (gameMode === "endless") {
+    resetEndlessScore();
+  }
+
+  if (gameMode === "complete") {
+    resetCompleteProgress();
+  }
+
+  nextQuiz();
+  return;
+}
+   
+  // ▼ 未回答なら判定
+  if (!answered) {
+
+    const input = document.getElementById("answer").value;
+const inputNorm = normalize(input);
+
+const sameStages = getSameStages(current);
+
+const nameOK = sameStages.some(name =>
+  inputNorm === normalize(name)
+);
+
+const idText = `${current.chapterId}-${current.stageId}`;
+const idOK = inputNorm === normalize(idText);
+
+const ok = nameOK || idOK;
+
+    if (ok) {
+  if (gameMode === "complete") {
+    remaining = remaining.filter(st =>
+      !(st.stageName === current.stageName &&
+        st.chapterId === current.chapterId &&
+        st.stageId === current.stageId)
+    );
+  }
+      result.textContent = "正解！ 🎉";
+      result.style.color = "green";
+
+      correct++;
+
+      if (
+        correct > bestScore ||
+        (correct === bestScore && hintTotal < bestHint)
+      ) {
+        bestScore = correct;
+        bestHint = hintTotal;
+        saveBest();
+      }
+
+      justCorrect = true;
+      wasWrong = false;
+
+      updateScore();
+      lockButtons();
+      setTimeout(nextQuiz, 800);
+      return;
+    }
+  }
+
+ // ▼ 純粋スキップ
+const answerText = getSameStageLabels(current).join("\n");
+
+result.textContent =
+  `スキップ！ 正解：${answerText}`;
+result.style.color = "red";
+
+setTimeout(() => {
+  if (gameMode === "endless") {
+    resetEndlessScore();
+  }
+
+  if (gameMode === "complete") {
+    resetCompleteProgress();
+  }
+
+  nextQuiz();
+}, 800);
+ }
+  
+  function showHint() {
+
+  const mode = document.getElementById("mode").value;
+  const result = document.getElementById("result");
+
+  let hint = "";
+
+  if (mode === "ALL") {
+
+    if (current.chapterId.startsWith("N") &&
+        !current.chapterId.startsWith("NA") &&
+        !current.chapterId.startsWith("ND")) {
+      hint = "ヒント：レジェンド";
+    }
+
+    else if (current.chapterId.startsWith("NA")) {
+      hint = "ヒント：真レジェンド";
+    }
+
+    else if (current.chapterId.startsWith("ND")) {
+      hint = "ヒント：レジェンド0";
+    }
+
+  } else {
+    hint = `ヒント：${current.chapterName}`;
+  }
+
+  result.textContent = hint;
+  result.style.color = "blue";
+
+  hintTotal++; // ←ここ変更🔥
+  updateScore();
+}
+
+  function startTimer() {
+  startTime = Date.now() - timer * 1000; // ←超重要
+
+  if (timerId) clearInterval(timerId);
+
+  timerId = setInterval(() => {
+    const sec = Math.floor((Date.now() - startTime) / 1000);
+    timer = sec;
+
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+
+    document.getElementById("timer").textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerId);
+  timerId = null; // ←これ必須
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+  function buildPool(mode) {
+  const list = [];
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      list.push({
+        stageName: st.stageName,
+        chapterName: ch.chapterName,
+        chapterId: ch.chapterId,
+        stageId: st.stageId,
+        enemies: st.enemies
+      });
+    });
+  });
+
+  return list;
+}
+
+ function changePlayMode() {
+  gameMode = document.getElementById("playMode").value;
+
+   resetEndlessScore();
+
+  stopTimer();
+  timer = 0;
+  document.getElementById("timer").textContent = "00:00";
+
+   document.getElementById("remaining").textContent = "";
+
+  const mode = document.getElementById("mode").value;
+
+  // 🔥 先にプール作る
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
+
+  const timerEl = document.getElementById("timer");
+
+  if (gameMode === "endless") {
+    timerEl.style.display = "none";
+  } else {
+    timerEl.style.display = "block";
+    startTimer();
+  }
+
+   pool = buildPool(mode);
+remaining = [...pool];
+totalCount = remaining.length;
+  loadBest();
+  updateScore();
+  nextQuiz();
+}
+  
+  function saveCompleteRecord() {
+  const mode = document.getElementById("mode").value;
+  const key = "complete_" + mode + "_" + gameMode;
+
+  const data = localStorage.getItem(key);
+
+  if (!data || timer < Number(data)) {
+    localStorage.setItem(key, timer);
+  }
+}
+
+  function resetTimer() {
+  stopTimer();
+  timer = 0;
+  document.getElementById("timer").textContent = "00:00";
+}
+
+  function lockButtons() {
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("skipBtn").disabled = true;
+}
+
+function unlockButtons() {
+  document.getElementById("checkBtn").disabled = false;
+  document.getElementById("skipBtn").disabled = false;
+}
+
+  function initCompleteCount(mode) {
+  const list = buildPool(mode);
+
+  totalCount = list.length;
+  remainCount = totalCount;
+}
+
+  function resetRound() {
+  correct = 0;
+  hintTotal = 0;
+
+  // 🔥 追加（これが本体）
+  if (gameMode === "complete") {
+    remainCount = totalCount;
+  }
+}
+
+  function handleWrong() {
+  wasWrong = true;
+
+  if (gameMode === "complete") {
+    stopTimer();
+  }
+
+  updateScore();
+}
+
+ function resetCompleteProgress() {
+  if (gameMode === "complete") {
+    const mode = document.getElementById("mode").value;
+
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+
+    resetTimer();
+  }
+
+  correct = 0;
+  hintTotal = 0;
+  wasWrong = false;
+  answered = false;
+
+  resetRound();
+
+  updateScore(); // 🔥これ必須
+}
+
+ function resetEndlessScore() {
+  correct = 0;
+  hintTotal = 0;
+  wasWrong = false;
+  answered = false;
+  updateScore();
+}
+
+  function getEnemyKey(enemies) {
+  return enemies
+    .filter(e => e !== "カンバン娘")
+    .map(e => e.trim())
+    .sort()
+    .join("|");
+}
+
+  function getSameStageLabels(current) {
+  const key = getEnemyKey(current.enemies);
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (getEnemyKey(st.enemies) === key) {
+        list.push(`${ch.chapterName} - ${st.stageName}`);
+      }
+    });
+  });
+
+  return [...new Set(list)];
+}
+
+  function getSameStages(current) {
+  const key = getEnemyKey(current.enemies);
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (getEnemyKey(st.enemies) === key) {
+        list.push(st.stageName);
+      }
+    });
+  });
+
+  return [...new Set(list)];
+}
+
+function getSameStageLabels(current) {
+  const key = getEnemyKey(current.enemies);
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (getEnemyKey(st.enemies) === key) {
+        list.push(`${ch.chapterName} - ${st.stageName}`);
+      }
+    });
+  });
+
+  return [...new Set(list)];
+}
+  
+init();
+</script>
+
+</body>
+</html>
