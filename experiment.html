@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)１</title>
+<title>ステージ当てクイズ(実験用)</title>
 
 <style>
 body {
@@ -316,7 +316,14 @@ const enemiesJson = await fetch("enemies.json").then(r => r.json());
 
 // 敵名 → データ の辞書を作る
 enemiesMaster = {};
-enemiesJson.forEach(enemy => {
+
+const enemyList = Array.isArray(enemiesJson)
+  ? enemiesJson
+  : Array.isArray(enemiesJson.enemies)
+    ? enemiesJson.enemies
+    : [];
+
+enemyList.forEach(enemy => {
   enemiesMaster[enemy.name] = enemy;
 });
 
