@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -741,6 +741,8 @@ function formatTime(sec) {
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
+
+   document.getElementById("remaining").textContent = "";
 
   const mode = document.getElementById("mode").value;
 
