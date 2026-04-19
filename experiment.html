@@ -490,6 +490,11 @@ result.textContent =
 
   wasWrong = true;
 
+    // 🔥 不正解時にタイマー停止
+  if (gameMode === "complete") {
+    stopTimer();
+  }
+
     showNextButton();
 }
 }
