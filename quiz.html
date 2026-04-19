@@ -216,7 +216,6 @@ let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
-let needReset = false;
 
 // 画像用
 function getFileName(name) {
@@ -315,13 +314,6 @@ function isTargetChapter(ch, mode) {
 }
 
 function nextQuiz() {
-
-  // 🔥 ここが核心
-  if (needReset) {
-    correct = 0;
-    hintTotal = 0;
-    needReset = false;
-  }
 
   const mode = document.getElementById("mode").value;
 
@@ -439,14 +431,16 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  handleWrong();
+  wasWrong = true; // ←これ追加（重要）
 
-    // 🔥 リセット予約
-needReset = true;
-
-setTimeout(nextQuiz, 800);
-  }
-}  
+  setTimeout(() => {
+    if (gameMode === "endless") {
+      resetEndlessScore(); // ←ここでリセット
+    }
+    nextQuiz();
+  }, 800);
+}
+}
   
 function updateScore() {
 
@@ -645,10 +639,12 @@ if (gameMode === "complete") {
   resetCompleteProgress();  // ←これが本体
 }
 
-handleWrong();
+   // 🔥 エンドレス用
+if (gameMode === "endless") {
+  resetEndlessScore();
+}
 
-// 🔥 リセット予約
-needReset = true;
+handleWrong();
 
 setTimeout(nextQuiz, 800);
  }
@@ -812,9 +808,6 @@ function unlockButtons() {
   function handleWrong() {
   wasWrong = true;
 
-  // 🔥 リセット予約
-  needReset = true;
-
   if (gameMode === "complete") {
     stopTimer();
   }
@@ -833,6 +826,11 @@ function unlockButtons() {
   }
 
   resetRound();
+}
+
+  function resetEndlessScore() {
+  correct = 0;
+  hintTotal = 0;
 }
   
 init();
