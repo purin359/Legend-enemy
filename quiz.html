@@ -347,15 +347,16 @@ function nextQuiz() {
   if (gameMode === "complete" && remaining.length === 0) {
   stopTimer();
 
+  const newRecord = isNewCompleteRecord();
+
   document.getElementById("result").textContent =
-    `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`;
+    newRecord
+      ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`
+      : `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`;
 
   saveCompleteRecord();
 
-  // 🔥 回答ボタンを隠して次の問題ボタン表示
   showNextButton();
-
-  // 🔥 次の問題ボタンだけ押せるようにする
   document.getElementById("nextBtn").disabled = false;
   document.getElementById("checkBtn").disabled = true;
 
@@ -942,6 +943,14 @@ function getSameStageLabels(current) {
   updateScore();
   showCheckButton();
   nextQuiz();
+}
+
+  function isNewCompleteRecord() {
+  const mode = document.getElementById("mode").value;
+  const key = "complete_" + mode + "_" + gameMode;
+  const data = localStorage.getItem(key);
+
+  return !data || timer < Number(data);
 }
   
 init();
