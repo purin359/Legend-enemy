@@ -528,7 +528,7 @@ function loadBest() {
 
   function changeMode() {
   correct = 0;
-  hintTotal = 0; // ←重要
+  hintTotal = 0;
 
   resetTimer();
   loadBest();
@@ -538,6 +538,15 @@ function loadBest() {
 
   pool = [];
   remaining = [];
+
+  if (gameMode === "complete") {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  } else {
+    totalCount = 0;
+    document.getElementById("remaining").textContent = "";
+  }
 
   updateScore();
   nextQuiz();
