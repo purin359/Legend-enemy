@@ -307,6 +307,13 @@ function normalizeName(str) {
     .replace(/[ 　]/g, "")
     .trim();
 }
+
+  function normalize(str) {
+  return String(str)
+    .replace(/\r?\n/g, "")
+    .replace(/[ 　]+/g, "")
+    .trim();
+}
   
 async function init() {
   usedAnswersByGroup = {};
