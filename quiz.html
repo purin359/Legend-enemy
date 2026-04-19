@@ -431,14 +431,12 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  wasWrong = true; // ←これ追加（重要）
+  wasWrong = true;
 
-  setTimeout(() => {
-    if (gameMode === "endless") {
-      resetEndlessScore(); // ←ここでリセット
-    }
-    nextQuiz();
-  }, 800);
+  // 🔥 ボタンロック（連打防止）
+  lockButtons();
+
+  // 🔥 次の問題は出さない
 }
 }
   
