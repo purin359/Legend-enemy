@@ -576,7 +576,11 @@ function loadBest() {
     if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
-      stageList.push(st.stageName);
+      if (Array.isArray(st.stageName)) {
+        stageList.push(...st.stageName);
+      } else {
+        stageList.push(st.stageName);
+      }
     });
   });
 }
