@@ -237,6 +237,8 @@ function normalize(str) {
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
 
+  resetEndlessScore();
+
   const mode = document.getElementById("mode").value;
 buildStageList(mode);
 
@@ -529,6 +531,7 @@ function loadBest() {
 
   function changeMode() {
   correct = 0;
+  hintTotal = 0; // ←重要
 
   resetTimer();
   loadBest();
@@ -536,7 +539,6 @@ function loadBest() {
   const mode = document.getElementById("mode").value;
   buildStageList(mode);
 
-  // 🔥これ追加
   pool = [];
   remaining = [];
 
@@ -736,6 +738,8 @@ function formatTime(sec) {
  function changePlayMode() {
   gameMode = document.getElementById("playMode").value;
 
+   resetEndlessScore();
+
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
@@ -842,6 +846,8 @@ function unlockButtons() {
   function resetEndlessScore() {
   correct = 0;
   hintTotal = 0;
+  wasWrong = false;
+  answered = false;
 }
   
 init();
