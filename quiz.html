@@ -798,6 +798,9 @@ function unlockButtons() {
   function handleWrong() {
   wasWrong = true;
 
+  // 🔥 連続リセット（これが本体）
+  correct = 0;
+
   if (gameMode === "complete") {
     stopTimer();
   }
