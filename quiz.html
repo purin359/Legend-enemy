@@ -431,18 +431,16 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  wasWrong = true;
+  wasWrong = true; // ←これ追加（重要）
 
-    // 🔥 エンドレスは即リセット
-  if (gameMode === "endless") {
-    resetEndlessScore();
-  }
-
-  lockButtons(); // ←OK
-
-  // 🔥 ここで次の問題出さない（そのまま待機）
+  setTimeout(() => {
+    if (gameMode === "endless") {
+      resetEndlessScore(); // ←ここでリセット
+    }
+    nextQuiz();
+  }, 800);
 }
-}
+}  
   
 function updateScore() {
 
@@ -570,8 +568,25 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  // 🔥 不正解後に押された場合
+  // ▼ 不正解後は何もせず次へ
   if (wasWrong) {
+
+  resetCompleteProgress();
+  wasWrong = false;
+
+    if (gameMode === "complete") {
+    resetTimer(); // ←これ追加
+  }
+
+
+  updateScore(); // ←表示更新も必須
+
+  nextQuiz();
+  return;
+}
+   
+  // ▼ 未回答なら判定
+  if (!answered) {
 
     const input = document.getElementById("answer").value;
     const inputNorm = normalize(input);
@@ -582,9 +597,14 @@ function loadBest() {
 
     const ok = nameOK || idOK;
 
-    // ✅ 入力が正解なら救済
     if (ok) {
-
+  if (gameMode === "complete") {
+    remaining = remaining.filter(st =>
+      !(st.stageName === current.stageName &&
+        st.chapterId === current.chapterId &&
+        st.stageId === current.stageId)
+    );
+  }
       result.textContent = "正解！ 🎉";
       result.style.color = "green";
 
@@ -599,55 +619,35 @@ function loadBest() {
         saveBest();
       }
 
-      if (gameMode === "complete") {
-        remaining = remaining.filter(st =>
-          !(st.stageName === current.stageName &&
-            st.chapterId === current.chapterId &&
-            st.stageId === current.stageId)
-        );
-      }
-
+      justCorrect = true;
       wasWrong = false;
-      updateScore();
-      unlockButtons();
 
+      updateScore();
+      lockButtons();
       setTimeout(nextQuiz, 800);
       return;
     }
-
-    // ❌ 正解じゃない → リセット
-    if (gameMode === "endless") {
-      resetEndlessScore();
-    }
-
-    if (gameMode === "complete") {
-      resetCompleteProgress();
-    }
-
-    wasWrong = false;
-    unlockButtons();
-    updateScore();
-    nextQuiz();
-    return;
   }
 
-  // ▼ 通常スキップ
-  result.textContent =
-    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
-  result.style.color = "red";
+ // ▼ 純粋スキップ
+result.textContent =
+  `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+result.style.color = "red";
 
-  if (gameMode === "complete") {
-    resetCompleteProgress();
-  }
-
-  if (gameMode === "endless") {
-    resetEndlessScore();
-  }
-
-  wasWrong = true;
-  lockButtons();
-  updateScore();
+// 🔥 完全リセット
+if (gameMode === "complete") {
+  resetCompleteProgress();  // ←これが本体
 }
+
+   // 🔥 エンドレスは即リセット
+if (gameMode === "endless") {
+  resetEndlessScore();
+}
+
+handleWrong();
+
+setTimeout(nextQuiz, 800);
+ }
   
   function showHint() {
 
