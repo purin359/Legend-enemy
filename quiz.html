@@ -318,22 +318,17 @@ function nextQuiz() {
 
   const mode = document.getElementById("mode").value;
 
-  // 🔥 リセットは1回だけ＆最優先
+  // 🔥 リセットはここだけ
   if (needReset) {
-
     correct = 0;
     hintTotal = 0;
-
-    if (gameMode === "complete") {
-      pool = buildPool(mode);
-      remaining = [...pool];
-      totalCount = remaining.length;
-      resetTimer();
-    }
-
     needReset = false;
   }
 
+  // ↓↓↓ ここ重要
+  answered = false;
+  wasWrong = false;
+  
   // 初回生成
   if (gameMode === "complete" && pool.length === 0) {
     pool = buildPool(mode);
@@ -448,12 +443,10 @@ function check() {
     `不正解！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  answered = true;   // ←これ重要
-  wasWrong = true;   // ←これも重要
-    
-  handleWrong();
+  answered = true;
+  wasWrong = true;
+  needReset = true;
 
-  // 🔥 これ追加（必須）
   setTimeout(nextQuiz, 800);
 }
 }
@@ -590,17 +583,12 @@ function loadBest() {
     `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
   result.style.color = "red";
 
-  // 🔥 状態を完全に「不正解扱い」にする
+  // 🔥 不正解扱い
   answered = true;
   wasWrong = true;
-
-  // 🔥 次の問題でリセット
   needReset = true;
 
-  // 🔥 ボタン無効化（連打防止）
   lockButtons();
-
-  updateScore();
 
   setTimeout(nextQuiz, 800);
 }
