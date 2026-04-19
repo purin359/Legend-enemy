@@ -575,22 +575,23 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  // ▼ 不正解後は何もせず次へ
+  // 🔥ミス後スキップは必ずここで統一リセット
   if (wasWrong) {
 
-  resetCompleteProgress();
-  wasWrong = false;
+    if (gameMode === "endless") {
+      resetEndlessScore();
+    }
 
     if (gameMode === "complete") {
-    resetTimer(); // ←これ追加
+      resetCompleteProgress();
+      resetTimer();
+    }
+
+    wasWrong = false;
+    updateScore();
+    nextQuiz();
+    return;
   }
-
-
-  updateScore(); // ←表示更新も必須
-
-  nextQuiz();
-  return;
-}
    
   // ▼ 未回答なら判定
   if (!answered) {
@@ -640,16 +641,6 @@ function loadBest() {
 result.textContent =
   `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
 result.style.color = "red";
-
-// 🔥 完全リセット
-if (gameMode === "complete") {
-  resetCompleteProgress();  // ←これが本体
-}
-
-   // 🔥 エンドレスは即リセット
-if (gameMode === "endless") {
-  resetEndlessScore();
-}
 
 setTimeout(nextQuiz, 800);
  }
