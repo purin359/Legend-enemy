@@ -482,6 +482,10 @@ result.textContent =
   `不正解！ 正解：${answerText}`;
   result.style.color = "red";
 
+    if (gameMode === "complete") {
+    usedAnswersByGroup = {};
+  }
+
   wasWrong = true;
 
   setTimeout(() => {
@@ -717,6 +721,11 @@ const answerText = getSameStageLabels(current).join("\n");
   result.textContent = `その答えは使いました：${alreadyUsedName}`;
   result.style.color = "orange";
   return;
+}
+
+   if (gameMode === "complete") {
+  usedAnswersByGroup = {};
+  resetCompleteProgress();
 }
 
 result.textContent =
@@ -977,6 +986,12 @@ function unlockButtons() {
 
   function getAvailableStages(current) {
   const all = getSameStages(current);
+
+  // 🔥 エンドレスでは使用履歴を無視
+  if (gameMode !== "complete") {
+    return all;
+  }
+
   const groupKey = getGroupKeyFromCurrent(current);
   const used = usedAnswersByGroup[groupKey] || [];
 
@@ -1003,6 +1018,9 @@ function getSameStageLabels(current) {
 }
 
   function markAnswerUsed(current, answerName) {
+  // 🔥 エンドレスでは記録しない
+  if (gameMode !== "complete") return;
+
   const groupKey = getGroupKeyFromCurrent(current);
 
   if (!usedAnswersByGroup[groupKey]) {
