@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ１</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -319,15 +319,19 @@ function nextQuiz() {
   const mode = document.getElementById("mode").value;
 
   // 🔥 リセットはここだけ
-  if (needReset) {
-    correct = 0;
-    hintTotal = 0;
-    needReset = false;
+ if (needReset) {
+  correct = 0;
+  hintTotal = 0;
+
+  if (gameMode === "complete") {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+    resetTimer();
   }
 
-  // ↓↓↓ ここ重要
-  answered = false;
-  wasWrong = false;
+  needReset = false;
+}
   
   // 初回生成
   if (gameMode === "complete" && pool.length === 0) {
