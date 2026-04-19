@@ -345,6 +345,23 @@ function nextQuiz() {
     startTimer();
   }
 
+  if (needReset) {
+
+  correct = 0;
+  hintTotal = 0;
+
+  // 🔥 コンプリート時はここで再生成
+  if (gameMode === "complete") {
+    const mode = document.getElementById("mode").value;
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+    resetTimer();
+  }
+
+  needReset = false;
+}
+
   let q;
 
   if (gameMode === "complete") {
@@ -439,8 +456,10 @@ function check() {
   result.style.color = "red";
 
   handleWrong();
-  }
-}  
+
+  // 🔥 これ追加（必須）
+  setTimeout(nextQuiz, 800);
+}
   
 function updateScore() {
 
@@ -570,87 +589,20 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  // ▼ 不正解後は何もせず次へ
-  if (wasWrong) {
+  result.textContent =
+    `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
+  result.style.color = "red";
 
-    needReset = true;
+  // 🔥 リセット予約だけ
+  needReset = true;
 
-  resetCompleteProgress();
-  wasWrong = false;
+  // ❌ これ消す
+  // resetCompleteProgress();
 
-    if (gameMode === "complete") {
-    resetTimer(); // ←これ追加
-  }
+  updateScore();
 
-
-  updateScore(); // ←表示更新も必須
-
-  nextQuiz();
-  return;
+  setTimeout(nextQuiz, 800);
 }
-   
-  // ▼ 未回答なら判定
-  if (!answered) {
-
-    const input = document.getElementById("answer").value;
-    const inputNorm = normalize(input);
-
-    const nameOK = inputNorm === normalize(current.stageName);
-    const idText = `${current.chapterId}-${current.stageId}`;
-    const idOK = inputNorm === normalize(idText);
-
-    const ok = nameOK || idOK;
-
-    if (ok) {
-  if (gameMode === "complete") {
-    remaining = remaining.filter(st =>
-      !(st.stageName === current.stageName &&
-        st.chapterId === current.chapterId &&
-        st.stageId === current.stageId)
-    );
-  }
-      result.textContent = "正解！ 🎉";
-      result.style.color = "green";
-
-      correct++;
-
-      if (
-        correct > bestScore ||
-        (correct === bestScore && hintTotal < bestHint)
-      ) {
-        bestScore = correct;
-        bestHint = hintTotal;
-        saveBest();
-      }
-
-      justCorrect = true;
-      wasWrong = false;
-
-      updateScore();
-      lockButtons();
-      setTimeout(nextQuiz, 800);
-      return;
-    }
-  }
-
-// ▼ 純粋スキップ
-result.textContent =
-  `スキップ！ 正解：${current.chapterName} - ${current.stageName}`;
-result.style.color = "red";
-
-// 🔥 必ずリセット予約
-needReset = true;
-
-// コンプリートなら追加処理
-if (gameMode === "complete") {
-  resetCompleteProgress();
-}
-
-// ❗ handleWrongは呼ばなくてもOK（呼んでもOK）
-updateScore();
-
-setTimeout(nextQuiz, 800);
-  }
   
   function showHint() {
 
