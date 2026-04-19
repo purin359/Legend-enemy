@@ -229,6 +229,7 @@ let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
+let usedAnswersByGroup = {};
 
 // 画像用
 function getFileName(name) {
@@ -248,6 +249,7 @@ function normalize(str) {
 }
 
 async function init() {
+  usedAnswersByGroup = {};
   stagesData = await fetch("stages.json").then(r=>r.json());
 
   resetEndlessScore();
@@ -399,11 +401,19 @@ function check() {
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
-  const sameStages = getSameStages(current);
+  const availableStages = getAvailableStages(current);
 
-  const nameOK = sameStages.some(name =>
-    inputNorm === normalize(name)
-  );
+const matchedName = availableStages.find(name =>
+  inputNorm === normalize(name)
+);
+
+const nameOK = !!matchedName;
+
+  const allStages = getSameStages(current);
+
+const alreadyUsedName = allStages.find(name =>
+  inputNorm === normalize(name)
+);
 
   const idText = `${current.chapterId}-${current.stageId}`;
   const idOK = inputNorm === normalize(idText);
@@ -416,6 +426,10 @@ function check() {
   
   if (ok) {
 
+    if (matchedName) {
+  markAnswerUsed(current, matchedName);
+}
+
   if (gameMode === "complete") {
     remaining = remaining.filter(st =>
       !(st.stageName === current.stageName &&
@@ -423,6 +437,14 @@ function check() {
         st.stageId === current.stageId)
     );
   }
+
+    if (idOK && !matchedName) {
+  const availableStages = getAvailableStages(current);
+  if (availableStages.length > 0) {
+    markAnswerUsed(current, availableStages[0]);
+  }
+}
+    
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
 
@@ -448,6 +470,12 @@ function check() {
   setTimeout(nextQuiz, 800);
 
 } else {
+
+    if (alreadyUsedName && !nameOK && !idOK) {
+  result.textContent = `その答えは使いました：${alreadyUsedName}`;
+  result.style.color = "orange";
+  return;
+}
   const answerText = getSameStageLabels(current).join("\n");
 
 result.textContent =
@@ -571,6 +599,7 @@ function loadBest() {
 
   updateScore();
   nextQuiz();
+  usedAnswersByGroup = {};
 }
   
   function buildStageList(mode) {
@@ -638,6 +667,10 @@ const idOK = inputNorm === normalize(idText);
 const ok = nameOK || idOK;
 
     if (ok) {
+      if (matchedName) {
+  markAnswerUsed(current, matchedName);
+}
+      
   if (gameMode === "complete") {
     remaining = remaining.filter(st =>
       !(st.stageName === current.stageName &&
@@ -645,6 +678,14 @@ const ok = nameOK || idOK;
         st.stageId === current.stageId)
     );
   }
+
+      if (idOK && !matchedName) {
+  const availableStages = getAvailableStages(current);
+  if (availableStages.length > 0) {
+    markAnswerUsed(current, availableStages[0]);
+  }
+}
+      
       result.textContent = "正解！ 🎉";
       result.style.color = "green";
 
@@ -671,6 +712,12 @@ const ok = nameOK || idOK;
 
  // ▼ 純粋スキップ
 const answerText = getSameStageLabels(current).join("\n");
+
+   if (alreadyUsedName && !nameOK && !idOK) {
+  result.textContent = `その答えは使いました：${alreadyUsedName}`;
+  result.style.color = "orange";
+  return;
+}
 
 result.textContent =
   `スキップ！ 正解：${answerText}`;
@@ -803,6 +850,7 @@ totalCount = remaining.length;
   loadBest();
   updateScore();
   nextQuiz();
+   usedAnswersByGroup = {};
 }
   
   function saveCompleteRecord() {
@@ -868,6 +916,7 @@ function unlockButtons() {
     totalCount = remaining.length;
 
     resetTimer();
+    usedAnswersByGroup = {};
   }
 
   correct = 0;
@@ -926,6 +975,14 @@ function unlockButtons() {
   return [...new Set(list)];
 }
 
+  function getAvailableStages(current) {
+  const all = getSameStages(current);
+  const groupKey = getGroupKeyFromCurrent(current);
+  const used = usedAnswersByGroup[groupKey] || [];
+
+  return all.filter(name => !used.includes(name));
+}
+
 function getSameStageLabels(current) {
   const key = getEnemyKey(current.enemies);
   const list = [];
@@ -939,6 +996,22 @@ function getSameStageLabels(current) {
   });
 
   return [...new Set(list)];
+}
+
+  function getGroupKeyFromCurrent(current) {
+  return getEnemyKey(current.enemies);
+}
+
+  function markAnswerUsed(current, answerName) {
+  const groupKey = getGroupKeyFromCurrent(current);
+
+  if (!usedAnswersByGroup[groupKey]) {
+    usedAnswersByGroup[groupKey] = [];
+  }
+
+  if (!usedAnswersByGroup[groupKey].includes(answerName)) {
+    usedAnswersByGroup[groupKey].push(answerName);
+  }
 }
   
 init();
