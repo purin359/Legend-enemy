@@ -230,6 +230,7 @@ let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
 let usedAnswersByGroup = {};
+let hintUsed = false;
 
 // 画像用
 function getFileName(name) {
@@ -404,6 +405,8 @@ function nextQuiz() {
 
   answered = false;
   wasWrong = false;
+  hintUsed = false;
+  document.querySelector(".hintBtn").disabled = false;
 
   unlockButtons();
   showCheckButton();
@@ -644,6 +647,8 @@ function loadBest() {
   
   function showHint() {
 
+  if (hintUsed) return; // ←2回目以降は無視
+
   const mode = document.getElementById("mode").value;
   const result = document.getElementById("result");
 
@@ -672,10 +677,12 @@ function loadBest() {
   result.textContent = hint;
   result.style.color = "blue";
 
-  hintTotal++; // ←ここ変更🔥
+  hintTotal++;
+  hintUsed = true; // ←ここ重要
+  document.querySelector(".hintBtn").disabled = true;
+
   updateScore();
 }
-
   function startTimer() {
   startTime = Date.now() - timer * 1000; // ←超重要
 
