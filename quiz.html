@@ -573,6 +573,8 @@ function loadBest() {
   // ▼ 不正解後は何もせず次へ
   if (wasWrong) {
 
+    needReset = true;
+
   resetCompleteProgress();
   wasWrong = false;
 
