@@ -450,25 +450,49 @@ function check() {
 }  
   
 function updateScore() {
-
   const mode = document.getElementById("mode").value;
+  const key = "quizBest_" + mode + "_" + gameMode;
+  const data = localStorage.getItem(key);
 
-  let bestText = `${bestScore}（ヒント: ${bestHint}）`;
+  let bestText = "";
 
-  if (gameMode === "complete") {
-  const bestTime = localStorage.getItem("complete_" + mode + "_complete");
+  if (data) {
+    try {
+      const obj = JSON.parse(data);
 
-  if (bestTime !== null) {
-    bestText += ` / 最速: ${formatTime(Number(bestTime))}`;
+      if (gameMode === "complete") {
+        const bestScoreText = obj.score ?? 0;
+        const bestTimeText =
+          obj.time != null ? formatTime(Number(obj.time)) : "--:--";
+        const bestHintText = obj.hint ?? 0;
+
+        bestText = `${bestScoreText} / 最速: ${bestTimeText}（ヒント: ${bestHintText}）`;
+      } else {
+        const bestScoreText = obj.score ?? 0;
+        const bestHintText = obj.hint ?? 0;
+
+        bestText = `${bestScoreText}（ヒント: ${bestHintText}）`;
+      }
+    } catch {
+      bestText = `0（ヒント: 0）`;
+    }
+  } else {
+    if (gameMode === "complete") {
+      bestText = `0 / 最速: --:--（ヒント: 0）`;
+    } else {
+      bestText = `0（ヒント: 0）`;
+    }
   }
 
-  document.getElementById("remaining").textContent =
-    `残り: ${remaining.length} / ${totalCount}`;
-} else {
-  document.getElementById("remaining").textContent = "";
-}
+  if (gameMode === "complete") {
+    document.getElementById("remaining").textContent =
+      `残り: ${remaining.length} / ${totalCount}`;
+  } else {
+    document.getElementById("remaining").textContent = "";
+  }
+
   document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） / 最高: ${bestText}`;
+    `連続: ${correct}（ヒント: ${hintTotal}） / ${gameMode === "complete" ? "最速" : "最高"}: ${bestText}`;
 }
   
   function saveScore() {
@@ -485,47 +509,76 @@ function saveBest() {
   const mode = document.getElementById("mode").value;
   const key = "quizBest_" + mode + "_" + gameMode;
 
-  localStorage.setItem(key, JSON.stringify({
-    score: bestScore,
-    hint: bestHint
-  }));
+  const newRecord = {
+    score: correct,
+    time: gameMode === "complete" ? timer : null,
+    hint: hintTotal
+  };
+
+  const oldData = localStorage.getItem(key);
+
+  if (!oldData) {
+    localStorage.setItem(key, JSON.stringify(newRecord));
+    return;
+  }
+
+  let oldRecord;
+  try {
+    oldRecord = JSON.parse(oldData);
+  } catch {
+    oldRecord = null;
+  }
+
+  if (!oldRecord || typeof oldRecord !== "object") {
+    localStorage.setItem(key, JSON.stringify(newRecord));
+    return;
+  }
+
+  const oldScore = oldRecord.score ?? 0;
+  const oldTime = oldRecord.time ?? Number.MAX_SAFE_INTEGER;
+  const oldHint = oldRecord.hint ?? Number.MAX_SAFE_INTEGER;
+
+  const newScore = newRecord.score ?? 0;
+  const newTime = newRecord.time ?? Number.MAX_SAFE_INTEGER;
+  const newHint = newRecord.hint ?? Number.MAX_SAFE_INTEGER;
+
+  const shouldUpdate =
+    newScore > oldScore ||
+    (newScore === oldScore && newTime < oldTime) ||
+    (newScore === oldScore && newTime === oldTime && newHint < oldHint);
+
+  if (shouldUpdate) {
+    localStorage.setItem(key, JSON.stringify(newRecord));
+  }
 }
 
 function loadBest() {
   const mode = document.getElementById("mode").value;
   const key = "quizBest_" + mode + "_" + gameMode;
-  
+
   const data = localStorage.getItem(key);
 
-  if (data) {
-    try {
-      const obj = JSON.parse(data);
+  if (!data) {
+    bestScore = 0;
+    bestHint = 0;
+    return;
+  }
 
-      if (typeof obj === "object") {
-        bestScore = obj.score ?? 0;
+  try {
+    const obj = JSON.parse(data);
 
-        // 🔥 ここが重要
-        if (bestScore === 0) {
-          bestHint = 0;
-        } else {
-          bestHint = obj.hint ?? 0;
-        }
-
-      } else {
-        bestScore = Number(obj) || 0;
-        bestHint = 0;
-      }
-
-    } catch {
+    if (typeof obj === "object" && obj !== null) {
+      bestScore = obj.score ?? 0;
+      bestHint = obj.hint ?? 0;
+    } else {
       bestScore = 0;
       bestHint = 0;
     }
-  } else {
+  } catch {
     bestScore = 0;
     bestHint = 0;
   }
 }
-
   function changeMode() {
   correct = 0;
   hintTotal = 0; // ←重要
