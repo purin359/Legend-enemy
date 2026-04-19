@@ -566,16 +566,18 @@ function loadBest() {
 
   const result = document.getElementById("result");
 
-  // ▼ 不正解後は何もせず次へ
-  if (wasWrong) {
+  // 🔥 不正解後に押されたらここでリセットして次へ
+if (wasWrong) {
 
-  resetCompleteProgress();
-  wasWrong = false;
-
-    if (gameMode === "complete") {
-    resetTimer(); // ←これ追加
+  if (gameMode === "endless") {
+    resetEndlessScore();
   }
 
+  wasWrong = false;
+  unlockButtons();
+  nextQuiz();
+  return;
+}
 
   updateScore(); // ←表示更新も必須
 
