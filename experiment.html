@@ -345,13 +345,22 @@ function nextQuiz() {
 
   // クリア判定
   if (gameMode === "complete" && remaining.length === 0) {
-    stopTimer();
-    document.getElementById("result").textContent =
-      `🎉 クリア！ タイム: ${formatTime(timer)}`;
-    saveCompleteRecord();
-    unlockButtons();
-    return;
-  }
+  stopTimer();
+
+  document.getElementById("result").textContent =
+    `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`;
+
+  saveCompleteRecord();
+
+  // 🔥 回答ボタンを隠して次の問題ボタン表示
+  showNextButton();
+
+  // 🔥 次の問題ボタンだけ押せるようにする
+  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("checkBtn").disabled = true;
+
+  return;
+}
 
   if (gameMode === "complete") {
     startTimer();
