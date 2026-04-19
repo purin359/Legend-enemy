@@ -201,7 +201,7 @@ img {
 
   <div class="btnRow">
   <button id="checkBtn" onclick="check()">回答</button>
-  <button id="skipBtn" onclick="skipQuiz()">次の問題</button>
+<button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
 </div>
 
   <div id="result"></div>
@@ -309,6 +309,7 @@ buildStageList(mode);
 
 updateScore();
 nextQuiz();
+showCheckButton();
 }
   
 function isTargetChapter(ch, mode) {
@@ -395,6 +396,7 @@ function nextQuiz() {
   wasWrong = false;
 
   unlockButtons();
+  showCheckButton();
 }
   
 function check() {
@@ -488,17 +490,12 @@ result.textContent =
 
   wasWrong = true;
 
-  setTimeout(() => {
-    if (gameMode === "endless") {
-      resetEndlessScore();
-    }
+    // 🔥 不正解時にタイマー停止
+  if (gameMode === "complete") {
+    stopTimer();
+  }
 
-    if (gameMode === "complete") {
-      resetCompleteProgress();
-    }
-
-    nextQuiz();
-  }, 800);
+    showNextButton();
 }
 }
   
@@ -634,116 +631,6 @@ function loadBest() {
     .replace(/[ 　]/g, "")
     .trim();
 }
-
- function skipQuiz() {
-
-  const result = document.getElementById("result");
-
-  // 🔥ミス後スキップは必ずここで統一リセット
-  if (wasWrong) {
-  if (gameMode === "endless") {
-    resetEndlessScore();
-  }
-
-  if (gameMode === "complete") {
-    resetCompleteProgress();
-  }
-
-  nextQuiz();
-  return;
-}
-   
-  // ▼ 未回答なら判定
-  if (!answered) {
-
-    const input = document.getElementById("answer").value;
-const inputNorm = normalize(input);
-
-const sameStages = getSameStages(current);
-
-const nameOK = sameStages.some(name =>
-  inputNorm === normalize(name)
-);
-
-const idText = `${current.chapterId}-${current.stageId}`;
-const idOK = inputNorm === normalize(idText);
-
-const ok = nameOK || idOK;
-
-    if (ok) {
-      if (matchedName) {
-  markAnswerUsed(current, matchedName);
-}
-      
-  if (gameMode === "complete") {
-    remaining = remaining.filter(st =>
-      !(st.stageName === current.stageName &&
-        st.chapterId === current.chapterId &&
-        st.stageId === current.stageId)
-    );
-  }
-
-      if (idOK && !matchedName) {
-  const availableStages = getAvailableStages(current);
-  if (availableStages.length > 0) {
-    markAnswerUsed(current, availableStages[0]);
-  }
-}
-      
-      result.textContent = "正解！ 🎉";
-      result.style.color = "green";
-
-      correct++;
-
-      if (
-        correct > bestScore ||
-        (correct === bestScore && hintTotal < bestHint)
-      ) {
-        bestScore = correct;
-        bestHint = hintTotal;
-        saveBest();
-      }
-
-      justCorrect = true;
-      wasWrong = false;
-
-      updateScore();
-      lockButtons();
-      setTimeout(nextQuiz, 800);
-      return;
-    }
-  }
-
- // ▼ 純粋スキップ
-const answerText = getSameStageLabels(current).join("\n");
-
-   if (alreadyUsedName && !nameOK && !idOK) {
-  result.textContent = `その答えは使いました：${alreadyUsedName}`;
-  result.style.color = "orange";
-  return;
-}
-
-   if (gameMode === "complete") {
-  usedAnswersByGroup = {};
-  resetCompleteProgress();
-}
-
-result.textContent =
-  `スキップ！ 正解：${answerText}`;
-result.style.color = "red";
-
-setTimeout(() => {
-  if (gameMode === "endless") {
-    resetEndlessScore();
-  }
-
-  if (gameMode === "complete") {
-    resetCompleteProgress();
-  }
-
-  nextQuiz();
-}, 800);
- }
   
   function showHint() {
 
@@ -881,14 +768,29 @@ totalCount = remaining.length;
 
   function lockButtons() {
   document.getElementById("checkBtn").disabled = true;
-  document.getElementById("skipBtn").disabled = true;
+  document.getElementById("nextBtn").disabled = true;
 }
 
 function unlockButtons() {
   document.getElementById("checkBtn").disabled = false;
-  document.getElementById("skipBtn").disabled = false;
+  document.getElementById("nextBtn").disabled = false;
 }
 
+  function showCheckButton() {
+  document.getElementById("checkBtn").style.display = "inline-block";
+  document.getElementById("nextBtn").style.display = "none";
+
+  document.getElementById("checkBtn").disabled = false;
+  document.getElementById("nextBtn").disabled = false;
+}
+
+function showNextButton() {
+  document.getElementById("checkBtn").style.display = "none";
+  document.getElementById("nextBtn").style.display = "inline-block";
+
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("nextBtn").disabled = false;
+}
   function initCompleteCount(mode) {
   const list = buildPool(mode);
 
@@ -954,21 +856,6 @@ function unlockButtons() {
     .join("|");
 }
 
-  function getSameStageLabels(current) {
-  const key = getEnemyKey(current.enemies);
-  const list = [];
-
-  stagesData.forEach(ch => {
-    ch.stages.forEach(st => {
-      if (getEnemyKey(st.enemies) === key) {
-        list.push(`${ch.chapterName} - ${st.stageName}`);
-      }
-    });
-  });
-
-  return [...new Set(list)];
-}
-
   function getSameStages(current) {
   const key = getEnemyKey(current.enemies);
   const list = [];
@@ -1030,6 +917,22 @@ function getSameStageLabels(current) {
   if (!usedAnswersByGroup[groupKey].includes(answerName)) {
     usedAnswersByGroup[groupKey].push(answerName);
   }
+}
+
+  function goNextAfterWrong() {
+  if (gameMode === "endless") {
+    resetEndlessScore();
+  }
+
+  if (gameMode === "complete") {
+    usedAnswersByGroup = {};
+    resetCompleteProgress();
+  }
+
+  wasWrong = false;
+  updateScore();
+  showCheckButton();
+  nextQuiz();
 }
   
 init();
