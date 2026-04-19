@@ -156,6 +156,10 @@ img {
   gap: 10px;               /* ←ボタン間の余白 */
   margin-top: 10px;
 }
+
+  #result {
+  white-space: pre-line;
+}
   
 </style>
 </head>
@@ -444,7 +448,7 @@ const nameOK = sameStages.some(name =>
   setTimeout(nextQuiz, 800);
 
 } else {
-  const answerText = getSameStages(current).join(" / ");
+  const answerText = getSameStages(current).join(" \n ");
 
   result.textContent =
     `不正解！ 正解：${current.chapterName} - ${answerText}`;
@@ -666,7 +670,7 @@ const idOK = inputNorm === normalize(idText);
   }
 
  // ▼ 純粋スキップ
-const answerText = getSameStages(current).join(<br>);
+const answerText = getSameStages(current).join( \n );
 
 result.textContent =
   `スキップ！ 正解：${current.chapterName} - ${answerText}`;
@@ -892,18 +896,14 @@ function unlockButtons() {
     .join("|");
 }
 
-  function getSameStages(current) {
+  function getSameStageLabels(current) {
   const key = getEnemyKey(current.enemies);
   const list = [];
 
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
       if (getEnemyKey(st.enemies) === key) {
-        if (Array.isArray(st.stageName)) {
-          list.push(...st.stageName);
-        } else {
-          list.push(st.stageName);
-        }
+        list.push(`${ch.chapterName} - ${st.stageName}`);
       }
     });
   });
