@@ -216,6 +216,7 @@ let startTime = 0;    // タイマー開始
 let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
+let needReset = false;
 
 // 画像用
 function getFileName(name) {
@@ -314,6 +315,13 @@ function isTargetChapter(ch, mode) {
 }
 
 function nextQuiz() {
+
+  // 🔥 ここが核心
+  if (needReset) {
+    correct = 0;
+    hintTotal = 0;
+    needReset = false;
+  }
 
   const mode = document.getElementById("mode").value;
 
@@ -634,6 +642,9 @@ if (gameMode === "complete") {
 
 handleWrong();
 
+// 🔥 リセット予約
+needReset = true;
+
 setTimeout(nextQuiz, 800);
  }
   
@@ -795,6 +806,9 @@ function unlockButtons() {
 
   function handleWrong() {
   wasWrong = true;
+
+  // 🔥 リセット予約
+  needReset = true;
 
   if (gameMode === "complete") {
     stopTimer();
