@@ -172,14 +172,14 @@ img {
 
 .topBar2 {
   display: flex;
-  justify-content: space-between;
-  align-items: center; /* ←ここ重要（flex-startから変更） */
-  min-height: 40px;    /* ←高さ固定 */
+  flex-direction: column;  /* ←縦にする */
+  gap: 4px;
 }
 
 .leftBox {
-  min-height: 40px;
-  justify-content: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
   
 #remaining {
@@ -192,8 +192,9 @@ img {
 }
 
 #timer {
-  margin-left: 10px;
-  min-width: 60px; /* ←幅固定でズレ防止 */
+  text-align: center;
+  width: 100%;
+  font-size: 16px;
 }
 
   .scoreRow {
