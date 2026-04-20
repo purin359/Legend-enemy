@@ -278,6 +278,30 @@ img {
   font-size: 20px;
   cursor: pointer;
 }
+
+  .answerRow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.answerRow input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.clearAnswerBtn {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  margin: 0;
+  border-radius: 8px;
+  background: #999;
+}
+
+.clearAnswerBtn:hover {
+  background: #777;
+}
   
 </style>
 </head>
@@ -301,6 +325,7 @@ img {
     <select id="playMode" onchange="changePlayMode()">
       <option value="endless">エンドレス</option>
       <option value="complete">コンプリート</option>
+      <option value="practice">練習用</option>
     </select>
   </div>
 
@@ -324,15 +349,18 @@ img {
 
   <div id="enemies"></div>
 
+  <div class="answerRow">
   <input id="answer" placeholder="ステージ名を入力" autocomplete="off">
+  <button type="button" id="clearAnswerBtn" class="clearAnswerBtn" onclick="clearAnswerInput()">×</button>
+</div>
 <div id="suggest"></div>
   <br><br>
 
   <div class="btnRow">
-  <button id="checkBtn" onclick="check()">回答</button>
-<button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
-</div>
-
+    <button id="checkBtn" onclick="check()">回答</button>
+    <button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
+    <button id="giveUpBtn" onclick="giveUpPractice()" style="display:none;">ギブアップ</button>
+  </div>
   <div id="result"></div>
 
 </div>
@@ -457,13 +485,13 @@ buildStageList(mode);
   document.getElementById("timer").style.display = "none";
 }
 
-  if (gameMode === "complete") {
+  if (isStageClearMode()) {
   const mode = document.getElementById("mode").value;
   pool = buildPool(mode);
   remaining = [...pool];
   totalCount = remaining.length;
 }
-
+  
 updateScore();
 nextQuiz();
 showCheckButton();
@@ -494,7 +522,7 @@ function nextQuiz() {
   const mode = document.getElementById("mode").value;
 
   // 初回生成
-  if (gameMode === "complete" && pool.length === 0) {
+  if (isStageClearMode() && pool.length === 0) {
   const mode = document.getElementById("mode").value;
   pool = buildPool(mode);
   remaining = [...pool];
@@ -502,7 +530,7 @@ function nextQuiz() {
 }
 
   // クリア判定
-  if (gameMode === "complete" && remaining.length === 0) {
+  if (isStageClearMode() && remaining.length === 0) {
   stopTimer();
 
   const newRecord = isNewCompleteRecord();
@@ -517,25 +545,26 @@ function nextQuiz() {
   showNextButton();
   document.getElementById("nextBtn").disabled = false;
   document.getElementById("checkBtn").disabled = true;
+  document.getElementById("giveUpBtn").disabled = true;
 
   return;
 }
 
-  if (gameMode === "complete") {
-    startTimer();
-  }
+  if (isStageClearMode()) {
+  startTimer();
+}
 
   let q;
 
-  if (gameMode === "complete") {
-    const i = Math.floor(Math.random() * remaining.length);
-    q = remaining[i];
-  } else {
-    if (pool.length === 0) {
-      pool = buildPool(mode);
-    }
-    q = pool[Math.floor(Math.random() * pool.length)];
+  if (isStageClearMode()) {
+  const i = Math.floor(Math.random() * remaining.length);
+  q = remaining[i];
+} else {
+  if (pool.length === 0) {
+    pool = buildPool(mode);
   }
+  q = pool[Math.floor(Math.random() * pool.length)];
+}
 
   const visibleEnemies = q.enemies.filter(e => e !== "カンバン娘");
 
@@ -640,7 +669,7 @@ const alreadyUsedName =
   markAnswerUsed(current, matchedName);
 }
 
-  if (gameMode === "complete") {
+  if (isStageClearMode()) {
   const targetName = matchedName
     ? matchedName
     : current.stageName;
@@ -684,62 +713,63 @@ const alreadyUsedName =
 
 } else {
 
-    if (gameMode === "complete" && alreadyUsedName && !nameOK && !idOK) {
-  result.textContent = `その答えは使いました：${alreadyUsedName}`;
-  result.style.color = "orange";
-  return;
-}
-    
-  const answerNames =
-  hideMode === "hidden"
-    ? getPossibleStagesFromCurrentView(current)
-    : getSameStageLabels(current);
+  if (gameMode === "complete" && alreadyUsedName && !nameOK && !idOK) {
+    result.textContent = `その答えは使いました：${alreadyUsedName}`;
+    result.style.color = "orange";
+    return;
+  }
 
-const answerText =
-  hideMode === "hidden"
-    ? getPossibleStageLabelsFromCurrentView(current).join("\n")
-    : getSameStageLabels(current).join("\n");
+  if (gameMode === "practice") {
+    result.textContent = "残念！";
+    result.style.color = "red";
+    answered = false;
+    return;
+  }
 
-result.textContent = `不正解！ 正解↓\n${answerText}`;
+  const answerText =
+    hideMode === "hidden"
+      ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+      : getSameStageLabels(current).join("\n");
+
+  result.textContent = `不正解！ 正解↓\n${answerText}`;
   result.style.color = "red";
 
-    if (gameMode === "complete") {
+  if (gameMode === "complete") {
     usedAnswersByGroup = {};
   }
 
   wasWrong = true;
 
-    // 🔥 不正解時にタイマー停止
   if (gameMode === "complete") {
     stopTimer();
   }
 
-    showNextButton();
+  showNextButton();
 }
 }
   
 function updateScore() {
-
   const mode = document.getElementById("mode").value;
 
   let bestText = `${bestScore}（ヒント: ${bestHint}）`;
 
-  if (gameMode === "complete") {
-  const bestTimeKey = hideMode === "normal"
-  ? "complete_" + mode + "_" + gameMode
-  : "complete_" + mode + "_" + gameMode + "_hidden";
+  if (isStageClearMode()) {
+    const bestTimeKey = hideMode === "normal"
+      ? "complete_" + mode + "_" + gameMode
+      : "complete_" + mode + "_" + gameMode + "_hidden";
 
-const bestTime = localStorage.getItem(bestTimeKey);
+    const bestTime = localStorage.getItem(bestTimeKey);
 
-  if (bestTime !== null) {
-    bestText += ` タイム: ${formatTime(Number(bestTime))}`;
+    if (bestTime !== null) {
+      bestText += ` タイム: ${formatTime(Number(bestTime))}`;
+    }
+
+    document.getElementById("remaining").textContent =
+      `残り: ${remaining.length} / ${totalCount}`;
+  } else {
+    document.getElementById("remaining").textContent = "";
   }
 
-  document.getElementById("remaining").textContent =
-    `残り: ${remaining.length} / ${totalCount}`;
-} else {
-  document.getElementById("remaining").textContent = "";
-}
   document.getElementById("score").textContent =
     `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
 }
@@ -802,11 +832,10 @@ function loadBest() {
 }
   
   function changeMode() {
+  if (isStageClearMode()) {
+    usedAnswersByGroup = {};
+  }
 
-    if (gameMode === "complete") {
-  usedAnswersByGroup = {};
-}
-    
   hideMode = document.getElementById("hideMode").value;
   correct = 0;
   hintTotal = 0;
@@ -821,7 +850,7 @@ function loadBest() {
   pool = [];
   remaining = [];
 
-  if (gameMode === "complete") {
+  if (isStageClearMode()) {
     pool = buildPool(mode);
     remaining = [...pool];
     totalCount = remaining.length;
@@ -965,27 +994,21 @@ function formatTime(sec) {
 }
 
  function changePlayMode() {
-   
-  if (gameMode === "complete") {
   usedAnswersByGroup = {};
-}
-   
+
   hideMode = document.getElementById("hideMode").value;
   gameMode = document.getElementById("playMode").value;
 
-   hintCount = 0;
-
-   resetEndlessScore();
+  resetEndlessScore();
+  hintCount = 0;
 
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
-
-   document.getElementById("remaining").textContent = "";
+  document.getElementById("remaining").textContent = "";
 
   const mode = document.getElementById("mode").value;
 
-  // 🔥 先にプール作る
   pool = buildPool(mode);
   remaining = [...pool];
   totalCount = remaining.length;
@@ -999,9 +1022,6 @@ function formatTime(sec) {
     startTimer();
   }
 
-   pool = buildPool(mode);
-remaining = [...pool];
-totalCount = remaining.length;
   loadBest();
   updateScore();
   nextQuiz();
@@ -1036,21 +1056,27 @@ function unlockButtons() {
   document.getElementById("nextBtn").disabled = false;
 }
 
-  function showCheckButton() {
+function showCheckButton() {
   document.getElementById("checkBtn").style.display = "inline-block";
   document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("giveUpBtn").style.display =
+    gameMode === "practice" ? "inline-block" : "none";
 
   document.getElementById("checkBtn").disabled = false;
   document.getElementById("nextBtn").disabled = false;
+  document.getElementById("giveUpBtn").disabled = false;
 }
-
+  
 function showNextButton() {
   document.getElementById("checkBtn").style.display = "none";
   document.getElementById("nextBtn").style.display = "inline-block";
+  document.getElementById("giveUpBtn").style.display = "none";
 
   document.getElementById("checkBtn").disabled = true;
   document.getElementById("nextBtn").disabled = false;
+  document.getElementById("giveUpBtn").disabled = true;
 }
+  
   function initCompleteCount(mode) {
   const list = buildPool(mode);
 
@@ -1429,6 +1455,38 @@ window.addEventListener("click", e => {
     modal.style.display = "none";
   }
 });
+
+  function isStageClearMode() {
+  return gameMode === "complete" || gameMode === "practice";
+}
+
+function clearAnswerInput() {
+  document.getElementById("answer").value = "";
+  document.getElementById("suggest").innerHTML = "";
+  document.getElementById("answer").focus();
+}
+
+function giveUpPractice() {
+  if (gameMode !== "practice") return;
+
+  usedAnswersByGroup = {};
+  correct = 0;
+  hintTotal = 0;
+  hintCount = 0;
+  wasWrong = false;
+  answered = false;
+
+  resetTimer();
+
+  const mode = document.getElementById("mode").value;
+  pool = buildPool(mode);
+  remaining = [...pool];
+  totalCount = remaining.length;
+
+  loadBest();
+  updateScore();
+  nextQuiz();
+}
   
 init();
 </script>
@@ -1468,6 +1526,11 @@ init();
 問題の重複なしで範囲内のステージ全てを答えるタイムアタック<br>
 同じ構成のステージが考えられる場合は、1回目はどれを答えても正解になるが<br>
 2回目以降は既に使ったステージは使えなくなります<br><br>
+
+■ 練習用<br>
+問題の重複なしで範囲内のステージ全てを答える練習モード<br>
+間違えても失敗にならず、答えも表示されません<br>
+その他基本的なルールはコンプリートと同じ<br><br>
 
 
 <b>【敵表示】</b><br><br>
