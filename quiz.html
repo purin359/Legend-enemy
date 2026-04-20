@@ -364,7 +364,7 @@ img {
   <div class="btnRow">
     <button id="checkBtn" onclick="check()">回答</button>
     <button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
-    <button id="giveUpBtn" onclick="giveUpPractice()" style="display:none;">ギブアップ</button>
+    <button id="giveUpBtn" onclick="confirmGiveUpPractice()" style="display:none;">ギブアップ</button>
   </div>
   <div id="result"></div>
 
@@ -1488,9 +1488,21 @@ function giveUpPractice() {
   remaining = [...pool];
   totalCount = remaining.length;
 
-  loadBest();
+  document.getElementById("result").textContent =
+    'ギブアップ！\nもう一度挑戦する場合は「次の問題」を押してください';
+  document.getElementById("result").style.color = "red";
+
   updateScore();
-  nextQuiz();
+  showNextButton();
+}
+
+  function confirmGiveUpPractice() {
+  if (gameMode !== "practice") return;
+
+  const ok = confirm("ギブアップしますか？");
+  if (!ok) return;
+
+  giveUpPractice();
 }
   
 init();
