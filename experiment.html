@@ -171,11 +171,18 @@ img {
 }
 
 .topBar2 {
-  display: flex;
-  flex-direction: column;  /* ←縦にする */
-  gap: 4px;
+  position: relative;   /* ←基準にする */
+  padding-bottom: 20px; /* ←タイマー分の余白 */
 }
 
+#timer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;            /* ←常に同じ位置 */
+  font-size: 16px;
+}
+  
 .leftBox {
   display: flex;
   justify-content: space-between;
@@ -188,12 +195,6 @@ img {
 
 /* スコアは左 */
 #score {
-  font-size: 16px;
-}
-
-#timer {
-  text-align: center;
-  width: 100%;
   font-size: 16px;
 }
 
