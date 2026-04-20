@@ -173,14 +173,17 @@ img {
 .topBar2 {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center; /* ←ここ重要（flex-startから変更） */
+  min-height: 40px;    /* ←高さ固定 */
 }
 
 .leftBox {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;   /* ←縦→横に変更 */
+  align-items: center;
+  gap: 12px;
 }
-
+  
 #remaining {
   font-size: 16px;
 }
