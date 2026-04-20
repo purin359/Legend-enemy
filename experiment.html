@@ -575,12 +575,10 @@ const alreadyUsedName =
   markAnswerUsed(current, matchedName);
 }
 
-  if (gameMode === "complete") {
-    remaining = remaining.filter(st =>
-      !(st.stageName === current.stageName &&
-        st.chapterId === current.chapterId &&
-        st.stageId === current.stageId)
-    );
+  remaining = remaining.filter(st =>
+  !(st.chapterId === current.chapterId &&
+    st.stageId === current.stageId)
+);
   }
 
     if (idOK && !matchedName) {
@@ -1087,10 +1085,7 @@ function getSameStageLabels(current) {
 }
 
   function getGroupKeyFromCurrent(current) {
-  if (hideMode === "hidden") {
-    return currentVisibleKey;
-  }
-  return getEnemyKey(current.enemies);
+  return getAnswerGroupKey(current);
 }
   
   function markAnswerUsed(current, answerName) {
@@ -1317,6 +1312,18 @@ function getPossibleStageLabelsFromCurrentView(current) {
   });
 
   return [...new Set(list)];
+}
+
+  function getAnswerGroupKey(current) {
+  const names =
+    hideMode === "hidden"
+      ? getPossibleStagesFromCurrentView(current)
+      : getSameStages(current);
+
+  return names
+    .map(name => normalize(name))
+    .sort()
+    .join("|");
 }
   
 init();
