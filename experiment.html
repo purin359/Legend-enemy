@@ -227,8 +227,8 @@ img {
 }
 
 .infoBtn {
-  width: 8px;
-  height: 8px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border-radius: 50%;
   border: none;
@@ -262,7 +262,6 @@ img {
       <option value="NA">真レジェンド</option>
       <option value="ND">レジェンド0</option>
     </select>
-    <button type="button" class="infoBtn" onclick="showModeInfo()">ⓘ</button>
   </div>
 
   <div class="selectWrap">
@@ -270,7 +269,6 @@ img {
       <option value="endless">エンドレスモード</option>
       <option value="complete">コンプリートモード</option>
     </select>
-    <button type="button" class="infoBtn" onclick="showPlayModeInfo()">ⓘ</button>
   </div>
 
   <div class="selectWrap">
@@ -278,7 +276,7 @@ img {
       <option value="normal">敵隠しなし</option>
       <option value="hidden">敵隠しあり</option>
     </select>
-    <button type="button" class="infoBtn" onclick="showHideModeInfo()">ⓘ</button>
+    <button type="button" class="infoBtn" onclick="showAllInfo()">ⓘ</button>
   </div>
 
   <button class="hintBtn" onclick="showHint()">ヒント</button>
@@ -1364,41 +1362,41 @@ function getPossibleStageLabelsFromCurrentView(current) {
     .join("|");
 }
 
-  function showModeInfo() {
+  function showAllInfo() {
   alert(
-`【全て】
+`【モード】
+
+■ 全て
 レジェンド範囲内の全てのステージが出ます
 イディ、ノーヴァ含む
 
-【レジェンド】
+■ レジェンド
 レジェンドストーリーのステージのみ出ます
 イディ含む
 
-【真レジェンド】
+■ 真レジェンド
 真レジェンドストーリーのステージのみ出ます
 イディ、ノーヴァ含む
 
-【レジェンド0】
-レジェンドストーリー0のステージのみ出ます`
-  );
-}
+■ レジェンド0
+レジェンドストーリー0のステージのみ出ます
 
-function showPlayModeInfo() {
-  alert(
-`【エンドレスモード】
+
+【プレイモード】
+
+■ エンドレスモード
 問題の重複ありで何連続で答えられるかを試すゲーム
 
-【コンプリートモード】
-問題の重複なしで範囲内のステージ全てを答えるタイムアタック`
-  );
-}
+■ コンプリートモード
+問題の重複なしで範囲内のステージ全てを答えるタイムアタック
 
-function showHideModeInfo() {
-  alert(
-`【隠しなし】
+
+【敵表示】
+
+■ 隠しなし
 全ての敵が見える
 
-【隠しあり】
+■ 隠しあり
 一部の敵が属性カラーで隠されます
 隠されるのは全体の敵数の30%～50%程度`
   );
