@@ -245,6 +245,39 @@ img {
 .infoBtn:hover {
   background: #666;
 }
+
+  .modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+}
+
+.modalContent {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.modalText {
+  max-height: 60vh;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
   
 </style>
 </head>
@@ -1363,47 +1396,69 @@ function getPossibleStageLabelsFromCurrentView(current) {
 }
 
   function showAllInfo() {
-  alert(
-`【モード】
-
-■ 全て
-レジェンド範囲内の全てのステージが出ます
-イディ、ノーヴァ含む
-
-■ レジェンド
-レジェンドストーリーのステージのみ出ます
-イディ含む
-
-■ 真レジェンド
-真レジェンドストーリーのステージのみ出ます
-イディ、ノーヴァ含む
-
-■ レジェンド0
-レジェンドストーリー0のステージのみ出ます
-
-
-【プレイモード】
-
-■ エンドレス
-問題の重複ありで何連続で答えられるかを試すゲーム
-
-■ コンプリート
-問題の重複なしで範囲内のステージ全てを答えるタイムアタック
-
-
-【敵表示】
-
-■ 隠しなし
-全ての敵が見える
-
-■ 隠しあり
-一部の敵が属性カラーで隠されます
-隠されるのは全体の敵数の30%～50%程度`
-  );
+  document.getElementById("infoModal").style.display = "block";
 }
+
+function closeInfo() {
+  document.getElementById("infoModal").style.display = "none";
+}
+
+// 外クリックで閉じる
+window.addEventListener("click", e => {
+  const modal = document.getElementById("infoModal");
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+});
   
 init();
 </script>
+<div id="infoModal" class="modal">
+  <div class="modalContent">
+    <span class="closeBtn" onclick="closeInfo()">×</span>
 
+    <h3>ルール説明</h3>
+
+    <div class="modalText">
+
+<b>【モード】</b><br><br>
+
+■ 全て<br>
+レジェンド範囲内の全てのステージが出ます<br>
+イディ、ノーヴァ含む<br><br>
+
+■ レジェンド<br>
+レジェンドストーリーのステージのみ出ます<br>
+イディ含む<br><br>
+
+■ 真レジェンド<br>
+真レジェンドストーリーのステージのみ出ます<br>
+イディ、ノーヴァ含む<br><br>
+
+■ レジェンド0<br>
+レジェンドストーリー0のステージのみ出ます<br><br>
+
+
+<b>【プレイモード】</b><br><br>
+
+■ エンドレスモード<br>
+問題の重複ありで何連続で答えられるかを試すゲーム<br><br>
+
+■ コンプリートモード<br>
+問題の重複なしで範囲内のステージ全てを答えるタイムアタック<br><br>
+
+
+<b>【敵表示】</b><br><br>
+
+■ 隠しなし<br>
+全ての敵が見える<br><br>
+
+■ 隠しあり<br>
+一部の敵が属性カラーで隠されます<br>
+隠されるのは全体の敵数の30%～50%程度<br>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
