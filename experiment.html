@@ -219,6 +219,32 @@ img {
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+  .selectWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.infoBtn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: #888;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 24px;
+  text-align: center;
+  cursor: pointer;
+  margin: 0;
+}
+
+.infoBtn:hover {
+  background: #666;
+}
   
 </style>
 </head>
@@ -229,26 +255,34 @@ img {
   <h2>ステージ当てクイズ(レジェンド)</h2>
 
   <div class="topBar1">
-  <select id="mode" onchange="changeMode()">
-    <option value="ALL">全て</option>
-    <option value="N">レジェンド</option>
-    <option value="NA">真レジェンド</option>
-    <option value="ND">レジェンド0</option>
-  </select>
+  <div class="selectWrap">
+    <select id="mode" onchange="changeMode()">
+      <option value="ALL">全て</option>
+      <option value="N">レジェンド</option>
+      <option value="NA">真レジェンド</option>
+      <option value="ND">レジェンド0</option>
+    </select>
+    <button type="button" class="infoBtn" onclick="showModeInfo()">ⓘ</button>
+  </div>
 
-  <select id="playMode" onchange="changePlayMode()">
-    <option value="endless">エンドレスモード</option>
-    <option value="complete">コンプリートモード</option>
-  </select>
+  <div class="selectWrap">
+    <select id="playMode" onchange="changePlayMode()">
+      <option value="endless">エンドレスモード</option>
+      <option value="complete">コンプリートモード</option>
+    </select>
+    <button type="button" class="infoBtn" onclick="showPlayModeInfo()">ⓘ</button>
+  </div>
 
-  <select id="hideMode" onchange="changeHideMode()">
-    <option value="normal">敵隠しなし</option>
-    <option value="hidden">敵隠しあり</option>
-  </select>
+  <div class="selectWrap">
+    <select id="hideMode" onchange="changeHideMode()">
+      <option value="normal">敵隠しなし</option>
+      <option value="hidden">敵隠しあり</option>
+    </select>
+    <button type="button" class="infoBtn" onclick="showHideModeInfo()">ⓘ</button>
+  </div>
 
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
-
 <div class="topBar2">
   <div class="leftBox">
     <div id="score"></div>
@@ -1328,6 +1362,46 @@ function getPossibleStageLabelsFromCurrentView(current) {
     .map(name => normalize(name))
     .sort()
     .join("|");
+}
+
+  function showModeInfo() {
+  alert(
+`【全て】
+レジェンド範囲内の全てのステージが出ます
+イディ、ノーヴァ含む
+
+【レジェンド】
+レジェンドストーリーのステージのみ出ます
+イディ含む
+
+【真レジェンド】
+真レジェンドストーリーのステージのみ出ます
+イディ、ノーヴァ含む
+
+【レジェンド0】
+レジェンドストーリー0のステージのみ出ます`
+  );
+}
+
+function showPlayModeInfo() {
+  alert(
+`【エンドレスモード】
+問題の重複ありで何連続で答えられるかを試すゲーム
+
+【コンプリートモード】
+問題の重複なしで範囲内のステージ全てを答えるタイムアタック`
+  );
+}
+
+function showHideModeInfo() {
+  alert(
+`【隠しなし】
+全ての敵が見える
+
+【隠しあり】
+一部の敵が属性カラーで隠されます
+隠されるのは全体の敵数の30%～50%程度`
+  );
 }
   
 init();
