@@ -541,7 +541,7 @@ function check() {
 
 const availableStages =
   gameMode === "complete"
-    ? getAvailableStages(current).filter(name => sameStages.includes(name))
+    ? getAvailableStages(current)
     : sameStages;
 
 const matchedName = availableStages.find(name =>
@@ -1050,9 +1050,11 @@ function showNextButton() {
 }
   
   function getAvailableStages(current) {
-  const all = getSameStages(current);
+  const all =
+    hideMode === "hidden"
+      ? getPossibleStagesFromCurrentView(current)
+      : getSameStages(current);
 
-  // 🔥 エンドレスでは使用履歴を無視
   if (gameMode !== "complete") {
     return all;
   }
