@@ -484,7 +484,8 @@ function nextQuiz() {
   const box = document.createElement("div");
   box.className = "enemyBox";
 
-  const hiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
+  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(visibleEnemies) : [];
+  currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
 
 let visibleIndex = -1;
   
