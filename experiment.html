@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)１</title>
+<title>ステージ当てクイズ(実験用)</title>
 
 <style>
 body {
@@ -550,11 +550,15 @@ const matchedName = availableStages.find(name =>
   
 const nameOK = !!matchedName;
 
-  const allStages = getSameStages(current);
+  const allStages = sameStages;
 
-const alreadyUsedName = allStages.find(name =>
-  inputNorm === normalize(name)
-);
+const alreadyUsedName =
+  gameMode === "complete"
+    ? allStages.find(name =>
+        inputNorm === normalize(name) &&
+        !availableStages.includes(name)
+      )
+    : null;
 
   const idText = `${current.chapterId}-${current.stageId}`;
   const idOK = inputNorm === normalize(idText);
@@ -1072,9 +1076,12 @@ function getSameStageLabels(current) {
 }
 
   function getGroupKeyFromCurrent(current) {
+  if (hideMode === "hidden") {
+    return currentVisibleKey;
+  }
   return getEnemyKey(current.enemies);
 }
-
+  
   function markAnswerUsed(current, answerName) {
   // 🔥 エンドレスでは記録しない
   if (gameMode !== "complete") return;
@@ -1243,6 +1250,33 @@ function getHiddenIndexes(enemies) {
 
   parts.sort();
   return parts.join(" / ");
+}
+
+  function getPossibleStagesFromCurrentView(current) {
+  const list = [];
+
+  const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
+  const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
+
+      if (stageVisibleEnemies.length !== currentVisibleEnemies.length) return;
+
+      const key = getVisibleQuestionKeyByMask(stageVisibleEnemies, currentHiddenIndexes);
+
+      if (key === currentKey) {
+        if (Array.isArray(st.stageName)) {
+          list.push(...st.stageName);
+        } else {
+          list.push(st.stageName);
+        }
+      }
+    });
+  });
+
+  return [...new Set(list)];
 }
 
 function getPossibleStageLabelsFromCurrentView(current) {
