@@ -1474,6 +1474,17 @@ function clearAnswerInput() {
 function giveUpPractice() {
   if (gameMode !== "practice") return;
 
+  // 🔥 正解表示を作る
+  const answerText =
+    hideMode === "hidden"
+      ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+      : getSameStageLabels(current).join("\n");
+
+  document.getElementById("result").textContent =
+    `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
+  document.getElementById("result").style.color = "red";
+
+  // ▼ リセット処理
   usedAnswersByGroup = {};
   correct = 0;
   hintTotal = 0;
@@ -1487,10 +1498,6 @@ function giveUpPractice() {
   pool = buildPool(mode);
   remaining = [...pool];
   totalCount = remaining.length;
-
-  document.getElementById("result").textContent =
-    'ギブアップ！\nもう一度挑戦する場合は「次の問題」を押してください';
-  document.getElementById("result").style.color = "red";
 
   updateScore();
   showNextButton();
