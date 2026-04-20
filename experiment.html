@@ -171,30 +171,33 @@ img {
 }
 
 .topBar2 {
-  position: relative;   /* ←基準にする */
-  padding-bottom: 20px; /* ←タイマー分の余白 */
+  position: relative;
+  min-height: 48px;   /* 上段+タイマー分の高さを確保 */
+}
+
+.leftBox {
+  display: block;
+}
+
+#score {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+}
+
+#remaining {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 16px;
 }
 
 #timer {
   position: absolute;
+  top: 24px;          /* 下段に固定 */
   left: 50%;
   transform: translateX(-50%);
-  bottom: 0;            /* ←常に同じ位置 */
-  font-size: 16px;
-}
-  
-.leftBox {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-}
-  
-#remaining {
-  font-size: 16px;
-}
-
-/* スコアは左 */
-#score {
   font-size: 16px;
 }
 
