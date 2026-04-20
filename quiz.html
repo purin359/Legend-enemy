@@ -575,10 +575,16 @@ const alreadyUsedName =
   markAnswerUsed(current, matchedName);
 }
 
-  remaining = remaining.filter(st =>
-  !(st.chapterId === current.chapterId &&
-    st.stageId === current.stageId)
-);
+  if (gameMode === "complete") {
+  const targetName = matchedName
+    ? matchedName
+    : current.stageName;
+
+  remaining = remaining.filter(st => {
+    const names = Array.isArray(st.stageName) ? st.stageName : [st.stageName];
+    return !names.some(name => normalize(name) === normalize(targetName));
+  });
+}
 
     if (idOK && !matchedName) {
   const availableStages = getAvailableStages(current);
@@ -1247,13 +1253,12 @@ function getHiddenIndexes(enemies) {
 
     if (hiddenIndexes.includes(index)) {
       const colors = getAttributeColors(enemy).slice().sort();
-      parts.push("H:" + colors.join("|"));
+      parts.push(index + ":H:" + colors.join("|"));
     } else {
-      parts.push("N:" + normalizeName(enemy));
+      parts.push(index + ":N:" + normalizeName(enemy));
     }
   });
 
-  parts.sort();
   return parts.join(" / ");
 }
 
