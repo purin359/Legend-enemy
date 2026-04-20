@@ -494,6 +494,10 @@ q.enemies.forEach((enemy, index) => {
   img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
   img.onerror = () => img.src = "image/noimage.png";
 
+if (hideMode === "hidden" && currentHiddenIndexes.includes(index)) {
+  wrap.classList.add("covered");
+}
+  
   wrap.appendChild(img);
 
   if (hideMode === "hidden" && currentHiddenIndexes.includes(index)) {
