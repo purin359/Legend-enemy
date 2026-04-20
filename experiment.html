@@ -630,7 +630,7 @@ const answerText =
     ? getPossibleStageLabelsFromCurrentView(current).join("\n")
     : getSameStageLabels(current).join("\n");
 
-result.textContent = `不正解！ 正解：${answerText}`;
+result.textContent = `不正解！ 正解\n${answerText}`;
   result.style.color = "red";
 
     if (gameMode === "complete") {
