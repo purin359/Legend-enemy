@@ -303,6 +303,8 @@ let usedAnswersByGroup = {};
 let hintUsed = false;
 let enemiesMaster = {};
 let hideMode = "normal";
+let currentHiddenIndexes = [];
+let currentVisibleKey = "";
 
 // 画像用
 function getFileName(name) {
@@ -463,6 +465,9 @@ function nextQuiz() {
     startTimer();
   }
 
+  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
+currentVisibleKey = getVisibleQuestionKey(q.enemies, currentHiddenIndexes);
+
   let q;
 
   if (gameMode === "complete") {
@@ -497,14 +502,11 @@ q.enemies.forEach((enemy, index) => {
 
   wrap.appendChild(img);
 
-  if (hideMode === "hidden" && hiddenIndexes.includes(index)) {
-
-  wrap.classList.add("covered"); // ←これ追加
-
-  const colors = getAttributeColors(enemy);
-  const cover = createEnemyCover(colors);
-  wrap.appendChild(cover);
-}
+  if (hideMode === "hidden" && currentHiddenIndexes.includes(index)) {
+    const colors = getAttributeColors(enemy);
+    const cover = createEnemyCover(colors);
+    wrap.appendChild(cover);
+  }
 
   box.appendChild(wrap);
 });
@@ -527,7 +529,10 @@ function check() {
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
-  const availableStages = getAvailableStages(current);
+  const sameStages =
+    hideMode === "hidden"
+      ? getPossibleStagesFromCurrentView(current)
+      : getSameStages(current);
 
 const matchedName = availableStages.find(name =>
   inputNorm === normalize(name)
@@ -1203,6 +1208,46 @@ function getHiddenIndexes(enemies) {
   });
 
   return cover;
+}
+
+  function getVisibleQuestionKeyByMask(questionEnemies, hiddenIndexes) {
+  const parts = [];
+
+  questionEnemies.forEach((enemy, index) => {
+    if (enemy === "カンバン娘") return;
+
+    if (hiddenIndexes.includes(index)) {
+      const colors = getAttributeColors(enemy).slice().sort();
+      parts.push("H:" + colors.join("|"));
+    } else {
+      parts.push("N:" + normalizeName(enemy));
+    }
+  });
+
+  parts.sort();
+  return parts.join(" / ");
+}
+
+function getPossibleStagesFromCurrentView(current) {
+  const list = [];
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      if (st.enemies.length !== current.enemies.length) return;
+
+      const key = getVisibleQuestionKeyByMask(st.enemies, currentHiddenIndexes);
+
+      if (key === currentVisibleKey) {
+        if (Array.isArray(st.stageName)) {
+          list.push(...st.stageName);
+        } else {
+          list.push(st.stageName);
+        }
+      }
+    });
+  });
+
+  return [...new Set(list)];
 }
   
 init();
