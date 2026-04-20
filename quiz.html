@@ -219,6 +219,65 @@ img {
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+  .selectWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.infoBtn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background: #888;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 24px;
+  text-align: center;
+  cursor: pointer;
+  margin: 0;
+}
+
+.infoBtn:hover {
+  background: #666;
+}
+
+  .modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+}
+
+.modalContent {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.modalText {
+  max-height: 60vh;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
   
 </style>
 </head>
@@ -229,26 +288,32 @@ img {
   <h2>ステージ当てクイズ(レジェンド)</h2>
 
   <div class="topBar1">
-  <select id="mode" onchange="changeMode()">
-    <option value="ALL">全て</option>
-    <option value="N">レジェンド</option>
-    <option value="NA">真レジェンド</option>
-    <option value="ND">レジェンド0</option>
-  </select>
+  <div class="selectWrap">
+    <select id="mode" onchange="changeMode()">
+      <option value="ALL">全て</option>
+      <option value="N">レジェンド</option>
+      <option value="NA">真レジェンド</option>
+      <option value="ND">レジェンド0</option>
+    </select>
+  </div>
 
-  <select id="playMode" onchange="changePlayMode()">
-    <option value="endless">エンドレスモード</option>
-    <option value="complete">コンプリートモード</option>
-  </select>
+  <div class="selectWrap">
+    <select id="playMode" onchange="changePlayMode()">
+      <option value="endless">エンドレス</option>
+      <option value="complete">コンプリート</option>
+    </select>
+  </div>
 
-  <select id="hideMode" onchange="changeHideMode()">
-    <option value="normal">敵隠しなし</option>
-    <option value="hidden">敵隠しあり</option>
-  </select>
+  <div class="selectWrap">
+    <select id="hideMode" onchange="changeHideMode()">
+      <option value="normal">敵隠しなし</option>
+      <option value="hidden">敵隠しあり</option>
+    </select>
+    <button type="button" class="infoBtn" onclick="showAllInfo()">ⓘ</button>
+  </div>
 
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
-
 <div class="topBar2">
   <div class="leftBox">
     <div id="score"></div>
@@ -294,7 +359,7 @@ let timer = 0;        // 秒
 let timerId = null;
 let totalCount = 0;   // 総問題数
 let usedAnswersByGroup = {};
-let hintUsed = false;
+let hintCount = 0;
 let enemiesMaster = {};
 let hideMode = "normal";
 let currentHiddenIndexes = [];
@@ -523,8 +588,8 @@ q.enemies.forEach((enemy) => {
 
   answered = false;
   wasWrong = false;
-  hintUsed = false;
-  document.querySelector(".hintBtn").disabled = false;
+  hintCount = 0;
+document.querySelector(".hintBtn").disabled = false;
 
   unlockButtons();
   showCheckButton();
@@ -745,6 +810,7 @@ function loadBest() {
   hideMode = document.getElementById("hideMode").value;
   correct = 0;
   hintTotal = 0;
+  hintCount = 0;
 
   resetTimer();
   loadBest();
@@ -798,40 +864,55 @@ function loadBest() {
 }
   
   function showHint() {
-
-  if (hintUsed) return; // ←2回目以降は無視
-
   const mode = document.getElementById("mode").value;
   const result = document.getElementById("result");
-
-  let hint = "";
+  const hintBtn = document.querySelector(".hintBtn");
 
   if (mode === "ALL") {
+    if (hintCount >= 2) return;
 
-    if (current.chapterId.startsWith("N") &&
+    let hint = "";
+
+    if (hintCount === 0) {
+      if (
+        current.chapterId.startsWith("N") &&
         !current.chapterId.startsWith("NA") &&
-        !current.chapterId.startsWith("ND")) {
-      hint = "ヒント：レジェンド";
+        !current.chapterId.startsWith("ND")
+      ) {
+        hint = "ヒント：レジェンド";
+      } else if (current.chapterId.startsWith("NA")) {
+        hint = "ヒント：真レジェンド";
+      } else if (current.chapterId.startsWith("ND")) {
+        hint = "ヒント：レジェンド0";
+      }
+    } else if (hintCount === 1) {
+      hint = `ヒント：${current.chapterName}`;
     }
 
-    else if (current.chapterId.startsWith("NA")) {
-      hint = "ヒント：真レジェンド";
+    result.textContent = hint;
+    result.style.color = "blue";
+
+    hintTotal++;
+    hintCount++;
+
+    if (hintCount >= 2) {
+      hintBtn.disabled = true;
     }
 
-    else if (current.chapterId.startsWith("ND")) {
-      hint = "ヒント：レジェンド0";
-    }
-
-  } else {
-    hint = `ヒント：${current.chapterName}`;
+    updateScore();
+    return;
   }
 
+  // 全て以外は今まで通り1回だけ
+  if (hintCount >= 1) return;
+
+  const hint = `ヒント：${current.chapterName}`;
   result.textContent = hint;
   result.style.color = "blue";
 
   hintTotal++;
-  hintUsed = true; // ←ここ重要
-  document.querySelector(".hintBtn").disabled = true;
+  hintCount++;
+  hintBtn.disabled = true;
 
   updateScore();
 }
@@ -891,6 +972,8 @@ function formatTime(sec) {
    
   hideMode = document.getElementById("hideMode").value;
   gameMode = document.getElementById("playMode").value;
+
+   hintCount = 0;
 
    resetEndlessScore();
 
@@ -1139,6 +1222,7 @@ function getSameStageLabels(current) {
 
   correct = 0;
   hintTotal = 0;
+  hintCount = 0;
   usedAnswersByGroup = {};
 
   if (gameMode === "complete") {
@@ -1160,12 +1244,12 @@ function getSameStageLabels(current) {
     "赤": "#e53935",
     "浮き": "#9ccc65",
     "黒": "#222222",
-    "メタル": "#9e9e9e",
+    "メタル": "#C8C8C8",
     "天使": "#fff200",
-    "エイリアン": "#4fc3f7",
-    "ゾンビ": "#9b46b9",
+    "エイリアン": "#80FFEE",
+    "ゾンビ": "#C66CFF",
     "悪魔": "#4b7ea7",
-    "古代種": "#6d8346",
+    "古代種": "#566E3A",
     "無属性": "#ffffff"
   };
 
@@ -1264,14 +1348,11 @@ function getHiddenIndexes(enemies) {
 
   function getPossibleStagesFromCurrentView(current) {
   const list = [];
-  const mode = document.getElementById("mode").value;
 
   const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
   const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
 
   stagesData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
     ch.stages.forEach(st => {
       const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
 
@@ -1291,17 +1372,14 @@ function getHiddenIndexes(enemies) {
 
   return [...new Set(list)];
 }
-  
+
 function getPossibleStageLabelsFromCurrentView(current) {
   const list = [];
-  const mode = document.getElementById("mode").value;
 
   const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
   const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
 
   stagesData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
     ch.stages.forEach(st => {
       const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
 
@@ -1335,9 +1413,85 @@ function getPossibleStageLabelsFromCurrentView(current) {
     .sort()
     .join("|");
 }
+
+  function showAllInfo() {
+  document.getElementById("infoModal").style.display = "block";
+}
+
+function closeInfo() {
+  document.getElementById("infoModal").style.display = "none";
+}
+
+// 外クリックで閉じる
+window.addEventListener("click", e => {
+  const modal = document.getElementById("infoModal");
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+});
   
 init();
 </script>
+<div id="infoModal" class="modal">
+  <div class="modalContent">
+    <span class="closeBtn" onclick="closeInfo()">×</span>
 
+    <h3>ルール説明</h3>
+
+    <div class="modalText">
+
+<b>【モード】</b><br><br>
+
+■ 全て<br>
+レジェンド範囲内の全てのステージが出ます<br>
+イディ、ノーヴァ含む<br><br>
+
+■ レジェンド<br>
+レジェンドストーリーのステージのみ出ます<br>
+イディ含む<br><br>
+
+■ 真レジェンド<br>
+真レジェンドストーリーのステージのみ出ます<br>
+イディ、ノーヴァ含む<br><br>
+
+■ レジェンド0<br>
+レジェンドストーリー0のステージのみ出ます<br><br>
+
+
+<b>【プレイモード】</b><br><br>
+
+■ エンドレス<br>
+問題の重複ありで何連続で答えられるかを試すゲーム<br>
+同じ構成のステージが考えられる場合、どれを答えても正解になります<br><br>
+
+■ コンプリート<br>
+問題の重複なしで範囲内のステージ全てを答えるタイムアタック<br>
+同じ構成のステージが考えられる場合は、1回目はどれを答えても正解になるが<br>
+2回目以降は既に使ったステージは使えなくなります<br><br>
+
+
+<b>【敵表示】</b><br><br>
+
+■ 隠しなし<br>
+全ての敵が見えます<br><br>
+
+■ 隠しあり<br>
+一部の敵が属性カラーで隠されます<br>
+隠されるのは全体の敵数の30%～50%程度<br><br>
+
+<b>【ヒント】</b><br><br>
+
+【モード】が全ての時は1つの問題につき2回まで使用可能<br>
+1回目はレジェンド、真レジェンド、レジェンド0が表示されます<br>
+2回目は章名が表示されます<br><br>
+
+【モード】が全て以外の時は1つの問題につき1回まで使用可能<br>
+章名が表示されます<br><br>
+
+なお、ヒントを使用するとヒントカウントが1つ進みます<br>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
