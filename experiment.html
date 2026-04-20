@@ -474,7 +474,6 @@ function nextQuiz() {
 
   const visibleEnemies = q.enemies.filter(e => e !== "カンバン娘");
 
-  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(visibleEnemies) : [];
   currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
 
   current = q;
