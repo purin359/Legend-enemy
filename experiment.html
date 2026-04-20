@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)</title>
+<title>ステージ当てクイズ(実験用)１</title>
 
 <style>
 body {
@@ -75,17 +75,11 @@ img {
   width: 50px;
   height: 50px;
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
 }
   
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .enemyItem img {
   width: 50px;
   height: 50px;
@@ -465,9 +459,6 @@ function nextQuiz() {
     startTimer();
   }
 
-  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
-currentVisibleKey = getVisibleQuestionKey(q.enemies, currentHiddenIndexes);
-
   let q;
 
   if (gameMode === "complete") {
@@ -479,6 +470,9 @@ currentVisibleKey = getVisibleQuestionKey(q.enemies, currentHiddenIndexes);
     }
     q = pool[Math.floor(Math.random() * pool.length)];
   }
+
+  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
+  currentVisibleKey = getVisibleQuestionKey(q.enemies, currentHiddenIndexes);
 
   current = q;
 
@@ -530,13 +524,20 @@ function check() {
   const inputNorm = normalize(input);
 
   const sameStages =
-    hideMode === "hidden"
-      ? getPossibleStagesFromCurrentView(current)
-      : getSameStages(current);
+  hideMode === "hidden"
+    ? getPossibleStagesFromCurrentView(current)
+    : getSameStages(current);
+
+const availableStages =
+  gameMode === "complete"
+    ? getAvailableStages(current).filter(name => sameStages.includes(name))
+    : sameStages;
 
 const matchedName = availableStages.find(name =>
   inputNorm === normalize(name)
 );
+
+const nameOK = !!matchedName;
 
 const nameOK = !!matchedName;
 
