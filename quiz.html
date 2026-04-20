@@ -541,7 +541,7 @@ function check() {
 
 const availableStages =
   gameMode === "complete"
-    ? getAvailableStages(current).filter(name => sameStages.includes(name))
+    ? getAvailableStages(current)
     : sameStages;
 
 const matchedName = availableStages.find(name =>
@@ -616,11 +616,12 @@ const alreadyUsedName =
 
 } else {
 
-    if (alreadyUsedName && !nameOK && !idOK) {
+    if (gameMode === "complete" && alreadyUsedName && !nameOK && !idOK) {
   result.textContent = `その答えは使いました：${alreadyUsedName}`;
   result.style.color = "orange";
   return;
 }
+    
   const answerNames =
   hideMode === "hidden"
     ? getPossibleStagesFromCurrentView(current)
@@ -733,6 +734,11 @@ function loadBest() {
 }
   
   function changeMode() {
+
+    if (gameMode === "complete") {
+  usedAnswersByGroup = {};
+}
+    
   hideMode = document.getElementById("hideMode").value;
   correct = 0;
   hintTotal = 0;
@@ -757,7 +763,6 @@ function loadBest() {
 
   updateScore();
   nextQuiz();
-  usedAnswersByGroup = {};
 }
   
   function buildStageList(mode) {
@@ -876,6 +881,11 @@ function formatTime(sec) {
 }
 
  function changePlayMode() {
+   
+  if (gameMode === "complete") {
+  usedAnswersByGroup = {};
+}
+   
   hideMode = document.getElementById("hideMode").value;
   gameMode = document.getElementById("playMode").value;
 
@@ -909,7 +919,6 @@ totalCount = remaining.length;
   loadBest();
   updateScore();
   nextQuiz();
-   usedAnswersByGroup = {};
 }
   
   function saveCompleteRecord() {
@@ -1041,9 +1050,11 @@ function showNextButton() {
 }
   
   function getAvailableStages(current) {
-  const all = getSameStages(current);
+  const all =
+    hideMode === "hidden"
+      ? getPossibleStagesFromCurrentView(current)
+      : getSameStages(current);
 
-  // 🔥 エンドレスでは使用履歴を無視
   if (gameMode !== "complete") {
     return all;
   }
