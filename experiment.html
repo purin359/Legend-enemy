@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)</title>
+<title>ステージ当てクイズ(実験用)１</title>
 
 <style>
 body {
@@ -300,6 +300,7 @@ let hideMode = "normal";
 let currentHiddenIndexes = [];
 let currentVisibleKey = "";
 
+
 // 画像用
 function getFileName(name) {
   return name
@@ -471,8 +472,10 @@ function nextQuiz() {
     q = pool[Math.floor(Math.random() * pool.length)];
   }
 
-  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
-  currentVisibleKey = getVisibleQuestionKeyByMask(q.enemies, currentHiddenIndexes);
+  const visibleEnemies = q.enemies.filter(e => e !== "カンバン娘");
+
+  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(visibleEnemies) : [];
+  currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
 
   current = q;
 
@@ -484,8 +487,12 @@ function nextQuiz() {
 
   const hiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
 
-q.enemies.forEach((enemy, index) => {
+let visibleIndex = -1;
+  
+q.enemies.forEach((enemy) => {
   if (enemy === "カンバン娘") return;
+
+  visibleIndex++;
 
   const wrap = document.createElement("div");
   wrap.className = "enemyItem";
@@ -494,13 +501,13 @@ q.enemies.forEach((enemy, index) => {
   img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
   img.onerror = () => img.src = "image/noimage.png";
 
-if (hideMode === "hidden" && currentHiddenIndexes.includes(index)) {
-  wrap.classList.add("covered");
-}
-  
+  if (hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex)) {
+    wrap.classList.add("covered");
+  }
+
   wrap.appendChild(img);
 
-  if (hideMode === "hidden" && currentHiddenIndexes.includes(index)) {
+  if (hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex)) {
     const colors = getAttributeColors(enemy);
     const cover = createEnemyCover(colors);
     wrap.appendChild(cover);
@@ -610,10 +617,17 @@ const alreadyUsedName = allStages.find(name =>
   result.style.color = "orange";
   return;
 }
-  const answerText = getSameStageLabels(current).join("\n");
+  const answerNames =
+  hideMode === "hidden"
+    ? getPossibleStagesFromCurrentView(current)
+    : getSameStageLabels(current);
 
-result.textContent =
-  `不正解！ 正解：${answerText}`;
+const answerText =
+  hideMode === "hidden"
+    ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+    : getSameStageLabels(current).join("\n");
+
+result.textContent = `不正解！ 正解：${answerText}`;
   result.style.color = "red";
 
     if (gameMode === "complete") {
@@ -1231,20 +1245,27 @@ function getHiddenIndexes(enemies) {
   return parts.join(" / ");
 }
 
-function getPossibleStagesFromCurrentView(current) {
+function getPossibleStageLabelsFromCurrentView(current) {
   const list = [];
+
+  const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
+  const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
 
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
-      if (st.enemies.length !== current.enemies.length) return;
+      const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
 
-      const key = getVisibleQuestionKeyByMask(st.enemies, currentHiddenIndexes);
+      if (stageVisibleEnemies.length !== currentVisibleEnemies.length) return;
 
-      if (key === currentVisibleKey) {
+      const key = getVisibleQuestionKeyByMask(stageVisibleEnemies, currentHiddenIndexes);
+
+      if (key === currentKey) {
         if (Array.isArray(st.stageName)) {
-          list.push(...st.stageName);
+          st.stageName.forEach(name => {
+            list.push(`${ch.chapterName} - ${name}`);
+          });
         } else {
-          list.push(st.stageName);
+          list.push(`${ch.chapterName} - ${st.stageName}`);
         }
       }
     });
