@@ -65,6 +65,64 @@ img {
   width: 50px;
 }  
 
+  .enemyItem.covered img {
+  width: 44px;
+  height: 44px;
+}
+
+.enemyItem {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.enemyItem img {
+  width: 50px;
+  height: 50px;
+}
+
+.enemyCover {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+}
+.enemyCoverPart {
+  box-sizing: border-box;
+}
+
+.enemyCover.one .enemyCoverPart {
+  width: 100%;
+  height: 100%;
+}
+
+.enemyCover.two .enemyCoverPart {
+  width: 50%;
+  height: 100%;
+}
+
+.enemyCover.three .enemyCoverPart {
+  width: 33.3333%;
+  height: 100%;
+}
+
+.enemyCover.six .enemyCoverPart {
+  width: 33.3333%;
+  height: 50%;
+}
+  
   .enemyBox {
   border: none;                /* ←削除 */
   border-radius: 12px;
@@ -189,6 +247,11 @@ img {
     <option value="complete">コンプリートモード</option>
   </select>
 
+  <select id="hideMode" onchange="changeHideMode()">
+    <option value="normal">敵隠しなし</option>
+    <option value="hidden">敵隠しあり</option>
+  </select>
+
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
 
@@ -238,6 +301,8 @@ let timerId = null;
 let totalCount = 0;   // 総問題数
 let usedAnswersByGroup = {};
 let hintUsed = false;
+let enemiesMaster = {};
+let hideMode = "normal";
 
 // 画像用
 function getFileName(name) {
@@ -249,16 +314,38 @@ function getFileName(name) {
 }
 
 // 比較用
-function normalize(str) {
-  return str
+function normalizeName(str) {
+  return String(str)
+    .replace(/\r?\n/g, "")
+    .replace(/[：:]/g, "")
+    .replace(/[ 　]/g, "")
+    .trim();
+}
+
+  function normalize(str) {
+  return String(str)
     .replace(/\r?\n/g, "")
     .replace(/[ 　]+/g, "")
     .trim();
 }
-
+  
 async function init() {
   usedAnswersByGroup = {};
-  stagesData = await fetch("stages.json").then(r=>r.json());
+  stagesData = await fetch("stages.json").then(r => r.json());
+
+const enemiesJson = await fetch("enemies.json").then(r => r.json());
+
+enemiesMaster = {};
+
+const enemyList = Array.isArray(enemiesJson)
+  ? enemiesJson
+  : Object.values(enemiesJson);
+
+enemyList.forEach(enemy => {
+  enemiesMaster[normalizeName(enemy.name)] = enemy;
+});
+
+hideMode = document.getElementById("hideMode").value;
 
   resetEndlessScore();
 
@@ -318,6 +405,7 @@ buildStageList(mode);
 updateScore();
 nextQuiz();
 showCheckButton();
+hideMode = document.getElementById("hideMode").value;
 }
   
 function isTargetChapter(ch, mode) {
@@ -395,16 +483,32 @@ function nextQuiz() {
   const box = document.createElement("div");
   box.className = "enemyBox";
 
-  q.enemies.forEach(enemy => {
-    if (enemy === "カンバン娘") return;
+  const hiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(q.enemies) : [];
 
-    const img = document.createElement("img");
-    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
-    img.onerror = () => img.src = "image/noimage.png";
+q.enemies.forEach((enemy, index) => {
+  if (enemy === "カンバン娘") return;
 
-    box.appendChild(img);
-  });
+  const wrap = document.createElement("div");
+  wrap.className = "enemyItem";
 
+  const img = document.createElement("img");
+  img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+  img.onerror = () => img.src = "image/noimage.png";
+
+  wrap.appendChild(img);
+
+  if (hideMode === "hidden" && hiddenIndexes.includes(index)) {
+
+  wrap.classList.add("covered"); // ←これ追加
+
+  const colors = getAttributeColors(enemy);
+  const cover = createEnemyCover(colors);
+  wrap.appendChild(cover);
+}
+
+  box.appendChild(wrap);
+});
+  
   enemiesDiv.appendChild(box);
 
   document.getElementById("answer").value = "";
@@ -526,7 +630,11 @@ function updateScore() {
   let bestText = `${bestScore}（ヒント: ${bestHint}）`;
 
   if (gameMode === "complete") {
-  const bestTime = localStorage.getItem("complete_" + mode + "_complete");
+  const bestTimeKey = hideMode === "normal"
+  ? "complete_" + mode + "_" + gameMode
+  : "complete_" + mode + "_" + gameMode + "_hidden";
+
+const bestTime = localStorage.getItem(bestTimeKey);
 
   if (bestTime !== null) {
     bestText += ` タイム: ${formatTime(Number(bestTime))}`;
@@ -544,7 +652,6 @@ function updateScore() {
   function saveScore() {
   const mode = document.getElementById("mode").value;
   const key = "quizScore_" + mode;
-
   localStorage.setItem(key, JSON.stringify({
     correct,
     total
@@ -553,7 +660,9 @@ function updateScore() {
 
 function saveBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode + "_" + gameMode;
+  const key = hideMode === "normal"
+  ? "quizBest_" + mode + "_" + gameMode
+  : "quizBest_" + mode + "_" + gameMode + "_hidden";
 
   localStorage.setItem(key, JSON.stringify({
     score: bestScore,
@@ -563,9 +672,17 @@ function saveBest() {
 
 function loadBest() {
   const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode + "_" + gameMode;
-  
-  const data = localStorage.getItem(key);
+
+  const key = hideMode === "normal"
+  ? "quizBest_" + mode + "_" + gameMode
+  : "quizBest_" + mode + "_" + gameMode + "_hidden";
+  let data = localStorage.getItem(key);
+
+  // 敵隠しなしは旧スコアを引き継ぐ
+  if (!data && hideMode === "normal") {
+    const oldKey = "quizBest_" + mode + "_" + gameMode;
+    data = localStorage.getItem(oldKey);
+  }
 
   if (data) {
     try {
@@ -573,14 +690,7 @@ function loadBest() {
 
       if (typeof obj === "object") {
         bestScore = obj.score ?? 0;
-
-        // 🔥 ここが重要
-        if (bestScore === 0) {
-          bestHint = 0;
-        } else {
-          bestHint = obj.hint ?? 0;
-        }
-
+        bestHint = bestScore === 0 ? 0 : (obj.hint ?? 0);
       } else {
         bestScore = Number(obj) || 0;
         bestHint = 0;
@@ -595,8 +705,9 @@ function loadBest() {
     bestHint = 0;
   }
 }
-
+  
   function changeMode() {
+  hideMode = document.getElementById("hideMode").value;
   correct = 0;
   hintTotal = 0;
 
@@ -690,6 +801,7 @@ function loadBest() {
 
   updateScore();
 }
+  
   function startTimer() {
   startTime = Date.now() - timer * 1000; // ←超重要
 
@@ -738,6 +850,7 @@ function formatTime(sec) {
 }
 
  function changePlayMode() {
+  hideMode = document.getElementById("hideMode").value;
   gameMode = document.getElementById("playMode").value;
 
    resetEndlessScore();
@@ -775,7 +888,9 @@ totalCount = remaining.length;
   
   function saveCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode;
+  const key = hideMode === "normal"
+    ? "complete_" + mode + "_" + gameMode
+    : "complete_" + mode + "_" + gameMode + "_hidden";
 
   const data = localStorage.getItem(key);
 
@@ -783,7 +898,7 @@ totalCount = remaining.length;
     localStorage.setItem(key, timer);
   }
 }
-
+  
   function resetTimer() {
   stopTimer();
   timer = 0;
@@ -887,14 +1002,18 @@ function showNextButton() {
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
       if (getEnemyKey(st.enemies) === key) {
-        list.push(st.stageName);
+        if (Array.isArray(st.stageName)) {
+          list.push(...st.stageName);
+        } else {
+          list.push(st.stageName);
+        }
       }
     });
   });
 
   return [...new Set(list)];
 }
-
+  
   function getAvailableStages(current) {
   const all = getSameStages(current);
 
@@ -916,7 +1035,13 @@ function getSameStageLabels(current) {
   stagesData.forEach(ch => {
     ch.stages.forEach(st => {
       if (getEnemyKey(st.enemies) === key) {
-        list.push(`${ch.chapterName} - ${st.stageName}`);
+        if (Array.isArray(st.stageName)) {
+          st.stageName.forEach(name => {
+            list.push(`${ch.chapterName} - ${name}`);
+          });
+        } else {
+          list.push(`${ch.chapterName} - ${st.stageName}`);
+        }
       }
     });
   });
@@ -961,10 +1086,123 @@ function getSameStageLabels(current) {
 
   function isNewCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode;
-  const data = localStorage.getItem(key);
+  const key = hideMode === "normal"
+    ? "complete_" + mode + "_" + gameMode
+    : "complete_" + mode + "_" + gameMode + "_hidden";
 
+  const data = localStorage.getItem(key);
   return !data || timer < Number(data);
+}
+
+  function changeHideMode() {
+  hideMode = document.getElementById("hideMode").value;
+
+  correct = 0;
+  hintTotal = 0;
+  usedAnswersByGroup = {};
+
+  if (gameMode === "complete") {
+    resetTimer();
+  }
+
+  const mode = document.getElementById("mode").value;
+  pool = [];
+  remaining = [];
+  totalCount = 0;
+
+  loadBest();
+  updateScore();
+  nextQuiz();
+}
+  
+  function getAttributeColors(enemyName) {
+  const attrMap = {
+    "赤": "#e53935",
+    "浮き": "#9ccc65",
+    "黒": "#222222",
+    "メタル": "#9e9e9e",
+    "天使": "#fff200",
+    "エイリアン": "#4fc3f7",
+    "ゾンビ": "#9b46b9",
+    "悪魔": "#4b7ea7",
+    "古代種": "#6d8346",
+    "無属性": "#ffffff"
+  };
+
+  const ignoreAttrs = ["超獣", "超生命体", "超賢者", "怪人"];
+
+  const enemyData = enemiesMaster[normalizeName(enemyName)];
+
+  if (!enemyData || !enemyData.type) {
+    return ["#ffffff"];
+  }
+
+  const types = String(enemyData.type)
+    .split(",")
+    .map(s => s.trim())
+    .filter(s => s && !ignoreAttrs.includes(s));
+
+  const colors = types
+    .map(type => attrMap[type])
+    .filter(Boolean);
+
+  return colors.length ? colors : ["#ffffff"];
+}
+  
+  function shouldHideEnemy(totalCount, index, hiddenIndexes) {
+  return hiddenIndexes.includes(index);
+}
+
+function getHiddenIndexes(enemies) {
+  const validIndexes = enemies
+    .map((enemy, i) => enemy === "カンバン娘" ? -1 : i)
+    .filter(i => i !== -1);
+
+  if (validIndexes.length <= 1) return [];
+
+  const ratio = 0.3 + Math.random() * 0.2;
+  const hideCount = Math.max(1, Math.round(validIndexes.length * ratio));
+
+  const shuffled = [...validIndexes];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled.slice(0, hideCount);
+}
+
+  function createEnemyCover(colors) {
+  const cover = document.createElement("div");
+
+  let className = "one";
+  let useColors = [...colors];
+
+  if (useColors.length === 1) {
+    className = "one";
+  } else if (useColors.length === 2) {
+    className = "two";
+  } else if (useColors.length === 3) {
+    className = "three";
+  } else {
+    className = "six";
+
+    while (useColors.length < 6) {
+      useColors.push(useColors[useColors.length % colors.length]);
+    }
+    useColors = useColors.slice(0, 6);
+  }
+
+  cover.className = `enemyCover ${className}`;
+
+  useColors.forEach(color => {
+    const part = document.createElement("div");
+    part.className = "enemyCoverPart";
+    part.style.background = color;
+    cover.appendChild(part);
+  });
+
+  return cover;
 }
   
 init();
