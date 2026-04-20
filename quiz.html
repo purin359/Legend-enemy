@@ -474,7 +474,6 @@ function nextQuiz() {
 
   const visibleEnemies = q.enemies.filter(e => e !== "カンバン娘");
 
-  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(visibleEnemies) : [];
   currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
 
   current = q;
@@ -575,13 +574,10 @@ const alreadyUsedName =
   markAnswerUsed(current, matchedName);
 }
 
-  if (gameMode === "complete") {
-    remaining = remaining.filter(st =>
-      !(st.stageName === current.stageName &&
-        st.chapterId === current.chapterId &&
-        st.stageId === current.stageId)
-    );
-  }
+  remaining = remaining.filter(st =>
+  !(st.chapterId === current.chapterId &&
+    st.stageId === current.stageId)
+);
 
     if (idOK && !matchedName) {
   const availableStages = getAvailableStages(current);
@@ -632,7 +628,7 @@ const answerText =
     ? getPossibleStageLabelsFromCurrentView(current).join("\n")
     : getSameStageLabels(current).join("\n");
 
-result.textContent = `不正解！ 正解：${answerText}`;
+result.textContent = `不正解！ 正解↓\n${answerText}`;
   result.style.color = "red";
 
     if (gameMode === "complete") {
@@ -1087,10 +1083,7 @@ function getSameStageLabels(current) {
 }
 
   function getGroupKeyFromCurrent(current) {
-  if (hideMode === "hidden") {
-    return currentVisibleKey;
-  }
-  return getEnemyKey(current.enemies);
+  return getAnswerGroupKey(current);
 }
   
   function markAnswerUsed(current, answerName) {
@@ -1317,6 +1310,18 @@ function getPossibleStageLabelsFromCurrentView(current) {
   });
 
   return [...new Set(list)];
+}
+
+  function getAnswerGroupKey(current) {
+  const names =
+    hideMode === "hidden"
+      ? getPossibleStagesFromCurrentView(current)
+      : getSameStages(current);
+
+  return names
+    .map(name => normalize(name))
+    .sort()
+    .join("|");
 }
   
 init();
