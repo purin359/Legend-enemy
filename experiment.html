@@ -13,33 +13,49 @@ img { width:50px; cursor:pointer; }
 
 th { cursor:pointer; }
 
+  .attrBtn {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f5f5f5;
+  cursor: pointer;
+  height: 32px; /* ←ここで高さ統一 */
+}
+
+.attrBtn.active {
+  background: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
 </style>
 </head>
 <body>
 
 <h2>敵出現一覧</h2>
 
-<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px;">
-  <input id="searchBox" placeholder="敵名でフィルター" oninput="load()">
+<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+  <input id="searchBox" placeholder="敵名で絞り込み" oninput="load()">
 
-  <select id="attrFilter" multiple size="6" onchange="load()">
-    <option value="赤">赤</option>
-    <option value="浮き">浮き</option>
-    <option value="黒">黒</option>
-    <option value="メタル">メタル</option>
-    <option value="天使">天使</option>
-    <option value="エイリアン">エイリアン</option>
-    <option value="ゾンビ">ゾンビ</option>
-    <option value="悪魔">悪魔</option>
-    <option value="古代種">古代種</option>
-    <option value="無属性">無属性</option>
-    <option value="超生命体">超生命体</option>
-    <option value="超獣">超獣</option>
-    <option value="超賢者">超賢者</option>
-    <option value="城">城</option>
-  </select>
+  <div id="attrButtons">
+    <button class="attrBtn" data-attr="赤">赤</button>
+    <button class="attrBtn" data-attr="浮き">浮き</button>
+    <button class="attrBtn" data-attr="黒">黒</button>
+    <button class="attrBtn" data-attr="メタル">メタル</button>
+    <button class="attrBtn" data-attr="天使">天使</button>
+    <button class="attrBtn" data-attr="エイリアン">エイリアン</button>
+    <button class="attrBtn" data-attr="ゾンビ">ゾンビ</button>
+    <button class="attrBtn" data-attr="悪魔">悪魔</button>
+    <button class="attrBtn" data-attr="古代種">古代種</button>
+    <button class="attrBtn" data-attr="無属性">無属性</button>
+    <button class="attrBtn" data-attr="超生命体">超生命体</button>
+    <button class="attrBtn" data-attr="超獣">超獣</button>
+    <button class="attrBtn" data-attr="超賢者">超賢者</button>
+    <button class="attrBtn" data-attr="城">城</button>
+  </div>
 </div>
-
+  
 <select id="mode" onchange="load()">
   <option value="ALL">全て</option>
   <option value="N">レジェンド</option>
@@ -75,6 +91,7 @@ let desc = true;
 let enemiesData = {};
 let sortMode = "count";
 let orderMap = {};
+let selectedAttrs = [];
 
 async function init() {
   enemiesData = await fetch("enemies.json").then(r=>r.json());
@@ -87,7 +104,22 @@ async function init() {
   }
 
   changeSort();
-  load()
+  
+  document.querySelectorAll(".attrBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const attr = btn.dataset.attr;
+
+    if (selectedAttrs.includes(attr)) {
+      selectedAttrs = selectedAttrs.filter(a => a !== attr);
+      btn.classList.remove("active");
+    } else {
+      selectedAttrs.push(attr);
+      btn.classList.add("active");
+    }
+
+    load();
+  });
+});
 }
   
 // 比較専用（スペース無視）
@@ -203,10 +235,10 @@ if (search) {
 if (selectedAttrs.length > 0) {
   list = list.filter(e => {
     const types = getEnemyTypes(e.name);
-    return selectedAttrs.some(attr => types.includes(attr)); // OR条件
+    return selectedAttrs.some(attr => types.includes(attr));
   });
 }
-
+  
 list = list.map(e => {
 
   const match = e.first.match(/([A-Z]+)(\d+)-(\d+)/);
