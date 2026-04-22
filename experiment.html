@@ -430,7 +430,7 @@ img {
   </div>
   <div id="remaining"></div>
   <div id="timer"></div>
-</div>>
+</div>
 
   <div id="enemies"></div>
 
@@ -777,7 +777,7 @@ function check() {
   const inputNorm = normalize(input);
 
   const sameStages =
-  hideMode === "hidden"
+  isHiddenMode()
     ? getPossibleStagesFromCurrentView(current)
     : getSameStages(current);
 
@@ -884,10 +884,10 @@ result.style.color = "green";
   }
 
   const answerText =
-  hideMode === "hidden"
+  isHiddenMode()
     ? getPossibleStageLabelsFromCurrentView(current).join("\n")
     : getSameStageLabels(current).join("\n");
-
+    
 if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
@@ -922,14 +922,23 @@ function updateScore() {
   let bestText = `${bestScore}（ヒント: ${bestHint}）`;
 
   if (isStageClearMode()) {
-    function isNewCompleteRecord() {
-  const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
+    const bestTimeKey = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
+    const bestTime = localStorage.getItem(bestTimeKey);
 
-  const data = localStorage.getItem(key);
-  return !data || timer < Number(data);
+    if (bestTime !== null) {
+      bestText += ` タイム: ${formatTime(Number(bestTime))}`;
+    }
+
+    document.getElementById("remaining").textContent =
+      `残り: ${remaining.length} / ${totalCount}`;
+  } else {
+    document.getElementById("remaining").textContent = "";
+  }
+
+  document.getElementById("score").textContent =
+    `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
 }
-
+  
     const bestTime = localStorage.getItem(bestTimeKey);
 
     if (bestTime !== null) {
@@ -957,9 +966,7 @@ function updateScore() {
 
 function saveBest() {
   const mode = document.getElementById("mode").value;
-  const key = hideMode === "normal"
-  ? "quizBest_" + mode + "_" + gameMode
-  : "quizBest_" + mode + "_" + gameMode + "_hidden";
+  const key = "quizBest_" + mode + "_" + gameMode + getHideScoreSuffix();
 
   localStorage.setItem(key, JSON.stringify({
     score: bestScore,
@@ -1410,7 +1417,7 @@ function getSameStageLabels(current) {
 
   function goNextAfterWrong() {
   revealAfterAnswer = false;
-    
+
   if (gameMode === "endless") {
     resetEndlessScore();
   }
@@ -1420,8 +1427,25 @@ function getSameStageLabels(current) {
     resetCompleteProgress();
   }
 
+  if (gameMode === "practice") {
+    usedAnswersByGroup = {};
+    correct = 0;
+    hintTotal = 0;
+    hintCount = 0;
+    wasWrong = false;
+    answered = false;
+
+    resetTimer();
+
+    const mode = document.getElementById("mode").value;
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+
+    updateScore();
+  }
+
   wasWrong = false;
-  updateScore();
   showCheckButton();
   nextQuiz();
 }
