@@ -81,7 +81,6 @@ function normalize(str) {
 
 async function load() {
 
-  // ▼ 最初の1回だけURL反映
   if (!initialized) {
     const params = new URLSearchParams(location.search);
     const modeParam = params.get("mode");
@@ -160,7 +159,7 @@ async function load() {
         }
 
         shownInRange.add(enemyKey);
-        
+
         const baseName = enemyName.replace(/\r?\n/g, "").trim();
 
         const fileName = baseName
@@ -182,18 +181,6 @@ async function load() {
         hasAnyEnemyInChapter = true;
       });
 
-      if (showFirstOnly && !hasAnyEnemyInChapter) {
-      const noEnemy = document.createElement("div");
-      noEnemy.textContent = "初登場敵なし";
-      noEnemy.style.padding = "10px";
-      noEnemy.style.color = "#666";
-      chapterBox.appendChild(noEnemy);
-    }
-
-      noEnemy.style.background = "#f8f8f8";
-      noEnemy.style.border = "1px dashed #ccc";
-      noEnemy.style.textAlign = "center";
-
       if (td.childElementCount === 0) {
         return;
       }
@@ -207,9 +194,23 @@ async function load() {
       chapterBox.appendChild(table);
     });
 
+    const showFirstOnly = document.getElementById("showFirstOnly").checked;
+
+    if (showFirstOnly && !hasAnyEnemyInChapter) {
+      const noEnemy = document.createElement("div");
+      noEnemy.textContent = "初登場敵なし";
+      noEnemy.style.padding = "10px";
+      noEnemy.style.color = "#666";
+      noEnemy.style.background = "#f8f8f8";
+      noEnemy.style.border = "1px dashed #ccc";
+      noEnemy.style.textAlign = "center";
+      chapterBox.appendChild(noEnemy);
+    }
+
     list.appendChild(chapterBox);
   });
 }
+  
   function goBack() {
   history.back();
 }
