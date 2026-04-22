@@ -922,9 +922,13 @@ function updateScore() {
   let bestText = `${bestScore}（ヒント: ${bestHint}）`;
 
   if (isStageClearMode()) {
-    const bestTimeKey = hideMode === "normal"
-      ? "complete_" + mode + "_" + gameMode
-      : "complete_" + mode + "_" + gameMode + "_hidden";
+    function isNewCompleteRecord() {
+  const mode = document.getElementById("mode").value;
+  const key = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
+
+  const data = localStorage.getItem(key);
+  return !data || timer < Number(data);
+}
 
     const bestTime = localStorage.getItem(bestTimeKey);
 
@@ -966,15 +970,18 @@ function saveBest() {
 function loadBest() {
   const mode = document.getElementById("mode").value;
 
-  const key = hideMode === "normal"
-  ? "quizBest_" + mode + "_" + gameMode
-  : "quizBest_" + mode + "_" + gameMode + "_hidden";
+  const key = "quizBest_" + mode + "_" + gameMode + getHideScoreSuffix();
   let data = localStorage.getItem(key);
 
-  // 敵隠しなしは旧スコアを引き継ぐ
-  if (!data && hideMode === "normal") {
-    const oldKey = "quizBest_" + mode + "_" + gameMode;
-    data = localStorage.getItem(oldKey);
+  // 旧スコア引き継ぎ
+  if (!data) {
+    if (hideMode === "normal") {
+      const oldKey = "quizBest_" + mode + "_" + gameMode;
+      data = localStorage.getItem(oldKey);
+    } else if (hideMode === "hidden_easy") {
+      const oldHiddenKey = "quizBest_" + mode + "_" + gameMode + "_hidden";
+      data = localStorage.getItem(oldHiddenKey);
+    }
   }
 
   if (data) {
@@ -988,7 +995,6 @@ function loadBest() {
         bestScore = Number(obj) || 0;
         bestHint = 0;
       }
-
     } catch {
       bestScore = 0;
       bestHint = 0;
@@ -1197,9 +1203,7 @@ function formatTime(sec) {
   
   function saveCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = hideMode === "normal"
-    ? "complete_" + mode + "_" + gameMode
-    : "complete_" + mode + "_" + gameMode + "_hidden";
+  const key = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
 
   const data = localStorage.getItem(key);
 
@@ -1405,9 +1409,7 @@ function getSameStageLabels(current) {
 
   function isNewCompleteRecord() {
   const mode = document.getElementById("mode").value;
-  const key = hideMode === "normal"
-    ? "complete_" + mode + "_" + gameMode
-    : "complete_" + mode + "_" + gameMode + "_hidden";
+  const key = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
 
   const data = localStorage.getItem(key);
   return !data || timer < Number(data);
@@ -1420,15 +1422,24 @@ function getSameStageLabels(current) {
   hintTotal = 0;
   hintCount = 0;
   usedAnswersByGroup = {};
+  revealAfterAnswer = false;
 
-  if (gameMode === "complete") {
-    resetTimer();
-  }
+  resetTimer();
 
   const mode = document.getElementById("mode").value;
+  buildStageList(mode);
+
   pool = [];
   remaining = [];
-  totalCount = 0;
+
+  if (isStageClearMode()) {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  } else {
+    totalCount = 0;
+    document.getElementById("remaining").textContent = "";
+  }
 
   loadBest();
   updateScore();
@@ -1685,6 +1696,12 @@ window.addEventListener("click", e => {
 
   function isHiddenMode() {
   return hideMode === "hidden_easy" || hideMode === "hidden_hard";
+}
+
+  function getHideScoreSuffix() {
+  if (hideMode === "hidden_hard") return "_hidden_hard";
+  if (hideMode === "hidden_easy") return "_hidden";
+  return "";
 }
 
 function clearAnswerInput() {
