@@ -386,6 +386,23 @@ img {
 .clearAnswerBtn:hover {
   background: #777;
 }
+
+  .settingsMenu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 100;
+  min-width: 160px;
+}
+
+.settingsMenu.open {
+  display: block;
+}
   
 </style>
 </head>
@@ -398,6 +415,16 @@ img {
     ステージ当てクイズ(レジェンド)　Ver.15.3.0対応
   </h2>
 
+  <div style="margin-left:auto; position:relative;">
+    <button onclick="toggleSettings()" id="settingsBtn">⚙</button>
+
+    <div id="settingsMenu" class="settingsMenu">
+      <label>
+        <input type="checkbox" id="enterToggle" onchange="toggleEnterSubmit()">
+        Enterで回答
+      </label>
+    </div>
+  </div>
 </div>
 
   <div class="topBar1">
@@ -540,11 +567,15 @@ buildStageList(mode);
   // 🔥 変換中は無視
   if (e.isComposing || e.keyCode === 229) return;
 
-  if (e.key === "Enter") {
+  document.getElementById("answer").addEventListener("keydown", e => {
+  if (e.isComposing || e.keyCode === 229) return;
+
+  if (e.key === "Enter" && enableEnterSubmit) {
     e.preventDefault();
-  document.getElementById("suggest").innerHTML = "";
+    document.getElementById("suggest").innerHTML = "";
     check();
   }
+});
 });
 
   document.getElementById("answer").addEventListener("input", () => {
@@ -591,6 +622,7 @@ updateScore();
 nextQuiz();
 showCheckButton();
 hideMode = document.getElementById("hideMode").value;
+document.getElementById("enterToggle").checked = enableEnterSubmit;
 }
   
 function isTargetChapter(ch, mode) {
@@ -1814,6 +1846,23 @@ document.getElementById("result").textContent = resultText;
   const btn = document.getElementById("enterToggleBtn");
   btn.textContent = `Enter回答：${enableEnterSubmit ? "ON" : "OFF"}`;
 }
+
+  function toggleSettings() {
+  document.getElementById("settingsMenu").classList.toggle("open");
+}
+
+  function toggleEnterSubmit() {
+  enableEnterSubmit = document.getElementById("enterToggle").checked;
+}
+
+  window.addEventListener("click", e => {
+  const menu = document.getElementById("settingsMenu");
+  const btn = document.getElementById("settingsBtn");
+
+  if (!menu.contains(e.target) && !btn.contains(e.target)) {
+    menu.classList.remove("open");
+  }
+});
   
 init();
 </script>
