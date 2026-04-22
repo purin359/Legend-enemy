@@ -387,21 +387,40 @@ img {
   background: #777;
 }
 
-  .settingsMenu {
+.settingsMenu {
   display: none;
   position: absolute;
   right: 0;
-  top: 40px;
-  background: white;
+  top: 36px;
+  background: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px 10px;
   z-index: 100;
-  min-width: 160px;
+  min-width: 150px;
+  font-size: 13px;
 }
 
 .settingsMenu.open {
   display: block;
+}
+
+  .settingsBtn {
+  font-size: 12px;          /* 小さめ文字 */
+  padding: 4px 10px;
+  background: #888;         /* グレー */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.settingsBtn:hover {
+  background: #666;         /* 少し濃く */
+}
+
+.settingsBtn:active {
+  background: #555;
 }
   
 </style>
@@ -416,7 +435,7 @@ img {
   </h2>
 
   <div style="margin-left:auto; position:relative;">
-    <button onclick="toggleSettings()" id="settingsBtn">⚙</button>
+    <button onclick="toggleSettings()" id="settingsBtn" class="settingsBtn">設定</button>
 
     <div id="settingsMenu" class="settingsMenu">
       <label>
