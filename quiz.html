@@ -1919,9 +1919,15 @@ document.getElementById("result").textContent = resultText;
 
   items.forEach((item, i) => {
     item.classList.toggle("active", i === suggestIndex);
+
+    if (i === suggestIndex) {
+      item.scrollIntoView({
+        block: "nearest"
+      });
+    }
   });
 }
-
+  
 function applySelectedSuggest() {
   if (suggestIndex < 0 || suggestIndex >= currentSuggestList.length) return false;
 
