@@ -608,6 +608,8 @@ buildStageList(mode);
   }
 
   if (e.key === "Enter") {
+    if (!enableEnterSubmit) return;
+
     e.preventDefault();
     document.getElementById("suggest").innerHTML = "";
 
