@@ -621,6 +621,16 @@ buildStageList(mode);
 
   check();
   }
+    // Tab（←追加）
+  if (e.key === "Tab") {
+    e.preventDefault();
+
+    document.getElementById("suggest").innerHTML = "";
+
+    if (applySelectedSuggest()) return;
+
+    check();
+  }
   });
 
   document.getElementById("answer").addEventListener("input", () => {
