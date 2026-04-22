@@ -393,7 +393,15 @@ img {
 
 <div class="container">
 
-  <h2>ステージ当てクイズ(レジェンド)　Ver.15.3.0対応</h2>
+  <div style="display:flex; align-items:center;">
+  <h2 style="margin:0;">
+    ステージ当てクイズ(レジェンド)　Ver.15.3.0対応
+  </h2>
+
+  <button id="enterToggleBtn" onclick="toggleEnterSubmit()" style="margin-left:auto;">
+    Enter回答：ON
+  </button>
+</div>
 
   <div class="topBar1">
   <div class="selectWrap">
@@ -478,6 +486,7 @@ let hideMode = "normal";
 let currentHiddenIndexes = [];
 let currentVisibleKey = "";
 let revealAfterAnswer = false;
+let enableEnterSubmit = true;
 
 
 // 画像用
@@ -535,6 +544,8 @@ buildStageList(mode);
   if (e.isComposing || e.keyCode === 229) return;
 
   if (e.key === "Enter") {
+    e.preventDefault();
+  document.getElementById("suggest").innerHTML = "";
     check();
   }
 });
@@ -1797,6 +1808,13 @@ document.getElementById("result").textContent = resultText;
   const possibleStages = getPossibleStagesFromCurrentView(current);
 
   return possibleStages.length === sameStages.length;
+}
+
+  function toggleEnterSubmit() {
+  enableEnterSubmit = !enableEnterSubmit;
+
+  const btn = document.getElementById("enterToggleBtn");
+  btn.textContent = `Enter回答：${enableEnterSubmit ? "ON" : "OFF"}`;
 }
   
 init();
