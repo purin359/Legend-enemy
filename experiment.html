@@ -837,6 +837,10 @@ const alreadyUsedName =
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
 
+    if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
   correct++;
 
   if (
@@ -854,11 +858,11 @@ const alreadyUsedName =
   lockButtons();
   updateScore();
 
-  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
-
+    
   setTimeout(nextQuiz, 800);
 
 } else {
@@ -881,13 +885,17 @@ const alreadyUsedName =
       ? getPossibleStageLabelsFromCurrentView(current).join("\n")
       : getSameStageLabels(current).join("\n");
 
-  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
     
   result.textContent = `不正解！ 正解↓\n${answerText}`;
   result.style.color = "red";
+
+    if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
 
   if (gameMode === "complete") {
     usedAnswersByGroup = {};
@@ -1671,6 +1679,10 @@ function giveUpPractice() {
     `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
   document.getElementById("result").style.color = "red";
 
+  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
   // ▼ リセット処理
   usedAnswersByGroup = {};
   correct = 0;
@@ -1693,7 +1705,7 @@ function giveUpPractice() {
   function confirmGiveUpPractice() {
   if (gameMode !== "practice") return;
 
-  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
@@ -1704,13 +1716,13 @@ function giveUpPractice() {
   giveUpPractice();
 }
 
-  function hasMultiplePossibleAnswers(current) {
-  const names =
-    hideMode === "hidden"
-      ? getPossibleStagesFromCurrentView(current)
-      : getSameStages(current);
+  function shouldRevealBorder(current) {
+  if (hideMode !== "hidden") return false;
 
-  return names.length > 1;
+  const sameStages = getSameStages(current);
+  const possibleStages = getPossibleStagesFromCurrentView(current);
+
+  return possibleStages.length === sameStages.length;
 }
   
 init();
