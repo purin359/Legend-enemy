@@ -640,7 +640,7 @@ function check() {
     : getSameStages(current);
 
 const availableStages =
-  gameMode === "complete"
+  (gameMode === "complete" || gameMode === "practice")
     ? getAvailableStages(current)
     : sameStages;
 
@@ -653,7 +653,7 @@ const nameOK = !!matchedName;
   const allStages = sameStages;
 
 const alreadyUsedName =
-  gameMode === "complete"
+  (gameMode === "complete" || gameMode === "practice")
     ? allStages.find(name =>
         inputNorm === normalize(name) &&
         !availableStages.includes(name)
@@ -717,12 +717,12 @@ const alreadyUsedName =
 
 } else {
 
-  if (gameMode === "complete" && alreadyUsedName && !nameOK && !idOK) {
-    result.textContent = `その答えは使いました：${alreadyUsedName}`;
-    result.style.color = "orange";
-    return;
-  }
-
+  if ((gameMode === "complete" || gameMode === "practice") && alreadyUsedName && !nameOK && !idOK) {
+  result.textContent = `その答えは使いました：${alreadyUsedName}`;
+  result.style.color = "orange";
+  return;
+}
+    
   if (gameMode === "practice") {
     result.textContent = "残念！";
     result.style.color = "red";
@@ -1171,7 +1171,7 @@ function showNextButton() {
       ? getPossibleStagesFromCurrentView(current)
       : getSameStages(current);
 
-  if (gameMode !== "complete") {
+  if (gameMode !== "complete" && gameMode !== "practice") {
     return all;
   }
 
@@ -1208,7 +1208,7 @@ function getSameStageLabels(current) {
   
   function markAnswerUsed(current, answerName) {
   // 🔥 エンドレスでは記録しない
-  if (gameMode !== "complete") return;
+  if (gameMode !== "complete" && gameMode !== "practice") return;
 
   const groupKey = getGroupKeyFromCurrent(current);
 
