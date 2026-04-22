@@ -606,6 +606,8 @@ function nextQuiz() {
 
   const mode = document.getElementById("mode").value;
 
+  revealAfterAnswer = false;
+
   // 初回生成
   if (isStageClearMode() && pool.length === 0) {
   const mode = document.getElementById("mode").value;
@@ -619,8 +621,6 @@ function nextQuiz() {
   stopTimer();
 
   const newRecord = isNewCompleteRecord();
-
-  revealAfterAnswer = false;
 
   document.getElementById("result").textContent =
     newRecord
@@ -852,7 +852,12 @@ const alreadyUsedName =
   wasWrong = false;
 
   lockButtons();
-  updateScore(); // ←これ重要
+  updateScore();
+
+  if (hideMode === "hidden") {
+  revealAfterAnswer = true;
+  redrawCurrentEnemies();
+}
 
   setTimeout(nextQuiz, 800);
 
@@ -1368,6 +1373,8 @@ function getSameStageLabels(current) {
 }
 
   function goNextAfterWrong() {
+  revealAfterAnswer = false;
+    
   if (gameMode === "endless") {
     resetEndlessScore();
   }
