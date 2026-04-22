@@ -877,18 +877,24 @@ const alreadyUsedName =
   }
 
   const answerText =
-    hideMode === "hidden"
-      ? getPossibleStageLabelsFromCurrentView(current).join("\n")
-      : getSameStageLabels(current).join("\n");
+  hideMode === "hidden"
+    ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+    : getSameStageLabels(current).join("\n");
 
-  if (shouldRevealBorder(current)) {
+if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
-    
-  result.textContent = `不正解！ 正解↓\n${answerText}`;
-  result.style.color = "red";
 
+let resultText = `不正解！ 正解↓\n${answerText}`;
+
+if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
+result.textContent = resultText;
+result.style.color = "red";
+    
   if (gameMode === "complete") {
     usedAnswersByGroup = {};
   }
@@ -1667,8 +1673,14 @@ function giveUpPractice() {
       ? getPossibleStageLabelsFromCurrentView(current).join("\n")
       : getSameStageLabels(current).join("\n");
 
-  document.getElementById("result").textContent =
-    `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
+  let resultText =
+  `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
+
+if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
+document.getElementById("result").textContent = resultText;
   document.getElementById("result").style.color = "red";
 
   // ▼ リセット処理
