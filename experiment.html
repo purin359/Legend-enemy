@@ -221,8 +221,6 @@ function load() {
 let list = Object.values(map);
 
 const search = document.getElementById("searchBox").value.trim();
-const selectedAttrs = Array.from(document.getElementById("attrFilter").selectedOptions)
-  .map(opt => opt.value);
 
 if (search) {
   const keyword = normalize(search);
