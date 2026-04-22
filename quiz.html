@@ -630,6 +630,7 @@ document.querySelector(".hintBtn").disabled = false;
 }
   
 function check() {
+  document.getElementById("suggest").innerHTML = "";
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
@@ -694,8 +695,6 @@ const alreadyUsedName =
     
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
-
-  document.getElementById("suggest").innerHTML = "";
 
   correct++;
 
