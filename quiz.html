@@ -414,10 +414,11 @@ img {
   </div>
 
   <div class="selectWrap">
-    <select id="hideMode" onchange="changeHideMode()">
-      <option value="normal">敵隠しなし</option>
-      <option value="hidden">敵隠しあり</option>
-    </select>
+<select id="hideMode" onchange="changeHideMode()">
+  <option value="normal">敵隠しなし</option>
+  <option value="hidden_easy">敵隠しあり(易)</option>
+  <option value="hidden_hard">敵隠しあり(難)</option>
+</select>
     <button type="button" class="infoBtn" onclick="showAllInfo()">ⓘ</button>
   </div>
 
@@ -665,7 +666,7 @@ function nextQuiz() {
   const box = document.createElement("div");
   box.className = "enemyBox";
 
-  currentHiddenIndexes = hideMode === "hidden" ? getHiddenIndexes(visibleEnemies) : [];
+  currentHiddenIndexes = isHiddenMode() ? getHiddenIndexes(visibleEnemies) : [];
   currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
 
 let visibleIndex = -1;
@@ -683,7 +684,7 @@ q.enemies.forEach((enemy) => {
   img.onerror = () => img.src = "image/noimage.png";
 
   const isHiddenEnemy =
-  hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex);
+  isHiddenMode() && currentHiddenIndexes.includes(visibleIndex);
 
 if (isHiddenEnemy && !revealAfterAnswer) {
   wrap.classList.add("covered");
@@ -744,7 +745,7 @@ function redrawCurrentEnemies() {
     img.onerror = () => img.src = "image/noimage.png";
 
     const isHiddenEnemy =
-      hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex);
+  isHiddenMode() && currentHiddenIndexes.includes(visibleIndex);
 
     if (isHiddenEnemy && !revealAfterAnswer) {
       wrap.classList.add("covered");
@@ -836,7 +837,7 @@ const alreadyUsedName =
     
   let resultText = "正解！ 🎉";
 
-if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+if (isHiddenMode() && !shouldRevealBorder(current)) {
   resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
 }
 
@@ -894,7 +895,7 @@ if (shouldRevealBorder(current)) {
 
 let resultText = `不正解！ 正解↓\n${answerText}`;
 
-if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+if (isHiddenMode() && !shouldRevealBorder(current)) {
   resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
 }
 
@@ -1330,10 +1331,10 @@ function showNextButton() {
   
   function getAvailableStages(current) {
   const all =
-    hideMode === "hidden"
-      ? getPossibleStagesFromCurrentView(current)
-      : getSameStages(current);
-
+  isHiddenMode()
+    ? getPossibleStagesFromCurrentView(current)
+    : getSameStages(current);
+    
   if (gameMode !== "complete" && gameMode !== "practice") {
     return all;
   }
@@ -1477,10 +1478,29 @@ function getHiddenIndexes(enemies) {
     .map((enemy, i) => enemy === "カンバン娘" ? -1 : i)
     .filter(i => i !== -1);
 
-  if (validIndexes.length <= 1) return [];
+  const total = validIndexes.length;
 
-  const ratio = 0.3 + Math.random() * 0.2;
-  const hideCount = Math.max(1, Math.round(validIndexes.length * ratio));
+  // 1～3体の時も最低1体は残す
+  if (total <= 1) return [];
+
+  let minRatio, maxRatio;
+
+  if (hideMode === "hidden_hard") {
+    minRatio = 0.5;
+    maxRatio = 0.7;
+  } else {
+    // hidden_easy
+    minRatio = 0.3;
+    maxRatio = 0.5;
+  }
+
+  let hideCount = Math.round(total * (minRatio + Math.random() * (maxRatio - minRatio)));
+
+  // 最低1体は残す
+  hideCount = Math.min(hideCount, total - 1);
+
+  // 少なくとも1体は隠す
+  hideCount = Math.max(1, hideCount);
 
   const shuffled = [...validIndexes];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1633,9 +1653,9 @@ function getPossibleStageLabelsFromCurrentView(current) {
 
   function getAnswerGroupKey(current) {
   const names =
-    hideMode === "hidden"
-      ? getPossibleStagesFromCurrentView(current)
-      : getSameStages(current);
+  isHiddenMode()
+    ? getPossibleStagesFromCurrentView(current)
+    : getSameStages(current);
 
   return names
     .map(name => normalize(name))
@@ -1663,6 +1683,10 @@ window.addEventListener("click", e => {
   return gameMode === "complete" || gameMode === "practice";
 }
 
+  function isHiddenMode() {
+  return hideMode === "hidden_easy" || hideMode === "hidden_hard";
+}
+
 function clearAnswerInput() {
   document.getElementById("answer").value = "";
   document.getElementById("suggest").innerHTML = "";
@@ -1675,14 +1699,14 @@ function giveUpPractice() {
 
   // 🔥 正解表示を作る
   const answerText =
-    hideMode === "hidden"
-      ? getPossibleStageLabelsFromCurrentView(current).join("\n")
-      : getSameStageLabels(current).join("\n");
-
+    isHiddenMode()
+  ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+  : getSameStageLabels(current).join("\n");
+  
   let resultText =
   `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
 
-if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+if (isHiddenMode() && !shouldRevealBorder(current)) {
   resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
 }
 
@@ -1723,7 +1747,7 @@ document.getElementById("result").textContent = resultText;
 }
 
   function shouldRevealBorder(current) {
-  if (hideMode !== "hidden") return false;
+  if (!isHiddenMode()) return false;
 
   const sameStages = getSameStages(current);
   const possibleStages = getPossibleStagesFromCurrentView(current);
@@ -1781,9 +1805,15 @@ init();
 ■ 隠しなし<br>
 全ての敵が見えます<br><br>
 
-■ 隠しあり<br>
+■ 隠しあり(易)<br>
 一部の敵が属性カラーで隠されます<br>
 隠されるのは全体の敵数の30%～50%程度<br><br>
+
+■ 隠しあり(難)<br>
+一部の敵が属性カラーで隠されます<br>
+隠されるのは全体の敵数の50%～70%程度<br><br>
+
+なお、どのステージも最低1体は残ります<br><br>
 
 <b>【ヒント】</b><br><br>
 
