@@ -124,6 +124,8 @@ async function load() {
     chapterBox.style.padding = "10px";
     chapterBox.style.marginBottom = "20px";
 
+    let hasAnyEnemyInChapter = false;
+
     const title = document.createElement("h3");
     title.textContent = ch.chapterName;
     chapterBox.appendChild(title);
@@ -177,7 +179,20 @@ async function load() {
         });
 
         td.appendChild(img);
+        hasAnyEnemyInChapter = true;
       });
+
+      if (showFirstOnly && !hasAnyEnemyInChapter) {
+      const noEnemy = document.createElement("div");
+      noEnemy.textContent = "初登場敵なし";
+      noEnemy.style.padding = "10px";
+      noEnemy.style.color = "#666";
+      chapterBox.appendChild(noEnemy);
+    }
+
+      noEnemy.style.background = "#f8f8f8";
+      noEnemy.style.border = "1px dashed #ccc";
+      noEnemy.style.textAlign = "center";
 
       if (td.childElementCount === 0) {
         return;
