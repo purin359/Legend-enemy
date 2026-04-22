@@ -1471,6 +1471,7 @@ function clearAnswerInput() {
 }
 
 function giveUpPractice() {
+  document.getElementById("suggest").innerHTML = "";
   if (gameMode !== "practice") return;
 
   // 🔥 正解表示を作る
