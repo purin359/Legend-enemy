@@ -422,6 +422,10 @@ img {
 .settingsBtn:active {
   background: #555;
 }
+
+  .suggestItem.active {
+  background: #cfe8ff;
+}
   
 </style>
 </head>
@@ -530,6 +534,8 @@ let currentHiddenIndexes = [];
 let currentVisibleKey = "";
 let revealAfterAnswer = false;
 let enableEnterSubmit = true;
+let suggestIndex = -1;
+let currentSuggestList = [];
 
 
 // 画像用
@@ -583,18 +589,34 @@ buildStageList(mode);
   loadBest();
 
   document.getElementById("answer").addEventListener("keydown", e => {
-  // 🔥 変換中は無視
   if (e.isComposing || e.keyCode === 229) return;
 
-  document.getElementById("answer").addEventListener("keydown", e => {
-  if (e.isComposing || e.keyCode === 229) return;
+  const hasSuggest = currentSuggestList.length > 0;
 
-  if (e.key === "Enter" && enableEnterSubmit) {
+  if (e.key === "ArrowDown" && hasSuggest) {
+    e.preventDefault();
+    suggestIndex = (suggestIndex + 1) % currentSuggestList.length;
+    updateSuggestSelection();
+    return;
+  }
+
+  if (e.key === "ArrowUp" && hasSuggest) {
+    e.preventDefault();
+    suggestIndex = (suggestIndex - 1 + currentSuggestList.length) % currentSuggestList.length;
+    updateSuggestSelection();
+    return;
+  }
+
+  if (e.key === "Enter") {
     e.preventDefault();
     document.getElementById("suggest").innerHTML = "";
+
+    if (applySelectedSuggest()) {
+      return;
+    }
+
     check();
   }
-});
 });
 
   document.getElementById("answer").addEventListener("input", () => {
@@ -602,6 +624,8 @@ buildStageList(mode);
   const suggest = document.getElementById("suggest");
 
   suggest.innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
 
   if (!input) return;
 
@@ -609,21 +633,26 @@ buildStageList(mode);
 
   const results = stageList.filter(name =>
     normalizeSearch(name).includes(keyword)
-  ).slice(0, 20); // 最大20件
+  ).slice(0, 20);
 
-  results.forEach(name => {
+  currentSuggestList = results;
+
+  results.forEach((name, i) => {
     const div = document.createElement("div");
     div.className = "suggestItem";
     div.textContent = name;
 
-    if (e.key === "Enter" && enableEnterSubmit) {
-  e.preventDefault();
-  document.getElementById("suggest").innerHTML = "";
-  check();
-}
+    div.onclick = () => {
+      document.getElementById("answer").value = name;
+      suggest.innerHTML = "";
+      suggestIndex = -1;
+      currentSuggestList = [];
+    };
 
     suggest.appendChild(div);
   });
+
+  updateSuggestSelection();
 });
 
   if (gameMode === "endless") {
@@ -833,6 +862,8 @@ function redrawCurrentEnemies() {
   
 function check() {
   document.getElementById("suggest").innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
@@ -1882,6 +1913,24 @@ document.getElementById("result").textContent = resultText;
     menu.classList.remove("open");
   }
 });
+
+  function updateSuggestSelection() {
+  const items = document.querySelectorAll(".suggestItem");
+
+  items.forEach((item, i) => {
+    item.classList.toggle("active", i === suggestIndex);
+  });
+}
+
+function applySelectedSuggest() {
+  if (suggestIndex < 0 || suggestIndex >= currentSuggestList.length) return false;
+
+  document.getElementById("answer").value = currentSuggestList[suggestIndex];
+  document.getElementById("suggest").innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+  return true;
+}
   
 init();
 </script>
