@@ -834,8 +834,14 @@ const alreadyUsedName =
   }
 }
     
-  result.textContent = "正解！ 🎉";
-  result.style.color = "green";
+  let resultText = "正解！ 🎉";
+
+if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
+result.textContent = resultText;
+result.style.color = "green";
 
   correct++;
 
