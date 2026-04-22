@@ -140,12 +140,13 @@ async function load() {
 
       const tr2 = document.createElement("tr");
       const th = document.createElement("th");
-      th.textContent = "出現する敵";
-
-      const td = document.createElement("td");
 
       const showKanban = document.getElementById("showKanban").checked;
       const showFirstOnly = document.getElementById("showFirstOnly").checked;
+
+      th.textContent = showFirstOnly ? "初登場の敵" : "出現する敵";
+
+      const td = document.createElement("td");
 
       st.enemies.forEach(enemyName => {
         if (!showKanban && enemyName === "カンバン娘") return;
