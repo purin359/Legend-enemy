@@ -533,7 +533,6 @@ let hideMode = "normal";
 let currentHiddenIndexes = [];
 let currentVisibleKey = "";
 let revealAfterAnswer = false;
-let enableEnterSubmit = true;
 let suggestIndex = -1;
 let currentSuggestList = [];
 let enableEnterSubmit = localStorage.getItem("enterSubmit") !== "false";
@@ -1891,13 +1890,6 @@ document.getElementById("result").textContent = resultText;
   const possibleStages = getPossibleStagesFromCurrentView(current);
 
   return possibleStages.length === sameStages.length;
-}
-
-  function toggleEnterSubmit() {
-  enableEnterSubmit = !enableEnterSubmit;
-
-  const btn = document.getElementById("enterToggleBtn");
-  btn.textContent = `Enter回答：${enableEnterSubmit ? "ON" : "OFF"}`;
 }
 
   function toggleSettings() {
