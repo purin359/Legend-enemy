@@ -427,10 +427,10 @@ img {
 <div class="topBar2">
   <div class="leftBox">
     <div id="score"></div>
-    <div id="timer"></div>
   </div>
   <div id="remaining"></div>
-</div>
+  <div id="timer"></div>
+</div>>
 
   <div id="enemies"></div>
 
@@ -1033,6 +1033,13 @@ function loadBest() {
     document.getElementById("remaining").textContent = "";
   }
 
+    const timerEl = document.getElementById("timer");
+if (gameMode === "endless") {
+  timerEl.style.display = "none";
+} else {
+  timerEl.style.display = "block";
+}
+    
   updateScore();
   nextQuiz();
 }
@@ -1169,30 +1176,42 @@ function formatTime(sec) {
 
  function changePlayMode() {
   usedAnswersByGroup = {};
+  revealAfterAnswer = false;
 
   hideMode = document.getElementById("hideMode").value;
   gameMode = document.getElementById("playMode").value;
 
-  resetEndlessScore();
+  correct = 0;
+  hintTotal = 0;
   hintCount = 0;
+  wasWrong = false;
+  answered = false;
 
   stopTimer();
   timer = 0;
   document.getElementById("timer").textContent = "00:00";
-  document.getElementById("remaining").textContent = "";
 
   const mode = document.getElementById("mode").value;
 
-  pool = buildPool(mode);
-  remaining = [...pool];
-  totalCount = remaining.length;
+  pool = [];
+  remaining = [];
+  totalCount = 0;
+
+  if (isStageClearMode()) {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  }
 
   const timerEl = document.getElementById("timer");
+  const remainingEl = document.getElementById("remaining");
 
   if (gameMode === "endless") {
     timerEl.style.display = "none";
+    remainingEl.textContent = "";
   } else {
     timerEl.style.display = "block";
+    remainingEl.style.display = "block";
     startTimer();
   }
 
