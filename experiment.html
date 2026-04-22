@@ -837,10 +837,6 @@ const alreadyUsedName =
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
 
-    if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
-  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
-}
-
   correct++;
 
   if (
@@ -892,10 +888,6 @@ const alreadyUsedName =
     
   result.textContent = `不正解！ 正解↓\n${answerText}`;
   result.style.color = "red";
-
-    if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
-  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
-}
 
   if (gameMode === "complete") {
     usedAnswersByGroup = {};
@@ -1678,10 +1670,6 @@ function giveUpPractice() {
   document.getElementById("result").textContent =
     `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
   document.getElementById("result").style.color = "red";
-
-  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
-  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
-}
 
   // ▼ リセット処理
   usedAnswersByGroup = {};
