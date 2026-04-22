@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>全ステージ一覧</title>
+<title>全ステージ一覧(実験用)</title>
 
 <style>
 body {
@@ -57,9 +57,14 @@ img {
   <option value="ND">レジェンド0</option>
 </select>
 
-  <label>
+<label>
   <input type="checkbox" id="showKanban" onchange="load()">
   カンバン娘を表示
+</label>
+
+<label>
+  <input type="checkbox" id="showFirstOnly" onchange="load()">
+  初出敵のみ表示
 </label>
 
 <div id="list"></div>
@@ -87,104 +92,113 @@ async function load() {
   }
 
   const mode = document.getElementById("mode").value;
-  const stagesData = await fetch("stages.json").then(r=>r.json());
+  const stagesData = await fetch("stages.json").then(r => r.json());
 
   const list = document.getElementById("list");
   list.innerHTML = "";
 
+  const shownInRange = new Set();
+
   stagesData.forEach(ch => {
 
-  const isTarget =
-    (mode === "ALL") ||
+    const isTarget =
+      (mode === "ALL") ||
 
-    (mode === "N" && (
-      (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
-      || ch.chapterId === "E026"
-    )) ||
+      (mode === "N" && (
+        (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+        || ch.chapterId === "E026"
+      )) ||
 
-    (mode === "NA" && (
-      ch.chapterId.startsWith("NA")
-      || ch.chapterId === "E068"
-      || ch.chapterId === "E069"
-    )) ||
+      (mode === "NA" && (
+        ch.chapterId.startsWith("NA")
+        || ch.chapterId === "E068"
+        || ch.chapterId === "E069"
+      )) ||
 
-    (mode === "ND" && ch.chapterId.startsWith("ND"));
+      (mode === "ND" && ch.chapterId.startsWith("ND"));
 
-  if (!isTarget) return;
+    if (!isTarget) return;
 
-  // ▼ 章BOX（これ1個だけ）
-  const chapterBox = document.createElement("div");
-  chapterBox.style.border = "2px solid #ccc";
-  chapterBox.style.padding = "10px";
-  chapterBox.style.marginBottom = "20px";
+    const chapterBox = document.createElement("div");
+    chapterBox.style.border = "2px solid #ccc";
+    chapterBox.style.padding = "10px";
+    chapterBox.style.marginBottom = "20px";
 
-  // ▼ 章名
-  const title = document.createElement("h3");
-  title.textContent = ch.chapterName;
-  chapterBox.appendChild(title);
+    const title = document.createElement("h3");
+    title.textContent = ch.chapterName;
+    chapterBox.appendChild(title);
 
-  // ▼ ステージ
-  ch.stages.forEach(st => {
+    ch.stages.forEach(st => {
+      const table = document.createElement("table");
+      table.className = "stageTable";
 
-    const table = document.createElement("table");
-    table.className = "stageTable";
+      const tr1 = document.createElement("tr");
+      tr1.innerHTML = `
+        <th>ステージ</th>
+        <td>${st.stageName}</td>
+      `;
 
-    const tr1 = document.createElement("tr");
-    tr1.innerHTML = `
-      <th>ステージ</th>
-      <td>${st.stageName}</td>
-    `;
+      const tr2 = document.createElement("tr");
+      const th = document.createElement("th");
+      th.textContent = "出現する敵";
 
-    const tr2 = document.createElement("tr");
-    const th = document.createElement("th");
-    th.textContent = "出現する敵";
+      const td = document.createElement("td");
 
-    const td = document.createElement("td");
+      const showKanban = document.getElementById("showKanban").checked;
+      const showFirstOnly = document.getElementById("showFirstOnly").checked;
 
-    const showKanban = document.getElementById("showKanban").checked;
+      st.enemies.forEach(enemyName => {
+        if (!showKanban && enemyName === "カンバン娘") return;
 
-    st.enemies.forEach(enemyName => {
+        const enemyKey = normalize(enemyName);
 
-      if (!showKanban && enemyName === "カンバン娘") return;
+        if (showFirstOnly && shownInRange.has(enemyKey)) {
+          return;
+        }
 
-      const baseName = enemyName.replace(/\r?\n/g, "").trim();
+        shownInRange.add(enemyKey);
+        
+        const baseName = enemyName.replace(/\r?\n/g, "").trim();
 
-      const fileName = baseName
-        .replace(/[：:]/g, " ")
-        .replace(/[ 　]+/g, "");
+        const fileName = baseName
+          .replace(/[：:]/g, " ")
+          .replace(/[ 　]+/g, "");
 
-      const img = document.createElement("img");
-      img.src = "image/" + encodeURIComponent(fileName) + ".png";
-      img.onerror = () => img.src = "image/noimage.png";
+        const img = document.createElement("img");
+        img.src = "image/" + encodeURIComponent(fileName) + ".png";
+        img.onerror = () => img.src = "image/noimage.png";
 
-      img.addEventListener("click", () => {
-        const url = new URL("detail.html", location.href);
-        url.searchParams.set("name", enemyName);
-        url.searchParams.set("mode", mode);
-        location.href = url;
+        img.addEventListener("click", () => {
+          const url = new URL("detail.html", location.href);
+          url.searchParams.set("name", enemyName);
+          url.searchParams.set("mode", mode);
+          location.href = url;
+        });
+
+        td.appendChild(img);
       });
 
-      td.appendChild(img);
+      if (td.childElementCount === 0) {
+        return;
+      }
+
+      tr2.appendChild(th);
+      tr2.appendChild(td);
+
+      table.appendChild(tr1);
+      table.appendChild(tr2);
+
+      chapterBox.appendChild(table);
     });
 
-    tr2.appendChild(th);
-    tr2.appendChild(td);
-
-    table.appendChild(tr1);
-    table.appendChild(tr2);
-
-    chapterBox.appendChild(table);
+    list.appendChild(chapterBox);
   });
-
-  list.appendChild(chapterBox);
-});
 }
-
-load();
-
   function goBack() {
   history.back();
 }
+
+load();
 </script>
 
 </body>
