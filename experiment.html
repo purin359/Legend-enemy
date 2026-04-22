@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)</title>
+<title>ステージ当てクイズ</title>
 
 <style>
 body {
@@ -314,7 +314,7 @@ img {
 
 <div class="container">
 
-  <h2>ステージ当てクイズ(レジェンド)</h2>
+  <h2>ステージ当てクイズ(レジェンド)　Ver.15.3.0対応</h2>
 
   <div class="topBar1">
   <div class="selectWrap">
@@ -364,7 +364,7 @@ img {
   <div class="btnRow">
     <button id="checkBtn" onclick="check()">回答</button>
     <button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
-    <button id="giveUpBtn" onclick="giveUpPractice()" style="display:none;">ギブアップ</button>
+    <button id="giveUpBtn" onclick="confirmGiveUpPractice()" style="display:none;">ギブアップ</button>
   </div>
   <div id="result"></div>
 
@@ -630,6 +630,7 @@ document.querySelector(".hintBtn").disabled = false;
 }
   
 function check() {
+  document.getElementById("suggest").innerHTML = "";
   const input = document.getElementById("answer").value;
   const inputNorm = normalize(input);
 
@@ -639,7 +640,7 @@ function check() {
     : getSameStages(current);
 
 const availableStages =
-  gameMode === "complete"
+  (gameMode === "complete" || gameMode === "practice")
     ? getAvailableStages(current)
     : sameStages;
 
@@ -652,7 +653,7 @@ const nameOK = !!matchedName;
   const allStages = sameStages;
 
 const alreadyUsedName =
-  gameMode === "complete"
+  (gameMode === "complete" || gameMode === "practice")
     ? allStages.find(name =>
         inputNorm === normalize(name) &&
         !availableStages.includes(name)
@@ -695,8 +696,6 @@ const alreadyUsedName =
   result.textContent = "正解！ 🎉";
   result.style.color = "green";
 
-  document.getElementById("suggest").innerHTML = "";
-
   correct++;
 
   if (
@@ -718,12 +717,12 @@ const alreadyUsedName =
 
 } else {
 
-  if (gameMode === "complete" && alreadyUsedName && !nameOK && !idOK) {
-    result.textContent = `その答えは使いました：${alreadyUsedName}`;
-    result.style.color = "orange";
-    return;
-  }
-
+  if ((gameMode === "complete" || gameMode === "practice") && alreadyUsedName && !nameOK && !idOK) {
+  result.textContent = `その答えは使いました：${alreadyUsedName}`;
+  result.style.color = "orange";
+  return;
+}
+    
   if (gameMode === "practice") {
     result.textContent = "残念！";
     result.style.color = "red";
@@ -1172,7 +1171,7 @@ function showNextButton() {
       ? getPossibleStagesFromCurrentView(current)
       : getSameStages(current);
 
-  if (gameMode !== "complete") {
+  if (gameMode !== "complete" && gameMode !== "practice") {
     return all;
   }
 
@@ -1209,7 +1208,7 @@ function getSameStageLabels(current) {
   
   function markAnswerUsed(current, answerName) {
   // 🔥 エンドレスでは記録しない
-  if (gameMode !== "complete") return;
+  if (gameMode !== "complete" && gameMode !== "practice") return;
 
   const groupKey = getGroupKeyFromCurrent(current);
 
@@ -1472,8 +1471,20 @@ function clearAnswerInput() {
 }
 
 function giveUpPractice() {
+  document.getElementById("suggest").innerHTML = "";
   if (gameMode !== "practice") return;
 
+  // 🔥 正解表示を作る
+  const answerText =
+    hideMode === "hidden"
+      ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+      : getSameStageLabels(current).join("\n");
+
+  document.getElementById("result").textContent =
+    `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
+  document.getElementById("result").style.color = "red";
+
+  // ▼ リセット処理
   usedAnswersByGroup = {};
   correct = 0;
   hintTotal = 0;
@@ -1488,9 +1499,17 @@ function giveUpPractice() {
   remaining = [...pool];
   totalCount = remaining.length;
 
-  loadBest();
   updateScore();
-  nextQuiz();
+  showNextButton();
+}
+
+  function confirmGiveUpPractice() {
+  if (gameMode !== "practice") return;
+
+  const ok = confirm("ギブアップしますか？");
+  if (!ok) return;
+
+  giveUpPractice();
 }
   
 init();
