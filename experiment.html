@@ -97,6 +97,8 @@ async function load() {
   const list = document.getElementById("list");
   list.innerHTML = "";
 
+  const shownInRange = new Set();
+
   stagesData.forEach(ch => {
 
     const isTarget =
@@ -121,8 +123,6 @@ async function load() {
     chapterBox.style.border = "2px solid #ccc";
     chapterBox.style.padding = "10px";
     chapterBox.style.marginBottom = "20px";
-
-    const shownInChapter = new Set();
 
     const title = document.createElement("h3");
     title.textContent = ch.chapterName;
@@ -152,12 +152,12 @@ async function load() {
 
         const enemyKey = normalize(enemyName);
 
-        if (showFirstOnly && shownInChapter.has(enemyKey)) {
+        if (showFirstOnly && shownInRange.has(enemyKey)) {
           return;
         }
 
-        shownInChapter.add(enemyKey);
-
+        shownInRange.add(enemyKey);
+        
         const baseName = enemyName.replace(/\r?\n/g, "").trim();
 
         const fileName = baseName
