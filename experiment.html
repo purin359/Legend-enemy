@@ -93,6 +93,7 @@ img {
   display: flex;
   flex-wrap: wrap;
 }
+  
 .enemyCoverPart {
   box-sizing: border-box;
 }
@@ -115,6 +116,84 @@ img {
 .enemyCover.six .enemyCoverPart {
   width: 33.3333%;
   height: 50%;
+}
+
+  .enemyBorder {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.enemyBorderPart {
+  box-sizing: border-box;
+}
+
+.enemyBorder.one .enemyBorderPart {
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+}
+
+.enemyBorder.two .enemyBorderPart {
+  width: 50%;
+  height: 100%;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+}
+
+.enemyBorder.two .enemyBorderPart:nth-child(1) {
+  border-left: 3px solid transparent;
+}
+
+.enemyBorder.two .enemyBorderPart:nth-child(2) {
+  border-right: 3px solid transparent;
+}
+
+.enemyBorder.three .enemyBorderPart {
+  width: 33.3333%;
+  height: 100%;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+}
+
+.enemyBorder.three .enemyBorderPart:nth-child(1) {
+  border-left: 3px solid transparent;
+}
+
+.enemyBorder.three .enemyBorderPart:nth-child(3) {
+  border-right: 3px solid transparent;
+}
+
+.enemyBorder.six .enemyBorderPart {
+  width: 33.3333%;
+  height: 50%;
+}
+
+.enemyBorder.six .enemyBorderPart:nth-child(1),
+.enemyBorder.six .enemyBorderPart:nth-child(2),
+.enemyBorder.six .enemyBorderPart:nth-child(3) {
+  border-top: 3px solid transparent;
+}
+
+.enemyBorder.six .enemyBorderPart:nth-child(4),
+.enemyBorder.six .enemyBorderPart:nth-child(5),
+.enemyBorder.six .enemyBorderPart:nth-child(6) {
+  border-bottom: 3px solid transparent;
+}
+
+.enemyBorder.six .enemyBorderPart:nth-child(1),
+.enemyBorder.six .enemyBorderPart:nth-child(4) {
+  border-left: 3px solid transparent;
+}
+
+.enemyBorder.six .enemyBorderPart:nth-child(3),
+.enemyBorder.six .enemyBorderPart:nth-child(6) {
+  border-right: 3px solid transparent;
 }
   
   .enemyBox {
@@ -397,6 +476,7 @@ let enemiesMaster = {};
 let hideMode = "normal";
 let currentHiddenIndexes = [];
 let currentVisibleKey = "";
+let revealAfterAnswer = false;
 
 
 // 画像用
@@ -540,6 +620,8 @@ function nextQuiz() {
 
   const newRecord = isNewCompleteRecord();
 
+  revealAfterAnswer = false;
+
   document.getElementById("result").textContent =
     newRecord
       ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`
@@ -600,17 +682,26 @@ q.enemies.forEach((enemy) => {
   img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
   img.onerror = () => img.src = "image/noimage.png";
 
-  if (hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex)) {
-    wrap.classList.add("covered");
-  }
+  const isHiddenEnemy =
+  hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex);
 
-  wrap.appendChild(img);
+if (isHiddenEnemy && !revealAfterAnswer) {
+  wrap.classList.add("covered");
+}
 
-  if (hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex)) {
-    const colors = getAttributeColors(enemy);
+wrap.appendChild(img);
+
+if (isHiddenEnemy) {
+  const colors = getAttributeColors(enemy);
+
+  if (revealAfterAnswer) {
+    const border = createEnemyBorder(colors);
+    wrap.appendChild(border);
+  } else {
     const cover = createEnemyCover(colors);
     wrap.appendChild(cover);
   }
+}
 
   box.appendChild(wrap);
 });
@@ -627,6 +718,56 @@ document.querySelector(".hintBtn").disabled = false;
 
   unlockButtons();
   showCheckButton();
+}
+
+function redrawCurrentEnemies() {
+  if (!current) return;
+
+  const enemiesDiv = document.getElementById("enemies");
+  enemiesDiv.innerHTML = "";
+
+  const box = document.createElement("div");
+  box.className = "enemyBox";
+
+  let visibleIndex = -1;
+
+  current.enemies.forEach((enemy) => {
+    if (enemy === "カンバン娘") return;
+
+    visibleIndex++;
+
+    const wrap = document.createElement("div");
+    wrap.className = "enemyItem";
+
+    const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
+    img.onerror = () => img.src = "image/noimage.png";
+
+    const isHiddenEnemy =
+      hideMode === "hidden" && currentHiddenIndexes.includes(visibleIndex);
+
+    if (isHiddenEnemy && !revealAfterAnswer) {
+      wrap.classList.add("covered");
+    }
+
+    wrap.appendChild(img);
+
+    if (isHiddenEnemy) {
+      const colors = getAttributeColors(enemy);
+
+      if (revealAfterAnswer) {
+        const border = createEnemyBorder(colors);
+        wrap.appendChild(border);
+      } else {
+        const cover = createEnemyCover(colors);
+        wrap.appendChild(cover);
+      }
+    }
+
+    box.appendChild(wrap);
+  });
+
+  enemiesDiv.appendChild(box);
 }
   
 function check() {
@@ -734,6 +875,11 @@ const alreadyUsedName =
     hideMode === "hidden"
       ? getPossibleStageLabelsFromCurrentView(current).join("\n")
       : getSameStageLabels(current).join("\n");
+
+  if (hideMode === "hidden") {
+  revealAfterAnswer = true;
+  redrawCurrentEnemies();
+}
 
   result.textContent = `不正解！ 正解↓\n${answerText}`;
   result.style.color = "red";
@@ -1359,6 +1505,40 @@ function getHiddenIndexes(enemies) {
   return cover;
 }
 
+  function createEnemyBorder(colors) {
+  const border = document.createElement("div");
+  border.className = "enemyBorder";
+
+  let className = "one";
+  let useColors = [...colors];
+
+  if (useColors.length === 1) {
+    className = "one";
+  } else if (useColors.length === 2) {
+    className = "two";
+  } else if (useColors.length === 3) {
+    className = "three";
+  } else {
+    className = "six";
+
+    while (useColors.length < 6) {
+      useColors.push(useColors[useColors.length % colors.length]);
+    }
+    useColors = useColors.slice(0, 6);
+  }
+
+  border.classList.add(className);
+
+  useColors.forEach(color => {
+    const part = document.createElement("div");
+    part.className = "enemyBorderPart";
+    part.style.borderColor = color;
+    border.appendChild(part);
+  });
+
+  return border;
+}
+
   function getVisibleQuestionKeyByMask(questionEnemies, hiddenIndexes) {
   const parts = [];
 
@@ -1505,6 +1685,11 @@ function giveUpPractice() {
 
   function confirmGiveUpPractice() {
   if (gameMode !== "practice") return;
+
+  if (hideMode === "hidden") {
+  revealAfterAnswer = true;
+  redrawCurrentEnemies();
+}
 
   const ok = confirm("ギブアップしますか？");
   if (!ok) return;
