@@ -854,7 +854,8 @@ const alreadyUsedName =
   lockButtons();
   updateScore();
 
-  if (hideMode === "hidden") {
+  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
@@ -881,11 +882,12 @@ const alreadyUsedName =
       ? getPossibleStageLabelsFromCurrentView(current).join("\n")
       : getSameStageLabels(current).join("\n");
 
-  if (hideMode === "hidden") {
+  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
-
+    
   result.textContent = `不正解！ 正解↓\n${answerText}`;
   result.style.color = "red";
 
@@ -1693,7 +1695,8 @@ function giveUpPractice() {
   function confirmGiveUpPractice() {
   if (gameMode !== "practice") return;
 
-  if (hideMode === "hidden") {
+  if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
+  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
@@ -1702,6 +1705,15 @@ function giveUpPractice() {
   if (!ok) return;
 
   giveUpPractice();
+}
+
+  function hasMultiplePossibleAnswers(current) {
+  const names =
+    hideMode === "hidden"
+      ? getPossibleStagesFromCurrentView(current)
+      : getSameStages(current);
+
+  return names.length > 1;
 }
   
 init();
