@@ -569,10 +569,11 @@ buildStageList(mode);
     div.className = "suggestItem";
     div.textContent = name;
 
-    div.onclick = () => {
-      document.getElementById("answer").value = name;
-      suggest.innerHTML = "";
-    };
+    if (e.key === "Enter" && enableEnterSubmit) {
+  e.preventDefault();
+  document.getElementById("suggest").innerHTML = "";
+  check();
+}
 
     suggest.appendChild(div);
   });
