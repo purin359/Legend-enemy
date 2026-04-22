@@ -608,18 +608,20 @@ buildStageList(mode);
   }
 
   if (e.key === "Enter") {
-    if (!enableEnterSubmit) return;
+  e.preventDefault();
+  document.getElementById("suggest").innerHTML = "";
 
-    e.preventDefault();
-    document.getElementById("suggest").innerHTML = "";
-
-    if (applySelectedSuggest()) {
-      return;
-    }
-
-    check();
+  // ① サジェストがあれば優先して選択（常に動く）
+  if (applySelectedSuggest()) {
+    return;
   }
-});
+
+  // ② 回答はONの時だけ
+  if (!enableEnterSubmit) return;
+
+  check();
+  }
+  });
 
   document.getElementById("answer").addEventListener("input", () => {
   const input = document.getElementById("answer").value;
