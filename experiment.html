@@ -2,1876 +2,363 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)</title>
+<title>敵出現一覧(実験用)</title>
 
 <style>
-body {
-  font-family: sans-serif;
-  padding: 16px;
-  max-width: 600px;
-  margin: auto;
-}
+body { font-family: sans-serif; padding:20px; }
 
-h2 {
-  font-size: 22px;
-  margin-bottom: 12px;
-}
+table { border-collapse: collapse; width:100%; }
+th, td { border:1px solid #ccc; padding:5px; }
+img { width:50px; cursor:pointer; }
 
-/* 入力欄 */
-input {
-  font-size: 16px;
-  padding: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-}
+th { cursor:pointer; }
 
-/* ボタン */
-button {
-  font-size: 16px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  background: #4CAF50;
-  color: white;
-  margin: 5px 5px 10px 0;
-}
-
-/* セレクト */
-select {
-  font-size: 16px;
-  padding: 10px;
-  border-radius: 8px;
-  margin-right: 8px;
-}
-
-/* テーブル */
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-top: 10px;
-}
-
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 14px;
-}
-
-/* 画像 */
-img {
-  width: 50px;
-}  
-
-  .enemyItem.covered img {
-  width: 44px;
-  height: 44px;
-}
-
-.enemyItem {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  
-.enemyItem img {
-  width: 50px;
-  height: 50px;
-}
-
-.enemyCover {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-}
-  
-.enemyCoverPart {
-  box-sizing: border-box;
-}
-
-.enemyCover.one .enemyCoverPart {
-  width: 100%;
-  height: 100%;
-}
-
-.enemyCover.two .enemyCoverPart {
-  width: 50%;
-  height: 100%;
-}
-
-.enemyCover.three .enemyCoverPart {
-  width: 33.3333%;
-  height: 100%;
-}
-
-.enemyCover.six .enemyCoverPart {
-  width: 33.3333%;
-  height: 50%;
-}
-
-  .enemyBorder {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.enemyBorderPart {
-  box-sizing: border-box;
-}
-
-.enemyBorder.one .enemyBorderPart {
-  width: 100%;
-  height: 100%;
-  border: 3px solid transparent;
-}
-
-.enemyBorder.two .enemyBorderPart {
-  width: 50%;
-  height: 100%;
-  border-top: 3px solid transparent;
-  border-bottom: 3px solid transparent;
-}
-
-.enemyBorder.two .enemyBorderPart:nth-child(1) {
-  border-left: 3px solid transparent;
-}
-
-.enemyBorder.two .enemyBorderPart:nth-child(2) {
-  border-right: 3px solid transparent;
-}
-
-.enemyBorder.three .enemyBorderPart {
-  width: 33.3333%;
-  height: 100%;
-  border-top: 3px solid transparent;
-  border-bottom: 3px solid transparent;
-}
-
-.enemyBorder.three .enemyBorderPart:nth-child(1) {
-  border-left: 3px solid transparent;
-}
-
-.enemyBorder.three .enemyBorderPart:nth-child(3) {
-  border-right: 3px solid transparent;
-}
-
-.enemyBorder.six .enemyBorderPart {
-  width: 33.3333%;
-  height: 50%;
-}
-
-.enemyBorder.six .enemyBorderPart:nth-child(1),
-.enemyBorder.six .enemyBorderPart:nth-child(2),
-.enemyBorder.six .enemyBorderPart:nth-child(3) {
-  border-top: 3px solid transparent;
-}
-
-.enemyBorder.six .enemyBorderPart:nth-child(4),
-.enemyBorder.six .enemyBorderPart:nth-child(5),
-.enemyBorder.six .enemyBorderPart:nth-child(6) {
-  border-bottom: 3px solid transparent;
-}
-
-.enemyBorder.six .enemyBorderPart:nth-child(1),
-.enemyBorder.six .enemyBorderPart:nth-child(4) {
-  border-left: 3px solid transparent;
-}
-
-.enemyBorder.six .enemyBorderPart:nth-child(3),
-.enemyBorder.six .enemyBorderPart:nth-child(6) {
-  border-right: 3px solid transparent;
-}
-  
-  .enemyBox {
-  border: none;                /* ←削除 */
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-
-  background: #eaf4ff;         /* ←色で囲む */
-}
-
-  #suggest {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  max-height: 150px;
-  overflow-y: auto;
-  background: white;
-  position: absolute;
-  width: calc(100% - 32px);
-  z-index: 10;
-}
-
-.suggestItem {
-  padding: 8px;
-  cursor: pointer;
-}
-
-.suggestItem:hover {
-  background: #eaf4ff;
-}
-
-  .container {
-  position: relative;
-}
-
-  .topBar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.topBar1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* ヒントを右端へ */
-.hintBtn {
-  margin-left: auto;
-}
-
-.topBar2 {
-  position: relative;
-  min-height: 48px;   /* 上段+タイマー分の高さを確保 */
-}
-
-.leftBox {
-  display: block;
-}
-
-#score {
-  position: absolute;
-  top: 0;
-  left: 0;
-  font-size: 16px;
-}
-
-#remaining {
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 16px;
-}
-
-#timer {
-  position: absolute;
-  top: 24px;          /* 下段に固定 */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 16px;
-}
-
-  .scoreRow {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-  .btnRow {
-  display: flex;
-  justify-content: center; /* ←中央揃え */
-  gap: 10px;               /* ←ボタン間の余白 */
-  margin-top: 10px;
-}
-
-  #result {
-  white-space: pre-line;
-}
-
-  .hintBtn:disabled {
-  background: #999;
-  color: #ddd;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-  .selectWrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.infoBtn {
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border-radius: 50%;
-  border: none;
-  background: #888;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 24px;
-  text-align: center;
-  cursor: pointer;
-  margin: 0;
-}
-
-.infoBtn:hover {
-  background: #666;
-}
-
-  .modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 100;
-}
-
-.modalContent {
-  background: white;
-  width: 90%;
-  max-width: 500px;
-  margin: 5% auto;
-  padding: 20px;
-  border-radius: 12px;
-  position: relative;
-}
-
-.modalText {
-  max-height: 60vh;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.closeBtn {
-  position: absolute;
-  right: 12px;
-  top: 8px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-  .answerRow {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-}
-
-.answerRow input {
-  flex: 1;
-  margin-bottom: 0;
-}
-
-.clearAnswerBtn {
-  width: 44px;
-  min-width: 44px;
-  padding: 0;
-  margin: 0;
-  border-radius: 8px;
-  background: #999;
-}
-
-.clearAnswerBtn:hover {
-  background: #777;
-}
-  
 </style>
 </head>
 <body>
 
-<div class="container">
+<h2>敵出現一覧</h2>
 
-  <h2>ステージ当てクイズ(レジェンド)　Ver.15.3.0対応</h2>
+<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:10px;">
+  <input id="searchBox" placeholder="敵名でフィルター" oninput="load()">
 
-  <div class="topBar1">
-  <div class="selectWrap">
-    <select id="mode" onchange="changeMode()">
-      <option value="ALL">全て</option>
-      <option value="N">レジェンド</option>
-      <option value="NA">真レジェンド</option>
-      <option value="ND">レジェンド0</option>
-    </select>
-  </div>
+  <select id="attrFilter" multiple size="6" onchange="load()">
+    <option value="赤">赤</option>
+    <option value="浮き">浮き</option>
+    <option value="黒">黒</option>
+    <option value="メタル">メタル</option>
+    <option value="天使">天使</option>
+    <option value="エイリアン">エイリアン</option>
+    <option value="ゾンビ">ゾンビ</option>
+    <option value="悪魔">悪魔</option>
+    <option value="古代種">古代種</option>
+    <option value="無属性">無属性</option>
+    <option value="超生命体">超生命体</option>
+    <option value="超獣">超獣</option>
+    <option value="超賢者">超賢者</option>
+    <option value="城">城</option>
+  </select>
+</div>
 
-  <div class="selectWrap">
-    <select id="playMode" onchange="changePlayMode()">
-      <option value="endless">エンドレス</option>
-      <option value="complete">コンプリート</option>
-      <option value="practice">練習用</option>
-    </select>
-  </div>
-
-  <div class="selectWrap">
-<select id="hideMode" onchange="changeHideMode()">
-  <option value="normal">敵隠しなし</option>
-  <option value="hidden_easy">敵隠しあり(易)</option>
-  <option value="hidden_hard">敵隠しあり(難)</option>
+<select id="mode" onchange="load()">
+  <option value="ALL">全て</option>
+  <option value="N">レジェンド</option>
+  <option value="NA">真レジェンド</option>
+  <option value="ND" selected>レジェンド0</option>
 </select>
-    <button type="button" class="infoBtn" onclick="showAllInfo()">ⓘ</button>
-  </div>
 
-  <button class="hintBtn" onclick="showHint()">ヒント</button>
-</div>
-<div class="topBar2">
-  <div class="leftBox">
-    <div id="score"></div>
-  </div>
-  <div id="remaining"></div>
-  <div id="timer"></div>
-</div>
+<select id="sort" onchange="changeSort()">
+  <option value="count">登場回数順</option>
+  <option value="first">初出ステージ順</option>
+  <option value="order">図鑑順</option>
+</select>
 
-  <div id="enemies"></div>
+<button id="orderBtn" onclick="toggleOrder()">降順</button>
+  
+  <button onclick="goAllStages()">全ステージ一覧へ</button>
 
-  <div class="answerRow">
-  <input id="answer" placeholder="ステージ名を入力" autocomplete="off">
-  <button type="button" id="clearAnswerBtn" class="clearAnswerBtn" onclick="clearAnswerInput()">×</button>
-</div>
-<div id="suggest"></div>
-  <br><br>
+<table>
+<thead>
+<tr>
+  <th>画像</th>
+  <th>敵名</th>
+  <th>登場回数</th>
+  <th>初出ステージ</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
 
-  <div class="btnRow">
-    <button id="checkBtn" onclick="check()">回答</button>
-    <button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
-    <button id="giveUpBtn" onclick="confirmGiveUpPractice()" style="display:none;">ギブアップ</button>
-  </div>
-  <div id="result"></div>
-
-</div>
 <script>
 let stagesData = [];
-let current = null;
+let desc = true;
+let enemiesData = {};
+let sortMode = "count";
+let orderMap = {};
 
-let correct = 0;      // 連続正解数
-let bestScore = 0;    // 最高記録
-let justCorrect = false;
-let stageList = [];
-let hintTotal = 0;    // このゲーム中のヒント合計
-let bestHint = 9999;
-let answered = false;   // 回答済みか
-let lastResult = null;  // "ok" or "ng"
-let wasWrong = false;
-let gameMode = "endless"; // "endless" or "complete"
-
-let pool = [];        // 出題候補
-let remaining = [];   // コンプリート用（残り問題）
-
-let startTime = 0;    // タイマー開始
-let timer = 0;        // 秒
-let timerId = null;
-let totalCount = 0;   // 総問題数
-let usedAnswersByGroup = {};
-let hintCount = 0;
-let enemiesMaster = {};
-let hideMode = "normal";
-let currentHiddenIndexes = [];
-let currentVisibleKey = "";
-let revealAfterAnswer = false;
-
-
-// 画像用
-function getFileName(name) {
-  return name
-    .replace(/\r?\n/g, "")
-    .trim()
-    .replace(/[：:]/g, " ")
-    .replace(/[ 　]+/g, "");
-}
-
-// 比較用
-function normalizeName(str) {
-  return String(str)
-    .replace(/\r?\n/g, "")
-    .replace(/[：:]/g, "")
-    .replace(/[ 　]/g, "")
-    .trim();
-}
-
-  function normalize(str) {
-  return String(str)
-    .replace(/\r?\n/g, "")
-    .replace(/[ 　]+/g, "")
-    .trim();
-}
-  
 async function init() {
-  usedAnswersByGroup = {};
-  stagesData = await fetch("stages.json").then(r => r.json());
+  enemiesData = await fetch("enemies.json").then(r=>r.json());
+  stagesData = await fetch("stages.json").then(r=>r.json());
 
-const enemiesJson = await fetch("enemies.json").then(r => r.json());
-
-enemiesMaster = {};
-
-const enemyList = Array.isArray(enemiesJson)
-  ? enemiesJson
-  : Object.values(enemiesJson);
-
-enemyList.forEach(enemy => {
-  enemiesMaster[normalizeName(enemy.name)] = enemy;
-});
-
-hideMode = document.getElementById("hideMode").value;
-
-  resetEndlessScore();
-
-  const mode = document.getElementById("mode").value;
-buildStageList(mode);
-
-  loadBest();
-
-  document.getElementById("answer").addEventListener("keydown", e => {
-  // 🔥 変換中は無視
-  if (e.isComposing || e.keyCode === 229) return;
-
-  if (e.key === "Enter") {
-    check();
+  // 順番記録
+  let i = 0;
+  for (let key in enemiesData) {
+    orderMap[enemiesData[key].name] = i++;
   }
-});
 
-  document.getElementById("answer").addEventListener("input", () => {
-  const input = document.getElementById("answer").value;
-  const suggest = document.getElementById("suggest");
+  changeSort();
+  load()
+}
+  
+// 比較専用（スペース無視）
+function normalize(str) {
+  return str
+    .toString()
 
-  suggest.innerHTML = "";
+    // 改行削除
+    .replace(/\r?\n/g, "")
 
-  if (!input) return;
+    // 全角英数 → 半角
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    )
 
-  const keyword = normalizeSearch(input);
+    // カタカナ → ひらがな
+    .replace(/[ァ-ン]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)
+    )
 
-  const results = stageList.filter(name =>
-    normalizeSearch(name).includes(keyword)
-  ).slice(0, 20); // 最大20件
+    // 記号削除（コロンなど）
+    .replace(/[：:]/g, "")
 
-  results.forEach(name => {
-    const div = document.createElement("div");
-    div.className = "suggestItem";
-    div.textContent = name;
+    // 長音削除（ー）
+    .replace(/ー/g, "")
 
-    div.onclick = () => {
-      document.getElementById("answer").value = name;
-      suggest.innerHTML = "";
-    };
+    // スペース削除（全角・半角）
+    .replace(/[ 　]+/g, "")
 
-    suggest.appendChild(div);
-  });
-});
+    // 小文字化
+    .toLowerCase()
 
-  if (gameMode === "endless") {
-  document.getElementById("timer").style.display = "none";
+    .trim();
 }
 
-  if (isStageClearMode()) {
+  function getEnemyTypes(enemyName) {
+  const key = normalize(enemyName);
+
+  const found = Object.values(enemiesData).find(enemy =>
+    normalize(enemy.name) === key
+  );
+
+  if (!found || !found.type) return [];
+
+  return String(found.type)
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+  
+function load() {
   const mode = document.getElementById("mode").value;
-  pool = buildPool(mode);
-  remaining = [...pool];
-  totalCount = remaining.length;
-}
-  
-updateScore();
-nextQuiz();
-showCheckButton();
-hideMode = document.getElementById("hideMode").value;
-}
-  
-function isTargetChapter(ch, mode) {
-  return (
-    (mode === "ALL") ||
+  const map = {};
 
-    (mode === "N" && (
-      (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
-      || ch.chapterId === "E026"
-    )) ||
+  stagesData.forEach(ch => {
 
-    (mode === "NA" && (
-      ch.chapterId.startsWith("NA")
-      || ch.chapterId === "E068"
-      || ch.chapterId === "E069"
-    )) ||
+    const isTarget =
+  (mode === "ALL") ||
 
-    (mode === "ND" && ch.chapterId.startsWith("ND"))
+  (mode === "N" && (
+    (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+    || ch.chapterId === "E026"
+  )) ||
+
+  (mode === "NA" && (
+    ch.chapterId.startsWith("NA")
+    || ch.chapterId === "E068"
+    || ch.chapterId === "E069"
+  )) ||
+
+  (mode === "ND" && ch.chapterId.startsWith("ND"));
+
+    if (!isTarget) return;
+
+    ch.stages.forEach(st => {
+      st.enemies.forEach(enemyName => {
+
+        const key = normalize(enemyName);
+
+        const displayName = enemyName
+  .replace(/\r?\n/g, "")
+  .replace(/[ 　\u00A0]+/g, " ") // ←これ追加（超重要）
+  .trim();
+
+        if (!map[key]) {
+          map[key] = {
+            name: enemyName,
+            count: 0,
+            first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+          };
+        }
+
+        map[key].count++;
+      });
+    });
+
+  });
+
+let list = Object.values(map);
+
+const search = document.getElementById("searchBox").value.trim();
+const selectedAttrs = Array.from(document.getElementById("attrFilter").selectedOptions)
+  .map(opt => opt.value);
+
+if (search) {
+  const keyword = normalize(search);
+
+  list = list.filter(e =>
+    normalize(e.name).includes(keyword)
   );
 }
 
-function nextQuiz() {
-
-  const mode = document.getElementById("mode").value;
-
-  revealAfterAnswer = false;
-
-  // 初回生成
-  if (isStageClearMode() && pool.length === 0) {
-  const mode = document.getElementById("mode").value;
-  pool = buildPool(mode);
-  remaining = [...pool];
-  totalCount = remaining.length;
+if (selectedAttrs.length > 0) {
+  list = list.filter(e => {
+    const types = getEnemyTypes(e.name);
+    return selectedAttrs.some(attr => types.includes(attr)); // OR条件
+  });
 }
 
-  // クリア判定
-  if (isStageClearMode() && remaining.length === 0) {
-  stopTimer();
+list = list.map(e => {
 
-  const newRecord = isNewCompleteRecord();
+  const match = e.first.match(/([A-Z]+)(\d+)-(\d+)/);
 
-  document.getElementById("result").textContent =
-    newRecord
-      ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`
-      : `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`;
+  let firstNum = 999999;
 
-  saveCompleteRecord();
+  if (match) {
+    const prefix = match[1];
+    const chap = parseInt(match[2]);
+    const stage = parseInt(match[3]);
 
-  showNextButton();
-  document.getElementById("nextBtn").disabled = false;
-  document.getElementById("checkBtn").disabled = true;
-  document.getElementById("giveUpBtn").disabled = true;
+    const base =
+      prefix === "N"  ? 0 :
+      prefix === "NA" ? 100000 :
+      prefix === "ND" ? 200000 :
+      prefix === "E"  ? 300000 : 400000;
 
-  return;
-}
-
-  if (isStageClearMode()) {
-  startTimer();
-}
-
-  let q;
-
-  if (isStageClearMode()) {
-  const i = Math.floor(Math.random() * remaining.length);
-  q = remaining[i];
-} else {
-  if (pool.length === 0) {
-    pool = buildPool(mode);
+    firstNum = base + chap * 100 + stage;
   }
-  q = pool[Math.floor(Math.random() * pool.length)];
-}
 
-  const visibleEnemies = q.enemies.filter(e => e !== "カンバン娘");
-
-  currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
-
-  current = q;
-
-  const enemiesDiv = document.getElementById("enemies");
-  enemiesDiv.innerHTML = "";
-
-  const box = document.createElement("div");
-  box.className = "enemyBox";
-
-  currentHiddenIndexes = isHiddenMode() ? getHiddenIndexes(visibleEnemies) : [];
-  currentVisibleKey = getVisibleQuestionKeyByMask(visibleEnemies, currentHiddenIndexes);
-
-let visibleIndex = -1;
-  
-q.enemies.forEach((enemy) => {
-  if (enemy === "カンバン娘") return;
-
-  visibleIndex++;
-
-  const wrap = document.createElement("div");
-  wrap.className = "enemyItem";
-
-  const img = document.createElement("img");
-  img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
-  img.onerror = () => img.src = "image/noimage.png";
-
-  const isHiddenEnemy =
-  isHiddenMode() && currentHiddenIndexes.includes(visibleIndex);
-
-if (isHiddenEnemy && !revealAfterAnswer) {
-  wrap.classList.add("covered");
-}
-
-wrap.appendChild(img);
-
-if (isHiddenEnemy) {
-  const colors = getAttributeColors(enemy);
-
-  if (revealAfterAnswer) {
-    const border = createEnemyBorder(colors);
-    wrap.appendChild(border);
-  } else {
-    const cover = createEnemyCover(colors);
-    wrap.appendChild(cover);
-  }
-}
-
-  box.appendChild(wrap);
+  return { ...e, firstNum };
 });
   
-  enemiesDiv.appendChild(box);
+ list.sort((a, b) => {
 
-  document.getElementById("answer").value = "";
-  document.getElementById("result").textContent = "";
-
-  answered = false;
-  wasWrong = false;
-  hintCount = 0;
-document.querySelector(".hintBtn").disabled = false;
-
-  unlockButtons();
-  showCheckButton();
-}
-
-function redrawCurrentEnemies() {
-  if (!current) return;
-
-  const enemiesDiv = document.getElementById("enemies");
-  enemiesDiv.innerHTML = "";
-
-  const box = document.createElement("div");
-  box.className = "enemyBox";
-
-  let visibleIndex = -1;
-
-  current.enemies.forEach((enemy) => {
-    if (enemy === "カンバン娘") return;
-
-    visibleIndex++;
-
-    const wrap = document.createElement("div");
-    wrap.className = "enemyItem";
-
-    const img = document.createElement("img");
-    img.src = "image/" + encodeURIComponent(getFileName(enemy)) + ".png";
-    img.onerror = () => img.src = "image/noimage.png";
-
-    const isHiddenEnemy =
-  isHiddenMode() && currentHiddenIndexes.includes(visibleIndex);
-
-    if (isHiddenEnemy && !revealAfterAnswer) {
-      wrap.classList.add("covered");
-    }
-
-    wrap.appendChild(img);
-
-    if (isHiddenEnemy) {
-      const colors = getAttributeColors(enemy);
-
-      if (revealAfterAnswer) {
-        const border = createEnemyBorder(colors);
-        wrap.appendChild(border);
-      } else {
-        const cover = createEnemyCover(colors);
-        wrap.appendChild(cover);
-      }
-    }
-
-    box.appendChild(wrap);
-  });
-
-  enemiesDiv.appendChild(box);
-}
-  
-function check() {
-  document.getElementById("suggest").innerHTML = "";
-  const input = document.getElementById("answer").value;
-  const inputNorm = normalize(input);
-
-  const sameStages =
-  isHiddenMode()
-    ? getPossibleStagesFromCurrentView(current)
-    : getSameStages(current);
-
-const availableStages =
-  (gameMode === "complete" || gameMode === "practice")
-    ? getAvailableStages(current)
-    : sameStages;
-
-const matchedName = availableStages.find(name =>
-  inputNorm === normalize(name)
-);
-  
-const nameOK = !!matchedName;
-
-  const allStages = sameStages;
-
-const alreadyUsedName =
-  (gameMode === "complete" || gameMode === "practice")
-    ? allStages.find(name =>
-        inputNorm === normalize(name) &&
-        !availableStages.includes(name)
-      )
-    : null;
-
-  const idText = `${current.chapterId}-${current.stageId}`;
-  const idOK = inputNorm === normalize(idText);
-
-  const ok = nameOK || idOK;
-
-  const result = document.getElementById("result");
-
-  answered = true;
-  
-  if (ok) {
-
-    if (matchedName) {
-  markAnswerUsed(current, matchedName);
-}
-
-  if (isStageClearMode()) {
-  const targetName = matchedName
-    ? matchedName
-    : current.stageName;
-
-  remaining = remaining.filter(st => {
-    const names = Array.isArray(st.stageName) ? st.stageName : [st.stageName];
-    return !names.some(name => normalize(name) === normalize(targetName));
-  });
-}
-
-    if (idOK && !matchedName) {
-  const availableStages = getAvailableStages(current);
-  if (availableStages.length > 0) {
-    markAnswerUsed(current, availableStages[0]);
-  }
-}
-    
-  let resultText = "正解！ 🎉";
-
-if (isHiddenMode() && !shouldRevealBorder(current)) {
-  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
-}
-
-result.textContent = resultText;
-result.style.color = "green";
-
-  correct++;
-
-  if (
-    correct > bestScore ||
-    (correct === bestScore && hintTotal < bestHint)
-  ) {
-    bestScore = correct;
-    bestHint = hintTotal;
-    saveBest();
+  if (sortMode === "count") {
+    return desc ? b.count - a.count : a.count - b.count;
   }
 
-  justCorrect = true;
-  wasWrong = false;
-
-  lockButtons();
-  updateScore();
-
-  if (shouldRevealBorder(current)) {
-  revealAfterAnswer = true;
-  redrawCurrentEnemies();
-}
-    
-  setTimeout(nextQuiz, 800);
-
-} else {
-
-  if ((gameMode === "complete" || gameMode === "practice") && alreadyUsedName && !nameOK && !idOK) {
-  result.textContent = `その答えは使いました：${alreadyUsedName}`;
-  result.style.color = "orange";
-  return;
-}
-    
-  if (gameMode === "practice") {
-    result.textContent = "残念！";
-    result.style.color = "red";
-    answered = false;
-    return;
+  if (sortMode === "first") {
+    return a.firstNum - b.firstNum; // 固定（昇順のみ）
   }
 
-  const answerText =
-  isHiddenMode()
-    ? getPossibleStageLabelsFromCurrentView(current).join("\n")
-    : getSameStageLabels(current).join("\n");
-    
-if (shouldRevealBorder(current)) {
-  revealAfterAnswer = true;
-  redrawCurrentEnemies();
-}
-
-let resultText = `不正解！ 正解↓\n${answerText}`;
-
-if (isHiddenMode() && !shouldRevealBorder(current)) {
-  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
-}
-
-result.textContent = resultText;
-result.style.color = "red";
-    
-  if (gameMode === "complete") {
-    usedAnswersByGroup = {};
+  if (sortMode === "order") {
+    return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
   }
 
-  wasWrong = true;
-
-  if (gameMode === "complete") {
-    stopTimer();
-  }
-
-  showNextButton();
-}
-}
-  
-function updateScore() {
-  const mode = document.getElementById("mode").value;
-
-  let bestText = `${bestScore}（ヒント: ${bestHint}）`;
-
-  if (isStageClearMode()) {
-    const bestTimeKey = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
-    const bestTime = localStorage.getItem(bestTimeKey);
-
-    if (bestTime !== null) {
-      bestText += ` タイム: ${formatTime(Number(bestTime))}`;
-    }
-
-    document.getElementById("remaining").textContent =
-      `残り: ${remaining.length} / ${totalCount}`;
-  } else {
-    document.getElementById("remaining").textContent = "";
-  }
-
-  document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
-}
-  
-  function saveScore() {
-  const mode = document.getElementById("mode").value;
-  const key = "quizScore_" + mode;
-  localStorage.setItem(key, JSON.stringify({
-    correct,
-    total
-  }));
-}
-
-function saveBest() {
-  const mode = document.getElementById("mode").value;
-  const key = "quizBest_" + mode + "_" + gameMode + getHideScoreSuffix();
-
-  localStorage.setItem(key, JSON.stringify({
-    score: bestScore,
-    hint: bestHint
-  }));
-}
-
-function loadBest() {
-  const mode = document.getElementById("mode").value;
-
-  const key = "quizBest_" + mode + "_" + gameMode + getHideScoreSuffix();
-  let data = localStorage.getItem(key);
-
-  // 旧スコア引き継ぎ
-  if (!data) {
-    if (hideMode === "normal") {
-      const oldKey = "quizBest_" + mode + "_" + gameMode;
-      data = localStorage.getItem(oldKey);
-    } else if (hideMode === "hidden_easy") {
-      const oldHiddenKey = "quizBest_" + mode + "_" + gameMode + "_hidden";
-      data = localStorage.getItem(oldHiddenKey);
-    }
-  }
-
-  if (data) {
-    try {
-      const obj = JSON.parse(data);
-
-      if (typeof obj === "object") {
-        bestScore = obj.score ?? 0;
-        bestHint = bestScore === 0 ? 0 : (obj.hint ?? 0);
-      } else {
-        bestScore = Number(obj) || 0;
-        bestHint = 0;
-      }
-    } catch {
-      bestScore = 0;
-      bestHint = 0;
-    }
-  } else {
-    bestScore = 0;
-    bestHint = 0;
-  }
-}
-  
-  function changeMode() {
-  if (isStageClearMode()) {
-    usedAnswersByGroup = {};
-  }
-
-  hideMode = document.getElementById("hideMode").value;
-  correct = 0;
-  hintTotal = 0;
-  hintCount = 0;
-
-  resetTimer();
-  loadBest();
-
-  const mode = document.getElementById("mode").value;
-  buildStageList(mode);
-
-  pool = [];
-  remaining = [];
-
-  if (isStageClearMode()) {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-  } else {
-    totalCount = 0;
-    document.getElementById("remaining").textContent = "";
-  }
-
-    const timerEl = document.getElementById("timer");
-if (gameMode === "endless") {
-  timerEl.style.display = "none";
-} else {
-  timerEl.style.display = "block";
-}
-    
-  updateScore();
-  nextQuiz();
-}
-  
-  function buildStageList(mode) {
-  stageList = [];
-
-  stagesData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
-    ch.stages.forEach(st => {
-      if (Array.isArray(st.stageName)) {
-        stageList.push(...st.stageName);
-      } else {
-        stageList.push(st.stageName);
-      }
-    });
-  });
-}
-
-  function normalizeSearch(str) {
-  return str
-    .toLowerCase()
-    .replace(/[ぁ-ん]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) + 0x60)) // ひら→カタ
-    .replace(/[ァ-ヶ]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) - 0x60)) // カタ→ひら（統一）
-    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角→半角
-    .replace(/[ 　]/g, "")
-    .trim();
-}
-  
-  function showHint() {
-  const mode = document.getElementById("mode").value;
-  const result = document.getElementById("result");
-  const hintBtn = document.querySelector(".hintBtn");
-
-  if (mode === "ALL") {
-    if (hintCount >= 2) return;
-
-    let hint = "";
-
-    if (hintCount === 0) {
-      if (
-        current.chapterId.startsWith("N") &&
-        !current.chapterId.startsWith("NA") &&
-        !current.chapterId.startsWith("ND")
-      ) {
-        hint = "ヒント：レジェンド";
-      } else if (current.chapterId.startsWith("NA")) {
-        hint = "ヒント：真レジェンド";
-      } else if (current.chapterId.startsWith("ND")) {
-        hint = "ヒント：レジェンド0";
-      }
-    } else if (hintCount === 1) {
-      hint = `ヒント：${current.chapterName}`;
-    }
-
-    result.textContent = hint;
-    result.style.color = "blue";
-
-    hintTotal++;
-    hintCount++;
-
-    if (hintCount >= 2) {
-      hintBtn.disabled = true;
-    }
-
-    updateScore();
-    return;
-  }
-
-  // 全て以外は今まで通り1回だけ
-  if (hintCount >= 1) return;
-
-  const hint = `ヒント：${current.chapterName}`;
-  result.textContent = hint;
-  result.style.color = "blue";
-
-  hintTotal++;
-  hintCount++;
-  hintBtn.disabled = true;
-
-  updateScore();
-}
-  
-  function startTimer() {
-  startTime = Date.now() - timer * 1000; // ←超重要
-
-  if (timerId) clearInterval(timerId);
-
-  timerId = setInterval(() => {
-    const sec = Math.floor((Date.now() - startTime) / 1000);
-    timer = sec;
-
-    const m = String(Math.floor(sec / 60)).padStart(2, "0");
-    const s = String(sec % 60).padStart(2, "0");
-
-    document.getElementById("timer").textContent = `${m}:${s}`;
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerId);
-  timerId = null; // ←これ必須
-}
-
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-  function buildPool(mode) {
-  const list = [];
-
-  stagesData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
-    ch.stages.forEach(st => {
-      list.push({
-        stageName: st.stageName,
-        chapterName: ch.chapterName,
-        chapterId: ch.chapterId,
-        stageId: st.stageId,
-        enemies: st.enemies
-      });
-    });
-  });
-
-  return list;
-}
-
- function changePlayMode() {
-  usedAnswersByGroup = {};
-  revealAfterAnswer = false;
-
-  hideMode = document.getElementById("hideMode").value;
-  gameMode = document.getElementById("playMode").value;
-
-  correct = 0;
-  hintTotal = 0;
-  hintCount = 0;
-  wasWrong = false;
-  answered = false;
-
-  stopTimer();
-  timer = 0;
-  document.getElementById("timer").textContent = "00:00";
-
-  const mode = document.getElementById("mode").value;
-
-  pool = [];
-  remaining = [];
-  totalCount = 0;
-
-  if (isStageClearMode()) {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-  }
-
-  const timerEl = document.getElementById("timer");
-  const remainingEl = document.getElementById("remaining");
-
-  if (gameMode === "endless") {
-    timerEl.style.display = "none";
-    remainingEl.textContent = "";
-  } else {
-    timerEl.style.display = "block";
-    remainingEl.style.display = "block";
-    startTimer();
-  }
-
-  loadBest();
-  updateScore();
-  nextQuiz();
-}
-  
-  function saveCompleteRecord() {
-  const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
-
-  const data = localStorage.getItem(key);
-
-  if (!data || timer < Number(data)) {
-    localStorage.setItem(key, timer);
-  }
-}
-  
-  function resetTimer() {
-  stopTimer();
-  timer = 0;
-  document.getElementById("timer").textContent = "00:00";
-}
-
-  function lockButtons() {
-  document.getElementById("checkBtn").disabled = true;
-  document.getElementById("nextBtn").disabled = true;
-}
-
-function unlockButtons() {
-  document.getElementById("checkBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
-}
-
-function showCheckButton() {
-  document.getElementById("checkBtn").style.display = "inline-block";
-  document.getElementById("nextBtn").style.display = "none";
-  document.getElementById("giveUpBtn").style.display =
-    gameMode === "practice" ? "inline-block" : "none";
-
-  document.getElementById("checkBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
-  document.getElementById("giveUpBtn").disabled = false;
-}
-  
-function showNextButton() {
-  document.getElementById("checkBtn").style.display = "none";
-  document.getElementById("nextBtn").style.display = "inline-block";
-  document.getElementById("giveUpBtn").style.display = "none";
-
-  document.getElementById("checkBtn").disabled = true;
-  document.getElementById("nextBtn").disabled = false;
-  document.getElementById("giveUpBtn").disabled = true;
-}
-  
-  function initCompleteCount(mode) {
-  const list = buildPool(mode);
-
-  totalCount = list.length;
-  remainCount = totalCount;
-}
-
-  function resetRound() {
-  correct = 0;
-  hintTotal = 0;
-
-  // 🔥 追加（これが本体）
-  if (gameMode === "complete") {
-    remainCount = totalCount;
-  }
-}
-
-  function handleWrong() {
-  wasWrong = true;
-
-  if (gameMode === "complete") {
-    stopTimer();
-  }
-
-  updateScore();
-}
-
- function resetCompleteProgress() {
-  if (gameMode === "complete") {
-    const mode = document.getElementById("mode").value;
-
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-
-    resetTimer();
-    usedAnswersByGroup = {};
-  }
-
-  correct = 0;
-  hintTotal = 0;
-  wasWrong = false;
-  answered = false;
-
-  resetRound();
-
-  updateScore(); // 🔥これ必須
-}
-
- function resetEndlessScore() {
-  correct = 0;
-  hintTotal = 0;
-  wasWrong = false;
-  answered = false;
-  updateScore();
-}
-
-  function getEnemyKey(enemies) {
-  return enemies
-    .filter(e => e !== "カンバン娘")
-    .map(e => e.trim())
-    .sort()
-    .join("|");
-}
-
-  function getSameStages(current) {
-  const key = getEnemyKey(current.enemies);
-  const list = [];
-
-  stagesData.forEach(ch => {
-    ch.stages.forEach(st => {
-      if (getEnemyKey(st.enemies) === key) {
-        if (Array.isArray(st.stageName)) {
-          list.push(...st.stageName);
-        } else {
-          list.push(st.stageName);
-        }
-      }
-    });
-  });
-
-  return [...new Set(list)];
-}
-  
-  function getAvailableStages(current) {
-  const all =
-  isHiddenMode()
-    ? getPossibleStagesFromCurrentView(current)
-    : getSameStages(current);
-    
-  if (gameMode !== "complete" && gameMode !== "practice") {
-    return all;
-  }
-
-  const groupKey = getGroupKeyFromCurrent(current);
-  const used = usedAnswersByGroup[groupKey] || [];
-
-  return all.filter(name => !used.includes(name));
-}
-
-function getSameStageLabels(current) {
-  const key = getEnemyKey(current.enemies);
-  const list = [];
-
-  stagesData.forEach(ch => {
-    ch.stages.forEach(st => {
-      if (getEnemyKey(st.enemies) === key) {
-        if (Array.isArray(st.stageName)) {
-          st.stageName.forEach(name => {
-            list.push(`${ch.chapterName} - ${name}`);
-          });
-        } else {
-          list.push(`${ch.chapterName} - ${st.stageName}`);
-        }
-      }
-    });
-  });
-
-  return [...new Set(list)];
-}
-
-  function getGroupKeyFromCurrent(current) {
-  return getAnswerGroupKey(current);
-}
-  
-  function markAnswerUsed(current, answerName) {
-  // 🔥 エンドレスでは記録しない
-  if (gameMode !== "complete" && gameMode !== "practice") return;
-
-  const groupKey = getGroupKeyFromCurrent(current);
-
-  if (!usedAnswersByGroup[groupKey]) {
-    usedAnswersByGroup[groupKey] = [];
-  }
-
-  if (!usedAnswersByGroup[groupKey].includes(answerName)) {
-    usedAnswersByGroup[groupKey].push(answerName);
-  }
-}
-
-  function goNextAfterWrong() {
-  revealAfterAnswer = false;
-
-  if (gameMode === "endless") {
-    resetEndlessScore();
-  }
-
-  if (gameMode === "complete") {
-    usedAnswersByGroup = {};
-    resetCompleteProgress();
-  }
-
-  if (gameMode === "practice") {
-    usedAnswersByGroup = {};
-    correct = 0;
-    hintTotal = 0;
-    hintCount = 0;
-    wasWrong = false;
-    answered = false;
-
-    resetTimer();
-
-    const mode = document.getElementById("mode").value;
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-
-    updateScore();
-  }
-
-  wasWrong = false;
-  showCheckButton();
-  nextQuiz();
-}
-
-  function isNewCompleteRecord() {
-  const mode = document.getElementById("mode").value;
-  const key = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
-
-  const data = localStorage.getItem(key);
-  return !data || timer < Number(data);
-}
-
-  function changeHideMode() {
-  hideMode = document.getElementById("hideMode").value;
-
-  correct = 0;
-  hintTotal = 0;
-  hintCount = 0;
-  usedAnswersByGroup = {};
-  revealAfterAnswer = false;
-
-  resetTimer();
-
-  const mode = document.getElementById("mode").value;
-  buildStageList(mode);
-
-  pool = [];
-  remaining = [];
-
-  if (isStageClearMode()) {
-    pool = buildPool(mode);
-    remaining = [...pool];
-    totalCount = remaining.length;
-  } else {
-    totalCount = 0;
-    document.getElementById("remaining").textContent = "";
-  }
-
-  loadBest();
-  updateScore();
-  nextQuiz();
-}
-  
-  function getAttributeColors(enemyName) {
-  const attrMap = {
-    "赤": "#e53935",
-    "浮き": "#9ccc65",
-    "黒": "#222222",
-    "メタル": "#C8C8C8",
-    "天使": "#fff200",
-    "エイリアン": "#80FFEE",
-    "ゾンビ": "#C66CFF",
-    "悪魔": "#4b7ea7",
-    "古代種": "#566E3A",
-    "無属性": "#ffffff"
-  };
-
-  const ignoreAttrs = ["超獣", "超生命体", "超賢者", "怪人"];
-
-  const enemyData = enemiesMaster[normalizeName(enemyName)];
-
-  if (!enemyData || !enemyData.type) {
-    return ["#ffffff"];
-  }
-
-  const types = String(enemyData.type)
-    .split(",")
-    .map(s => s.trim())
-    .filter(s => s && !ignoreAttrs.includes(s));
-
-  const colors = types
-    .map(type => attrMap[type])
-    .filter(Boolean);
-
-  return colors.length ? colors : ["#ffffff"];
-}
-  
-  function shouldHideEnemy(totalCount, index, hiddenIndexes) {
-  return hiddenIndexes.includes(index);
-}
-
-function getHiddenIndexes(enemies) {
-  const validIndexes = enemies
-    .map((enemy, i) => enemy === "カンバン娘" ? -1 : i)
-    .filter(i => i !== -1);
-
-  const total = validIndexes.length;
-
-  // 1～3体の時も最低1体は残す
-  if (total <= 1) return [];
-
-  let minRatio, maxRatio;
-
-  if (hideMode === "hidden_hard") {
-    minRatio = 0.5;
-    maxRatio = 0.7;
-  } else {
-    // hidden_easy
-    minRatio = 0.3;
-    maxRatio = 0.5;
-  }
-
-  let hideCount = Math.round(total * (minRatio + Math.random() * (maxRatio - minRatio)));
-
-  // 最低1体は残す
-  hideCount = Math.min(hideCount, total - 1);
-
-  // 少なくとも1体は隠す
-  hideCount = Math.max(1, hideCount);
-
-  const shuffled = [...validIndexes];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-
-  return shuffled.slice(0, hideCount);
-}
-
-  function createEnemyCover(colors) {
-  const cover = document.createElement("div");
-
-  let className = "one";
-  let useColors = [...colors];
-
-  if (useColors.length === 1) {
-    className = "one";
-  } else if (useColors.length === 2) {
-    className = "two";
-  } else if (useColors.length === 3) {
-    className = "three";
-  } else {
-    className = "six";
-
-    while (useColors.length < 6) {
-      useColors.push(useColors[useColors.length % colors.length]);
-    }
-    useColors = useColors.slice(0, 6);
-  }
-
-  cover.className = `enemyCover ${className}`;
-
-  useColors.forEach(color => {
-    const part = document.createElement("div");
-    part.className = "enemyCoverPart";
-    part.style.background = color;
-    cover.appendChild(part);
-  });
-
-  return cover;
-}
-
-  function createEnemyBorder(colors) {
-  const border = document.createElement("div");
-  border.className = "enemyBorder";
-
-  let className = "one";
-  let useColors = [...colors];
-
-  if (useColors.length === 1) {
-    className = "one";
-  } else if (useColors.length === 2) {
-    className = "two";
-  } else if (useColors.length === 3) {
-    className = "three";
-  } else {
-    className = "six";
-
-    while (useColors.length < 6) {
-      useColors.push(useColors[useColors.length % colors.length]);
-    }
-    useColors = useColors.slice(0, 6);
-  }
-
-  border.classList.add(className);
-
-  useColors.forEach(color => {
-    const part = document.createElement("div");
-    part.className = "enemyBorderPart";
-    part.style.borderColor = color;
-    border.appendChild(part);
-  });
-
-  return border;
-}
-
-  function getVisibleQuestionKeyByMask(questionEnemies, hiddenIndexes) {
-  const parts = [];
-
-  questionEnemies.forEach((enemy, index) => {
-    if (enemy === "カンバン娘") return;
-
-    if (hiddenIndexes.includes(index)) {
-      const colors = getAttributeColors(enemy).slice().sort();
-      parts.push(index + ":H:" + colors.join("|"));
-    } else {
-      parts.push(index + ":N:" + normalizeName(enemy));
-    }
-  });
-
-  return parts.join(" / ");
-}
-
-  function getPossibleStagesFromCurrentView(current) {
-  const list = [];
-
-  const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
-  const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
-
-  stagesData.forEach(ch => {
-    ch.stages.forEach(st => {
-      const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
-
-      if (stageVisibleEnemies.length !== currentVisibleEnemies.length) return;
-
-      const key = getVisibleQuestionKeyByMask(stageVisibleEnemies, currentHiddenIndexes);
-
-      if (key === currentKey) {
-        if (Array.isArray(st.stageName)) {
-          list.push(...st.stageName);
-        } else {
-          list.push(st.stageName);
-        }
-      }
-    });
-  });
-
-  return [...new Set(list)];
-}
-
-function getPossibleStageLabelsFromCurrentView(current) {
-  const list = [];
-
-  const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
-  const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
-
-  stagesData.forEach(ch => {
-    ch.stages.forEach(st => {
-      const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
-
-      if (stageVisibleEnemies.length !== currentVisibleEnemies.length) return;
-
-      const key = getVisibleQuestionKeyByMask(stageVisibleEnemies, currentHiddenIndexes);
-
-      if (key === currentKey) {
-        if (Array.isArray(st.stageName)) {
-          st.stageName.forEach(name => {
-            list.push(`${ch.chapterName} - ${name}`);
-          });
-        } else {
-          list.push(`${ch.chapterName} - ${st.stageName}`);
-        }
-      }
-    });
-  });
-
-  return [...new Set(list)];
-}
-
-  function getAnswerGroupKey(current) {
-  const names =
-  isHiddenMode()
-    ? getPossibleStagesFromCurrentView(current)
-    : getSameStages(current);
-
-  return names
-    .map(name => normalize(name))
-    .sort()
-    .join("|");
-}
-
-  function showAllInfo() {
-  document.getElementById("infoModal").style.display = "block";
-}
-
-function closeInfo() {
-  document.getElementById("infoModal").style.display = "none";
-}
-
-// 外クリックで閉じる
-window.addEventListener("click", e => {
-  const modal = document.getElementById("infoModal");
-  if (e.target === modal) {
-    modal.style.display = "none";
-  }
 });
 
-  function isStageClearMode() {
-  return gameMode === "complete" || gameMode === "practice";
+  const tbody = document.getElementById("table");
+  tbody.innerHTML = "";
+
+  list.forEach(e => {
+
+  const baseName = e.name
+  .replace(/\r?\n/g, "")
+  .trim();
+
+// ▼画像用
+const fileName = baseName
+  .replace(/[：:]/g, " ")   // ← ★ここ重要（全角＋半角対応）
+  .replace(/[ 　]+/g, "");  // スペース削除
+const img = document.createElement("img");
+img.src = "image/" + encodeURIComponent(fileName) + ".png";
+
+img.onerror = () => img.src = "image/noimage.png";
+
+  // ★ここ重要（確実に動くクリック）
+  img.addEventListener("click", () => {
+    const mode = document.getElementById("mode").value;
+
+    const url = new URL("detail.html", location.href);
+    url.searchParams.set("name", e.name);
+    url.searchParams.set("mode", mode);
+
+    window.location.href = url.toString();
+  });
+
+  const tr = document.createElement("tr");
+
+  const tdImg = document.createElement("td");
+  tdImg.appendChild(img);
+
+  const tdName = document.createElement("td");
+  tdName.textContent = e.name;
+
+  const tdCount = document.createElement("td");
+  tdCount.textContent = e.count;
+
+  const tdFirst = document.createElement("td");
+  tdFirst.textContent = e.first;
+
+  tr.appendChild(tdImg);
+  tr.appendChild(tdName);
+  tr.appendChild(tdCount);
+  tr.appendChild(tdFirst);
+
+  tbody.appendChild(tr);
+});
 }
 
-  function isHiddenMode() {
-  return hideMode === "hidden_easy" || hideMode === "hidden_hard";
+function toggleSort() {
+  desc = !desc;
+  load();
 }
 
-  function getHideScoreSuffix() {
-  if (hideMode === "hidden_hard") return "_hidden_hard";
-  if (hideMode === "hidden_easy") return "_hidden";
-  return "";
-}
-
-function clearAnswerInput() {
-  document.getElementById("answer").value = "";
-  document.getElementById("suggest").innerHTML = "";
-  document.getElementById("answer").focus();
-}
-
-function giveUpPractice() {
-  document.getElementById("suggest").innerHTML = "";
-  if (gameMode !== "practice") return;
-
-  // 🔥 正解表示を作る
-  const answerText =
-    isHiddenMode()
-  ? getPossibleStageLabelsFromCurrentView(current).join("\n")
-  : getSameStageLabels(current).join("\n");
-  
-  let resultText =
-  `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
-
-if (isHiddenMode() && !shouldRevealBorder(current)) {
-  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
-}
-
-document.getElementById("result").textContent = resultText;
-  document.getElementById("result").style.color = "red";
-
-  // ▼ リセット処理
-  usedAnswersByGroup = {};
-  correct = 0;
-  hintTotal = 0;
-  hintCount = 0;
-  wasWrong = false;
-  answered = false;
-
-  resetTimer();
-
+function goDetail(name) {
   const mode = document.getElementById("mode").value;
-  pool = buildPool(mode);
-  remaining = [...pool];
-  totalCount = remaining.length;
 
-  updateScore();
-  showNextButton();
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("name", name);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
 }
 
-  function confirmGiveUpPractice() {
-  if (gameMode !== "practice") return;
+  function changeSort() {
+  sortMode = document.getElementById("sort").value;
 
-  if (shouldRevealBorder(current)) {
-  revealAfterAnswer = true;
-  redrawCurrentEnemies();
+  // ▼ 回数以外は昇降非表示
+  const btn = document.getElementById("orderBtn");
+btn.style.display = (sortMode === "count") ? "inline-block" : "none";
+    
+  load();
 }
 
-  const ok = confirm("ギブアップしますか？");
-  if (!ok) return;
-
-  giveUpPractice();
+function changeOrder() {
+  const val = document.getElementById("order").value;
+  desc = (val === "desc");
+  load();
 }
 
-  function shouldRevealBorder(current) {
-  if (!isHiddenMode()) return false;
-
-  const sameStages = getSameStages(current);
-  const possibleStages = getPossibleStagesFromCurrentView(current);
-
-  return possibleStages.length === sameStages.length;
+  function setAsc() {
+  desc = false;
+  load();
 }
-  
+
+function setDesc() {
+  desc = true;
+  load();
+}
+
+  function goAllStages() {
+  const mode = document.getElementById("mode").value;
+
+  const url = new URL("allStages.html", location.href);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
+}
+
+  function toggleOrder() {
+  desc = !desc;
+
+  const btn = document.getElementById("orderBtn");
+  btn.textContent = desc ? "降順" : "昇順";
+
+  load();
+}
+
 init();
 </script>
-<div id="infoModal" class="modal">
-  <div class="modalContent">
-    <span class="closeBtn" onclick="closeInfo()">×</span>
 
-    <h3>ルール説明</h3>
-
-    <div class="modalText">
-
-<b>【モード】</b><br><br>
-
-■ 全て<br>
-レジェンド範囲内の全てのステージが出ます<br>
-イディ、ノーヴァ含む<br><br>
-
-■ レジェンド<br>
-レジェンドストーリーのステージのみ出ます<br>
-イディ含む<br><br>
-
-■ 真レジェンド<br>
-真レジェンドストーリーのステージのみ出ます<br>
-イディ、ノーヴァ含む<br><br>
-
-■ レジェンド0<br>
-レジェンドストーリー0のステージのみ出ます<br><br>
-
-
-<b>【プレイモード】</b><br><br>
-
-■ エンドレス<br>
-問題の重複ありで何連続で答えられるかを試すゲーム<br>
-同じ構成のステージが考えられる場合、どれを答えても正解になります<br><br>
-
-■ コンプリート<br>
-問題の重複なしで範囲内のステージ全てを答えるタイムアタック<br>
-同じ構成のステージが考えられる場合は、1回目はどれを答えても正解になるが<br>
-2回目以降は既に使ったステージは使えなくなります<br><br>
-
-■ 練習用<br>
-問題の重複なしで範囲内のステージ全てを答える練習モード<br>
-間違えても失敗にならず、答えも表示されません<br>
-その他基本的なルールはコンプリートと同じ<br><br>
-
-
-<b>【敵表示】</b><br><br>
-
-■ 隠しなし<br>
-全ての敵が見えます<br><br>
-
-■ 隠しあり(易)<br>
-一部の敵が属性カラーで隠されます<br>
-隠されるのは全体の敵数の30%～50%程度<br><br>
-
-■ 隠しあり(難)<br>
-一部の敵が属性カラーで隠されます<br>
-隠されるのは全体の敵数の50%～70%程度<br><br>
-
-なお、どのステージも最低1体は残ります<br><br>
-
-<b>【ヒント】</b><br><br>
-
-【モード】が全ての時は1つの問題につき2回まで使用可能<br>
-1回目はレジェンド、真レジェンド、レジェンド0が表示されます<br>
-2回目は章名が表示されます<br><br>
-
-【モード】が全て以外の時は1つの問題につき1回まで使用可能<br>
-章名が表示されます<br><br>
-
-なお、ヒントを使用するとヒントカウントが1つ進みます<br>
-
-    </div>
-  </div>
-</div>
 </body>
 </html>
