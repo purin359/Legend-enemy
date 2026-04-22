@@ -855,7 +855,6 @@ const alreadyUsedName =
   updateScore();
 
   if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
-  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
@@ -883,7 +882,6 @@ const alreadyUsedName =
       : getSameStageLabels(current).join("\n");
 
   if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
-  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
@@ -1696,7 +1694,6 @@ function giveUpPractice() {
   if (gameMode !== "practice") return;
 
   if (hideMode === "hidden" && hasMultiplePossibleAnswers(current)) {
-  result.textContent += "\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
