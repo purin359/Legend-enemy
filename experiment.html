@@ -939,22 +939,6 @@ function updateScore() {
     `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
 }
   
-    const bestTime = localStorage.getItem(bestTimeKey);
-
-    if (bestTime !== null) {
-      bestText += ` タイム: ${formatTime(Number(bestTime))}`;
-    }
-
-    document.getElementById("remaining").textContent =
-      `残り: ${remaining.length} / ${totalCount}`;
-  } else {
-    document.getElementById("remaining").textContent = "";
-  }
-
-  document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
-}
-  
   function saveScore() {
   const mode = document.getElementById("mode").value;
   const key = "quizScore_" + mode;
