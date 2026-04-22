@@ -834,8 +834,14 @@ const alreadyUsedName =
   }
 }
     
-  result.textContent = "正解！ 🎉";
-  result.style.color = "green";
+  let resultText = "正解！ 🎉";
+
+if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
+result.textContent = resultText;
+result.style.color = "green";
 
   correct++;
 
@@ -854,11 +860,11 @@ const alreadyUsedName =
   lockButtons();
   updateScore();
 
-  if (hideMode === "hidden") {
+  if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
-
+    
   setTimeout(nextQuiz, 800);
 
 } else {
@@ -877,18 +883,24 @@ const alreadyUsedName =
   }
 
   const answerText =
-    hideMode === "hidden"
-      ? getPossibleStageLabelsFromCurrentView(current).join("\n")
-      : getSameStageLabels(current).join("\n");
+  hideMode === "hidden"
+    ? getPossibleStageLabelsFromCurrentView(current).join("\n")
+    : getSameStageLabels(current).join("\n");
 
-  if (hideMode === "hidden") {
+if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
 
-  result.textContent = `不正解！ 正解↓\n${answerText}`;
-  result.style.color = "red";
+let resultText = `不正解！ 正解↓\n${answerText}`;
 
+if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
+result.textContent = resultText;
+result.style.color = "red";
+    
   if (gameMode === "complete") {
     usedAnswersByGroup = {};
   }
@@ -1667,8 +1679,14 @@ function giveUpPractice() {
       ? getPossibleStageLabelsFromCurrentView(current).join("\n")
       : getSameStageLabels(current).join("\n");
 
-  document.getElementById("result").textContent =
-    `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
+  let resultText =
+  `ギブアップ！ 正解↓\n${answerText}\n\nもう一度挑戦する場合は「次の問題」を押してください`;
+
+if (hideMode === "hidden" && !shouldRevealBorder(current)) {
+  resultText += "\n\n※ 複数の正解候補があるため、隠し敵はそのまま表示しています";
+}
+
+document.getElementById("result").textContent = resultText;
   document.getElementById("result").style.color = "red";
 
   // ▼ リセット処理
@@ -1693,7 +1711,7 @@ function giveUpPractice() {
   function confirmGiveUpPractice() {
   if (gameMode !== "practice") return;
 
-  if (hideMode === "hidden") {
+  if (shouldRevealBorder(current)) {
   revealAfterAnswer = true;
   redrawCurrentEnemies();
 }
@@ -1702,6 +1720,15 @@ function giveUpPractice() {
   if (!ok) return;
 
   giveUpPractice();
+}
+
+  function shouldRevealBorder(current) {
+  if (hideMode !== "hidden") return false;
+
+  const sameStages = getSameStages(current);
+  const possibleStages = getPossibleStagesFromCurrentView(current);
+
+  return possibleStages.length === sameStages.length;
 }
   
 init();
