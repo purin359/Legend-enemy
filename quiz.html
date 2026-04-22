@@ -536,6 +536,7 @@ let revealAfterAnswer = false;
 let enableEnterSubmit = true;
 let suggestIndex = -1;
 let currentSuggestList = [];
+let enableEnterSubmit = localStorage.getItem("enterSubmit") !== "false";
 
 
 // 画像用
@@ -1900,11 +1901,16 @@ document.getElementById("result").textContent = resultText;
 }
 
   function toggleSettings() {
-  document.getElementById("settingsMenu").classList.toggle("open");
+  const menu = document.getElementById("settingsMenu");
+  const checkbox = document.getElementById("enterToggle");
+
+  checkbox.checked = enableEnterSubmit;
+  menu.classList.toggle("open");
 }
 
   function toggleEnterSubmit() {
   enableEnterSubmit = document.getElementById("enterToggle").checked;
+  localStorage.setItem("enterSubmit", enableEnterSubmit);
 }
 
   window.addEventListener("click", e => {
