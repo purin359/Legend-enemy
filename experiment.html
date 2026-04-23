@@ -426,6 +426,49 @@ img {
   .suggestItem.active {
   background: #cfe8ff;
 }
+
+  /* ダークモード */
+body.dark {
+  background: #121212;
+  color: #eee;
+}
+
+body.dark input,
+body.dark select,
+body.dark button {
+  background: #222;
+  color: #eee;
+  border: 1px solid #555;
+}
+
+body.dark table,
+body.dark th,
+body.dark td {
+  border-color: #555;
+}
+
+body.dark th {
+  background: #333;
+}
+
+body.dark .enemyBox {
+  background: #1e2a38;
+}
+
+body.dark #suggest {
+  background: #222;
+  color: #eee;
+  border-color: #555;
+}
+
+body.dark .suggestItem:hover {
+  background: #2a3a50;
+}
+
+body.dark .settingsMenu {
+  background: #222;
+  border-color: #555;
+}
   
 </style>
 </head>
@@ -442,12 +485,15 @@ img {
     <button onclick="toggleSettings()" id="settingsBtn" class="settingsBtn">設定</button>
 
     <div id="settingsMenu" class="settingsMenu">
-      <label>
-        <input type="checkbox" id="enterToggle" onchange="toggleEnterSubmit()">
-        Enterで回答
-      </label>
-    </div>
-  </div>
+  <label>
+    <input type="checkbox" id="enterToggle" onchange="toggleEnterSubmit()">
+    Enterで回答
+  </label>
+  <br>
+  <label>
+    <input type="checkbox" id="darkToggle" onchange="toggleDarkMode()">
+    ダークモード
+  </label>
 </div>
 
   <div class="topBar1">
@@ -685,6 +731,13 @@ nextQuiz();
 showCheckButton();
 hideMode = document.getElementById("hideMode").value;
 document.getElementById("enterToggle").checked = enableEnterSubmit;
+
+  const isDark = localStorage.getItem("darkMode") === "true";
+document.getElementById("darkToggle").checked = isDark;
+
+if (isDark) {
+  document.body.classList.add("dark");
+}
 }
   
 function isTargetChapter(ch, mode) {
@@ -1964,6 +2017,18 @@ function applySelectedSuggest() {
 
   function getCurrentMode() {
   return document.getElementById("mode").value;
+}
+
+  function toggleDarkMode() {
+  const isDark = document.getElementById("darkToggle").checked;
+
+  if (isDark) {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+
+  localStorage.setItem("darkMode", isDark);
 }
   
 init();
