@@ -1776,11 +1776,14 @@ function getHiddenIndexes(enemies) {
 
 function getPossibleStageLabelsFromCurrentView(current) {
   const list = [];
+  const mode = getCurrentMode();
 
   const currentVisibleEnemies = current.enemies.filter(e => e !== "カンバン娘");
   const currentKey = getVisibleQuestionKeyByMask(currentVisibleEnemies, currentHiddenIndexes);
 
   stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
     ch.stages.forEach(st => {
       const stageVisibleEnemies = st.enemies.filter(e => e !== "カンバン娘");
 
