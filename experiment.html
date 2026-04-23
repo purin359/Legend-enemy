@@ -427,47 +427,67 @@ img {
   background: #cfe8ff;
 }
 
-  /* ダークモード */
+  /* ===== ダークモード（レイアウト維持）===== */
+
 body.dark {
   background: #121212;
   color: #eee;
 }
 
-body.dark input,
+/* 上のバー・全体 */
+body.dark h2,
+body.dark div {
+  color: #eee;
+}
+
+/* セレクト・入力 */
 body.dark select,
-body.dark button {
-  background: #222;
+body.dark input {
+  background: #1e1e1e;
   color: #eee;
   border: 1px solid #555;
 }
 
-body.dark table,
-body.dark th,
-body.dark td {
-  border-color: #555;
+/* ボタン */
+body.dark button {
+  background: #444;
+  color: #fff;
 }
 
-body.dark th {
-  background: #333;
+body.dark button:hover {
+  background: #666;
 }
 
+/* ヒントボタン（緑はそのまま活かす） */
+body.dark button[style*="green"],
+body.dark .hintBtn {
+  background: #4CAF50;
+}
+
+/* 敵表示エリア（←ここが一番大事） */
 body.dark .enemyBox {
-  background: #1e2a38;
+  background: #2a3440; /* 今の水色を暗く */
 }
 
+/* 入力欄エリア */
+body.dark .inputArea {
+  background: #1e1e1e;
+}
+
+/* サジェスト */
 body.dark #suggest {
-  background: #222;
-  color: #eee;
-  border-color: #555;
+  background: #1e1e1e;
+  border: 1px solid #555;
 }
 
 body.dark .suggestItem:hover {
-  background: #2a3a50;
+  background: #333;
 }
 
+/* 設定メニュー */
 body.dark .settingsMenu {
-  background: #222;
-  border-color: #555;
+  background: #1e1e1e;
+  border: 1px solid #555;
 }
   
 </style>
