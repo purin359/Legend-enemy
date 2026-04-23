@@ -427,20 +427,16 @@ img {
   background: #cfe8ff;
 }
 
-  /* ===== ダークモード（レイアウト維持）===== */
-
+  /* ===== ダークモード ===== */
 body.dark {
   background: #121212;
   color: #eee;
 }
 
-/* 上のバー・全体 */
-body.dark h2,
-body.dark div {
+body.dark h2 {
   color: #eee;
 }
 
-/* セレクト・入力 */
 body.dark select,
 body.dark input {
   background: #1e1e1e;
@@ -448,46 +444,44 @@ body.dark input {
   border: 1px solid #555;
 }
 
-/* ボタン */
 body.dark button {
   background: #444;
   color: #fff;
 }
 
-body.dark button:hover {
-  background: #666;
-}
-
-/* ヒントボタン（緑はそのまま活かす） */
-body.dark button[style*="green"],
-body.dark .hintBtn {
-  background: #4CAF50;
-}
-
-/* 敵表示エリア（←ここが一番大事） */
 body.dark .enemyBox {
-  background: #2a3440; /* 今の水色を暗く */
+  background: #2a3440;
 }
 
-/* 入力欄エリア */
-body.dark .inputArea {
-  background: #1e1e1e;
-}
-
-/* サジェスト */
 body.dark #suggest {
   background: #1e1e1e;
-  border: 1px solid #555;
+  color: #eee;
+  border-color: #555;
 }
 
-body.dark .suggestItem:hover {
-  background: #333;
-}
-
-/* 設定メニュー */
 body.dark .settingsMenu {
   background: #1e1e1e;
-  border: 1px solid #555;
+  border-color: #555;
+}
+
+  .titleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.titleText {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.titleRight {
+  position: relative;
+  flex-shrink: 0;
 }
   
 </style>
@@ -496,24 +490,24 @@ body.dark .settingsMenu {
 
 <div class="container">
 
-  <div style="display:flex; align-items:center;">
-  <h2 style="margin:0;">
-    ステージ当てクイズ(レジェンド)　Ver.15.3.0対応
-  </h2>
+  <div class="titleBar">
+  <h2 class="titleText">ステージ当てクイズ(レジェンド)　Ver.15.3.0対応</h2>
 
-  <div style="margin-left:auto; position:relative;">
+  <div class="titleRight">
     <button onclick="toggleSettings()" id="settingsBtn" class="settingsBtn">設定</button>
 
     <div id="settingsMenu" class="settingsMenu">
-  <label>
-    <input type="checkbox" id="enterToggle" onchange="toggleEnterSubmit()">
-    Enterで回答
-  </label>
-  <br>
-  <label>
-    <input type="checkbox" id="darkToggle" onchange="toggleDarkMode()">
-    ダークモード
-  </label>
+      <label>
+        <input type="checkbox" id="enterToggle" onchange="toggleEnterSubmit()">
+        Enterで回答
+      </label>
+      <br>
+      <label>
+        <input type="checkbox" id="darkToggle" onchange="toggleDarkMode()">
+        ダークモード
+      </label>
+    </div>
+  </div>
 </div>
 
   <div class="topBar1">
