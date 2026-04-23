@@ -249,6 +249,10 @@ img {
   margin-left: auto;
 }
 
+  .hintText {
+  color: blue;
+}
+
 .topBar2 {
   position: relative;
   min-height: 48px;   /* 上段+タイマー分の高さを確保 */
@@ -493,7 +497,8 @@ body.dark .settingsMenu {
 }
 
   body.dark .hintText {
-  color: #66b3ff; /* 明るい青 */
+  color: #66b3ff;
+  text-shadow: 0 0 4px rgba(102, 179, 255, 0.5);
 }
   
 </style>
@@ -1275,7 +1280,7 @@ if (gameMode === "endless") {
     }
 
     result.textContent = hint;
-    result.style.color = "blue";
+    result.classList.add("hintText");
 
     hintTotal++;
     hintCount++;
