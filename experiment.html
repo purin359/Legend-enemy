@@ -1082,7 +1082,6 @@ if (isTimeAttackMode()) {
   result.textContent = "残念！";
   result.style.color = "red";
   answered = false;
-  nextQuiz();
   return;
 }
     
@@ -1241,6 +1240,12 @@ if (gameMode === "endless") {
 } else {
   timerEl.style.display = "block";
 }
+
+    if (isTimeAttackMode()) {
+  document.getElementById("timer").style.display = "block";
+  resetTimer();
+  startTimer();
+}
     
   updateScore();
   nextQuiz();
@@ -1335,9 +1340,30 @@ if (gameMode === "endless") {
 }
   
   function startTimer() {
-  startTime = Date.now() - timer * 1000; // ←超重要
-
   if (timerId) clearInterval(timerId);
+
+  if (isTimeAttackMode()) {
+    startTime = Date.now();
+
+    timerId = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remain = Math.max(0, timeAttackLimit - elapsed);
+
+      timer = elapsed;
+
+      const m = String(Math.floor(remain / 60)).padStart(2, "0");
+      const s = String(remain % 60).padStart(2, "0");
+      document.getElementById("timer").textContent = `${m}:${s}`;
+
+      if (remain <= 0) {
+        finishTimeAttack();
+      }
+    }, 1000);
+
+    return;
+  }
+
+  startTime = Date.now() - timer * 1000;
 
   timerId = setInterval(() => {
     const sec = Math.floor((Date.now() - startTime) / 1000);
@@ -1347,16 +1373,20 @@ if (gameMode === "endless") {
     const s = String(sec % 60).padStart(2, "0");
 
     document.getElementById("timer").textContent = `${m}:${s}`;
-    if (isTimeAttackMode() && timer >= timeAttackLimit) {
-  finishTimeAttack();
-  return;
-}
   }, 1000);
 }
-
+  
 function stopTimer() {
   clearInterval(timerId);
   timerId = null; // ←これ必須
+}
+
+  function resetTimer() {
+  stopTimer();
+  timer = 0;
+
+  document.getElementById("timer").textContent =
+    isTimeAttackMode() ? "10:00" : "00:00";
 }
 
 function formatTime(sec) {
@@ -1443,12 +1473,6 @@ function formatTime(sec) {
   }
 }
   
-  function resetTimer() {
-  stopTimer();
-  timer = 0;
-  document.getElementById("timer").textContent = "00:00";
-}
-
   function lockButtons() {
   document.getElementById("checkBtn").disabled = true;
   document.getElementById("nextBtn").disabled = true;
@@ -1463,7 +1487,7 @@ function showCheckButton() {
   document.getElementById("checkBtn").style.display = "inline-block";
   document.getElementById("nextBtn").style.display = "none";
   document.getElementById("giveUpBtn").style.display =
-    gameMode === "practice" ? "inline-block" : "none";
+  (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
 
   document.getElementById("checkBtn").disabled = false;
   document.getElementById("nextBtn").disabled = false;
@@ -1697,6 +1721,13 @@ function getSameStageLabels(current) {
   }
 
   loadBest();
+
+    if (isTimeAttackMode()) {
+  document.getElementById("timer").style.display = "block";
+  resetTimer();
+  startTimer();
+}
+    
   updateScore();
   nextQuiz();
 }
@@ -2011,15 +2042,20 @@ document.getElementById("result").textContent = resultText;
 }
 
   function confirmGiveUpPractice() {
-  if (gameMode !== "practice") return;
-
-  if (shouldRevealBorder(current)) {
-  revealAfterAnswer = true;
-  redrawCurrentEnemies();
-}
+  if (gameMode !== "practice" && !isTimeAttackMode()) return;
 
   const ok = confirm("ギブアップしますか？");
   if (!ok) return;
+
+  if (isTimeAttackMode()) {
+    finishTimeAttack();
+    return;
+  }
+
+  if (shouldRevealBorder(current)) {
+    revealAfterAnswer = true;
+    redrawCurrentEnemies();
+  }
 
   giveUpPractice();
 }
