@@ -2272,6 +2272,7 @@ document.getElementById("result").textContent =
   function toggleStartWaitMode() {
   enableStartWait = document.getElementById("startWaitToggle").checked;
   localStorage.setItem("startWaitMode", enableStartWait);
+  afterModeChanged();
 }
 
   function afterModeChanged() {
