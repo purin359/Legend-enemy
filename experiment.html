@@ -535,6 +535,10 @@ body.dark .settingsMenu {
         <input type="checkbox" id="darkToggle" onchange="toggleDarkMode()">
         ダークモード
       </label>
+      <label>
+        <input type="checkbox" id="startWaitToggle" onchange="toggleStartWaitMode()">
+        モード切替時にスタート表示
+      </label>
     </div>
   </div>
 </div>
@@ -626,6 +630,7 @@ let currentSuggestList = [];
 let enableEnterSubmit = localStorage.getItem("enterSubmit") !== "false";
 let passCount = 0;
 let gameStarted = false;
+let enableStartWait = localStorage.getItem("startWaitMode") === "true";
 const maxPassCount = 3;
 const timeAttackLimit = 600; // 10分
 
@@ -656,6 +661,7 @@ function normalizeName(str) {
 }
   
 async function init() {
+  document.getElementById("startWaitToggle").checked = enableStartWait;
   usedAnswersByGroup = {};
   stagesData = await fetch("stages.json").then(r => r.json());
 
@@ -1259,17 +1265,7 @@ if (gameMode === "endless") {
   resetTimer();
 }
     
-  updateScore();
-  clearQuestion();
-
-if (gameMode === "endless") {
-  gameStarted = true;
-  showCheckButton();
-  nextQuiz();
-} else {
-  gameStarted = false;
-  showStartButton();
-}
+  afterModeChanged();
 }
   
   function buildStageList(mode) {
@@ -1483,17 +1479,7 @@ function formatTime(sec) {
 }
    
   loadBest();
-  updateScore();
-  clearQuestion();
-
-if (gameMode === "endless") {
-  gameStarted = true;
-  showCheckButton();
-  nextQuiz();
-} else {
-  gameStarted = false;
-  showStartButton();
-}
+  afterModeChanged();
 }
   
   function saveCompleteRecord() {
@@ -1782,17 +1768,7 @@ function getSameStageLabels(current) {
   resetTimer();
 }
     
-  updateScore();
-  clearQuestion();
-
-  if (gameMode === "endless") {
-    gameStarted = true;
-    showCheckButton();
-    nextQuiz();
-  } else {
-    gameStarted = false;
-    showStartButton();
-  }
+  afterModeChanged();
 }
   
   function getAttributeColors(enemyName) {
@@ -2292,6 +2268,30 @@ document.getElementById("result").textContent =
   document.getElementById("answer").value = "";
   document.getElementById("suggest").innerHTML = "";
 }
+
+  function toggleStartWaitMode() {
+  enableStartWait = document.getElementById("startWaitToggle").checked;
+  localStorage.setItem("startWaitMode", enableStartWait);
+}
+
+  function afterModeChanged() {
+  updateScore();
+  clearQuestion();
+
+  if (gameMode === "endless") {
+    gameStarted = true;
+    showCheckButton();
+    nextQuiz();
+    return;
+  }
+
+  if (enableStartWait) {
+    gameStarted = false;
+    showStartButton();
+  } else {
+    startGame();
+  }
+}
   
 init();
 </script>
@@ -2339,7 +2339,7 @@ init();
 
 ■ 10分チャレンジ<br>
 10分以内に何問正解できるかを試すゲーム<br>
-問題重複ありで間違えても失敗にならず、答えも表示されません<br>
+問題の重複ありで間違えても失敗にならず、答えも表示されません<br>
 ヒントボタンがパスボタンに変わります<br><br>
 
 
