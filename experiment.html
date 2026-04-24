@@ -1130,7 +1130,9 @@ result.style.color = "red";
 function updateScore() {
   const mode = document.getElementById("mode").value;
 
-  let bestText = `${bestScore}（ヒント: ${bestHint}）`;
+  let bestText = isTimeAttackMode()
+  ? `${bestScore}（パス: ${bestHint}）`
+  : `${bestScore}（ヒント: ${bestHint}）`;
 
   if (isStageClearMode()) {
     const bestTimeKey = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
@@ -1147,7 +1149,9 @@ function updateScore() {
   }
 
   document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
+  isTimeAttackMode()
+    ? `連続: ${correct}（パス: ${passCount}） /最高: ${bestText}`
+    : `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
 }
   
   function saveScore() {
@@ -1685,6 +1689,22 @@ function getSameStageLabels(current) {
 
     updateScore();
   }
+
+    if (isTimeAttackMode()) {
+  correct = 0;
+  hintTotal = 0;
+  hintCount = 0;
+  passCount = 0;
+  wasWrong = false;
+  answered = false;
+  revealAfterAnswer = false;
+
+  resetTimer();
+  startTimer();
+
+  updateScore();
+  updateHintPassButton();
+}
 
   wasWrong = false;
   showCheckButton();
