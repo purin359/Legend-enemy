@@ -1260,6 +1260,7 @@ if (gameMode === "endless") {
 }
     
   updateScore();
+  clearQuestion();
 
 if (gameMode === "endless") {
   gameStarted = true;
@@ -1483,6 +1484,7 @@ function formatTime(sec) {
    
   loadBest();
   updateScore();
+  clearQuestion();
 
 if (gameMode === "endless") {
   gameStarted = true;
@@ -1781,6 +1783,7 @@ function getSameStageLabels(current) {
 }
     
   updateScore();
+  clearQuestion();
 
   if (gameMode === "endless") {
     gameStarted = true;
@@ -2281,6 +2284,13 @@ document.getElementById("result").textContent =
   updateScore();
   showCheckButton();
   nextQuiz();
+}
+
+  function clearQuestion() {
+  document.getElementById("enemies").innerHTML = "";
+  document.getElementById("result").textContent = "";
+  document.getElementById("answer").value = "";
+  document.getElementById("suggest").innerHTML = "";
 }
   
 init();
