@@ -586,7 +586,7 @@ body.dark .settingsMenu {
 
   <div class="btnRow">
     <button id="checkBtn" onclick="check()">回答</button>
-    <button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
+    <button id="startBtn" onclick="startGame()" style="display:none;">スタート</button>
     <button id="giveUpBtn" onclick="confirmGiveUpPractice()" style="display:none;">ギブアップ</button>
   </div>
   <div id="result"></div>
@@ -772,8 +772,7 @@ buildStageList(mode);
 }
   
 updateScore();
-nextQuiz();
-showCheckButton();
+showStartButton();
 hideMode = document.getElementById("hideMode").value;
 document.getElementById("enterToggle").checked = enableEnterSubmit;
 
@@ -1256,7 +1255,7 @@ if (gameMode === "endless") {
 }
     
   updateScore();
-  nextQuiz();
+  showStartButton();
 }
   
   function buildStageList(mode) {
@@ -1471,7 +1470,7 @@ function formatTime(sec) {
 
   loadBest();
   updateScore();
-  nextQuiz();
+  showStartButton();
 }
   
   function saveCompleteRecord() {
@@ -1497,9 +1496,9 @@ function unlockButtons() {
 
 function showCheckButton() {
   document.getElementById("checkBtn").style.display = "inline-block";
-  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("startBtn").style.display = "none";
   document.getElementById("giveUpBtn").style.display =
-  (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
+    (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
 
   document.getElementById("checkBtn").disabled = false;
   document.getElementById("nextBtn").disabled = false;
@@ -1508,12 +1507,18 @@ function showCheckButton() {
   
 function showNextButton() {
   document.getElementById("checkBtn").style.display = "none";
-  document.getElementById("nextBtn").style.display = "inline-block";
+  document.getElementById("startBtn").style.display = "inline-block";
   document.getElementById("giveUpBtn").style.display = "none";
 
   document.getElementById("checkBtn").disabled = true;
   document.getElementById("nextBtn").disabled = false;
   document.getElementById("giveUpBtn").disabled = true;
+}
+
+  function showStartButton() {
+  document.getElementById("checkBtn").style.display = "none";
+  document.getElementById("startBtn").style.display = "inline-block";
+  document.getElementById("giveUpBtn").style.display = "none";
 }
   
   function initCompleteCount(mode) {
@@ -1757,7 +1762,7 @@ function getSameStageLabels(current) {
 }
     
   updateScore();
-  nextQuiz();
+  showStartButton();
 }
   
   function getAttributeColors(enemyName) {
@@ -2205,10 +2210,41 @@ document.getElementById("result").textContent =
 
   document.getElementById("result").textContent =
     newRecord
-      ? `🏆 ニューレコード！ 終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「次の問題」を押してください`
-      : `終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「次の問題」を押してください`;
+      ? `🏆 ニューレコード！ 終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「スタート」を押してください`
+      : `終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「スタート」を押してください`;
 
   showNextButton();
+}
+
+  function startGame() {
+  // 初期化
+  correct = 0;
+  hintTotal = 0;
+  hintCount = 0;
+  passCount = 0;
+  wasWrong = false;
+  answered = false;
+  revealAfterAnswer = false;
+
+  const mode = document.getElementById("mode").value;
+
+  // コンプリート系
+  if (isStageClearMode()) {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  }
+
+  // タイマー
+  resetTimer();
+
+  if (gameMode !== "endless") {
+    startTimer();
+  }
+
+  updateScore();
+  showCheckButton();
+  nextQuiz();
 }
   
 init();
