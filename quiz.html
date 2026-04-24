@@ -246,9 +246,11 @@ img {
 
 /* ヒントを右端へ */
 .hintBtn {
-  margin-left: auto;
+  min-width: 80px;
+  white-space: nowrap;   /* ←改行禁止 */
+  text-align: center;
 }
-
+  
   .hintText {
   color: blue;
 }
@@ -533,6 +535,10 @@ body.dark .settingsMenu {
         <input type="checkbox" id="darkToggle" onchange="toggleDarkMode()">
         ダークモード
       </label>
+      <label>
+        <input type="checkbox" id="startWaitToggle" onchange="toggleStartWaitMode()">
+        モード切替時にスタート表示
+      </label>
     </div>
   </div>
 </div>
@@ -547,14 +553,13 @@ body.dark .settingsMenu {
     </select>
   </div>
 
-  <div class="selectWrap">
-    <select id="playMode" onchange="changePlayMode()">
-      <option value="endless">エンドレス</option>
-      <option value="complete">コンプリート</option>
-      <option value="practice">練習用</option>
-    </select>
-  </div>
-
+  <select id="playMode" onchange="changePlayMode()">
+    <option value="endless">エンドレス</option>
+    <option value="complete">コンプリート</option>
+    <option value="practice">練習用</option>
+    <option value="timeAttack10">10分チャレンジ</option>
+  </select>
+    
   <div class="selectWrap">
 <select id="hideMode" onchange="changeHideMode()">
   <option value="normal">敵隠しなし</option>
@@ -585,7 +590,7 @@ body.dark .settingsMenu {
 
   <div class="btnRow">
     <button id="checkBtn" onclick="check()">回答</button>
-    <button id="nextBtn" onclick="goNextAfterWrong()" style="display:none;">次の問題</button>
+    <button id="startBtn" onclick="startGame()" style="display:none;">スタート</button>
     <button id="giveUpBtn" onclick="confirmGiveUpPractice()" style="display:none;">ギブアップ</button>
   </div>
   <div id="result"></div>
@@ -623,6 +628,11 @@ let revealAfterAnswer = false;
 let suggestIndex = -1;
 let currentSuggestList = [];
 let enableEnterSubmit = localStorage.getItem("enterSubmit") !== "false";
+let passCount = 0;
+let gameStarted = false;
+let enableStartWait = localStorage.getItem("startWaitMode") === "true";
+const maxPassCount = 3;
+const timeAttackLimit = 600; // 10分
 
 
 // 画像用
@@ -651,6 +661,7 @@ function normalizeName(str) {
 }
   
 async function init() {
+  document.getElementById("startWaitToggle").checked = enableStartWait;
   usedAnswersByGroup = {};
   stagesData = await fetch("stages.json").then(r => r.json());
 
@@ -768,8 +779,16 @@ buildStageList(mode);
 }
   
 updateScore();
-nextQuiz();
-showCheckButton();
+
+if (gameMode === "endless") {
+  gameStarted = true;
+  showCheckButton();
+  nextQuiz();
+} else {
+  gameStarted = false;
+  showStartButton();
+}
+  
 hideMode = document.getElementById("hideMode").value;
 document.getElementById("enterToggle").checked = enableEnterSubmit;
 
@@ -801,6 +820,7 @@ function isTargetChapter(ch, mode) {
 }
 
 function nextQuiz() {
+  if (!gameStarted) return;
 
   const mode = document.getElementById("mode").value;
 
@@ -822,21 +842,16 @@ function nextQuiz() {
 
   document.getElementById("result").textContent =
     newRecord
-      ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`
-      : `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`;
+      ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「スタート」を押してください`
+      : `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「スタート」を押してください`;
 
   saveCompleteRecord();
 
   showNextButton();
-  document.getElementById("nextBtn").disabled = false;
   document.getElementById("checkBtn").disabled = true;
   document.getElementById("giveUpBtn").disabled = true;
 
   return;
-}
-
-  if (isStageClearMode()) {
-  startTimer();
 }
 
   let q;
@@ -913,6 +928,7 @@ if (isHiddenEnemy) {
   wasWrong = false;
   hintCount = 0;
 document.querySelector(".hintBtn").disabled = false;
+  updateHintPassButton();
 
   unlockButtons();
   showCheckButton();
@@ -1045,15 +1061,17 @@ result.style.color = "green";
 
   correct++;
 
-  if (
-    correct > bestScore ||
-    (correct === bestScore && hintTotal < bestHint)
-  ) {
-    bestScore = correct;
-    bestHint = hintTotal;
-    saveBest();
-  }
+  const subCount = isTimeAttackMode() ? passCount : hintTotal;
 
+if (
+  correct > bestScore ||
+  (correct === bestScore && subCount < bestHint)
+) {
+  bestScore = correct;
+  bestHint = subCount;
+  saveBest();
+}
+    
   justCorrect = true;
   wasWrong = false;
 
@@ -1072,6 +1090,13 @@ result.style.color = "green";
   if ((gameMode === "complete" || gameMode === "practice") && alreadyUsedName && !nameOK && !idOK) {
   result.textContent = `その答えは使いました：${alreadyUsedName}`;
   result.style.color = "orange";
+  return;
+}
+
+if (isTimeAttackMode()) {
+  result.textContent = "残念！";
+  result.style.color = "red";
+  answered = false;
   return;
 }
     
@@ -1118,7 +1143,9 @@ result.style.color = "red";
 function updateScore() {
   const mode = document.getElementById("mode").value;
 
-  let bestText = `${bestScore}（ヒント: ${bestHint}）`;
+  let bestText = isTimeAttackMode()
+  ? `${bestScore}（パス: ${bestHint}）`
+  : `${bestScore}（ヒント: ${bestHint}）`;
 
   if (isStageClearMode()) {
     const bestTimeKey = "complete_" + mode + "_" + gameMode + getHideScoreSuffix();
@@ -1135,7 +1162,9 @@ function updateScore() {
   }
 
   document.getElementById("score").textContent =
-    `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
+  isTimeAttackMode()
+    ? `連続: ${correct}（パス: ${passCount}） /最高: ${bestText}`
+    : `連続: ${correct}（ヒント: ${hintTotal}） /最高: ${bestText}`;
 }
   
   function saveScore() {
@@ -1204,6 +1233,7 @@ function loadBest() {
   correct = 0;
   hintTotal = 0;
   hintCount = 0;
+  passCount = 0;
 
   resetTimer();
   loadBest();
@@ -1229,9 +1259,13 @@ if (gameMode === "endless") {
 } else {
   timerEl.style.display = "block";
 }
+
+    if (isTimeAttackMode()) {
+  document.getElementById("timer").style.display = "block";
+  resetTimer();
+}
     
-  updateScore();
-  nextQuiz();
+  afterModeChanged();
 }
   
   function buildStageList(mode) {
@@ -1264,6 +1298,11 @@ if (gameMode === "endless") {
 }
   
   function showHint() {
+    if (isTimeAttackMode()) {
+  passQuestion();
+  return;
+}
+    
   const mode = document.getElementById("mode").value;
   const result = document.getElementById("result");
   const hintBtn = document.querySelector(".hintBtn");
@@ -1318,9 +1357,34 @@ if (gameMode === "endless") {
 }
   
   function startTimer() {
-  startTime = Date.now() - timer * 1000; // ←超重要
-
+    if (isTimeAttackMode()) {
+  document.getElementById("timer").textContent = "10:00";
+}
+    
   if (timerId) clearInterval(timerId);
+
+  if (isTimeAttackMode()) {
+    startTime = Date.now();
+
+    timerId = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remain = Math.max(0, timeAttackLimit - elapsed);
+
+      timer = elapsed;
+
+      const m = String(Math.floor(remain / 60)).padStart(2, "0");
+      const s = String(remain % 60).padStart(2, "0");
+      document.getElementById("timer").textContent = `${m}:${s}`;
+
+      if (remain <= 0) {
+        finishTimeAttack();
+      }
+    }, 1000);
+
+    return;
+  }
+
+  startTime = Date.now() - timer * 1000;
 
   timerId = setInterval(() => {
     const sec = Math.floor((Date.now() - startTime) / 1000);
@@ -1332,10 +1396,18 @@ if (gameMode === "endless") {
     document.getElementById("timer").textContent = `${m}:${s}`;
   }, 1000);
 }
-
+  
 function stopTimer() {
   clearInterval(timerId);
   timerId = null; // ←これ必須
+}
+
+  function resetTimer() {
+  stopTimer();
+  timer = 0;
+
+  document.getElementById("timer").textContent =
+    isTimeAttackMode() ? "10:00" : "00:00";
 }
 
 function formatTime(sec) {
@@ -1386,6 +1458,7 @@ function formatTime(sec) {
   pool = [];
   remaining = [];
   totalCount = 0;
+  passCount = 0;
 
   if (isStageClearMode()) {
     pool = buildPool(mode);
@@ -1400,14 +1473,13 @@ function formatTime(sec) {
     timerEl.style.display = "none";
     remainingEl.textContent = "";
   } else {
-    timerEl.style.display = "block";
-    remainingEl.style.display = "block";
-    startTimer();
-  }
-
+  timerEl.style.display = "block";
+  remainingEl.style.display = "block";
+  resetTimer();
+}
+   
   loadBest();
-  updateScore();
-  nextQuiz();
+  afterModeChanged();
 }
   
   function saveCompleteRecord() {
@@ -1421,41 +1493,40 @@ function formatTime(sec) {
   }
 }
   
-  function resetTimer() {
-  stopTimer();
-  timer = 0;
-  document.getElementById("timer").textContent = "00:00";
-}
-
   function lockButtons() {
   document.getElementById("checkBtn").disabled = true;
-  document.getElementById("nextBtn").disabled = true;
+  document.getElementById("startBtn").disabled = true;
 }
 
 function unlockButtons() {
   document.getElementById("checkBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("startBtn").disabled = false;
 }
 
 function showCheckButton() {
   document.getElementById("checkBtn").style.display = "inline-block";
-  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("startBtn").style.display = "none";
   document.getElementById("giveUpBtn").style.display =
-    gameMode === "practice" ? "inline-block" : "none";
-
-  document.getElementById("checkBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
-  document.getElementById("giveUpBtn").disabled = false;
+    (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
 }
   
 function showNextButton() {
+  gameStarted = false;
   document.getElementById("checkBtn").style.display = "none";
-  document.getElementById("nextBtn").style.display = "inline-block";
+  document.getElementById("startBtn").style.display = "inline-block";
   document.getElementById("giveUpBtn").style.display = "none";
 
   document.getElementById("checkBtn").disabled = true;
-  document.getElementById("nextBtn").disabled = false;
   document.getElementById("giveUpBtn").disabled = true;
+}
+
+  function showStartButton() {
+  gameStarted = false;
+  stopTimer();
+
+  document.getElementById("checkBtn").style.display = "none";
+  document.getElementById("startBtn").style.display = "inline-block";
+  document.getElementById("giveUpBtn").style.display = "none";
 }
   
   function initCompleteCount(mode) {
@@ -1634,6 +1705,22 @@ function getSameStageLabels(current) {
     updateScore();
   }
 
+    if (isTimeAttackMode()) {
+  correct = 0;
+  hintTotal = 0;
+  hintCount = 0;
+  passCount = 0;
+  wasWrong = false;
+  answered = false;
+  revealAfterAnswer = false;
+
+  resetTimer();
+  startTimer();
+
+  updateScore();
+  updateHintPassButton();
+}
+
   wasWrong = false;
   showCheckButton();
   nextQuiz();
@@ -1653,6 +1740,7 @@ function getSameStageLabels(current) {
   correct = 0;
   hintTotal = 0;
   hintCount = 0;
+  passCount = 0;
   usedAnswersByGroup = {};
   revealAfterAnswer = false;
 
@@ -1674,8 +1762,13 @@ function getSameStageLabels(current) {
   }
 
   loadBest();
-  updateScore();
-  nextQuiz();
+
+  if (isTimeAttackMode()) {
+  document.getElementById("timer").style.display = "block";
+  resetTimer();
+}
+    
+  afterModeChanged();
 }
   
   function getAttributeColors(enemyName) {
@@ -1984,19 +2077,32 @@ document.getElementById("result").textContent = resultText;
   totalCount = remaining.length;
 
   updateScore();
-  showNextButton();
+
+if (gameMode === "endless") {
+  gameStarted = true;
+  showCheckButton();
+  nextQuiz();
+} else {
+  gameStarted = false;
+  showStartButton();
+}
 }
 
   function confirmGiveUpPractice() {
-  if (gameMode !== "practice") return;
-
-  if (shouldRevealBorder(current)) {
-  revealAfterAnswer = true;
-  redrawCurrentEnemies();
-}
+  if (gameMode !== "practice" && !isTimeAttackMode()) return;
 
   const ok = confirm("ギブアップしますか？");
   if (!ok) return;
+
+  if (isTimeAttackMode()) {
+    finishTimeAttack();
+    return;
+  }
+
+  if (shouldRevealBorder(current)) {
+    revealAfterAnswer = true;
+    redrawCurrentEnemies();
+  }
 
   giveUpPractice();
 }
@@ -2071,6 +2177,121 @@ function applySelectedSuggest() {
 
   localStorage.setItem("darkMode", isDark);
 }
+
+  function isTimeAttackMode() {
+  return gameMode === "timeAttack10";
+}
+
+  function updateHintPassButton() {
+  const btn = document.querySelector(".hintBtn");
+
+  if (isTimeAttackMode()) {
+    btn.innerHTML = `パス<br>${maxPassCount - passCount}/${maxPassCount}`;
+    btn.disabled = passCount >= maxPassCount;
+  } else {
+    btn.textContent = "ヒント";
+    btn.disabled = false;
+  }
+}
+
+  function passQuestion() {
+  if (!isTimeAttackMode()) return;
+  if (passCount >= maxPassCount) return;
+
+  passCount++;
+updateScore();
+
+document.getElementById("result").textContent =
+  `パスしました（残り${maxPassCount - passCount}回）`;
+  document.getElementById("result").style.color = "orange";
+
+  updateHintPassButton();
+  nextQuiz();
+}
+
+  function finishTimeAttack() {
+  stopTimer();
+
+  const newRecord =
+    correct > bestScore ||
+    (correct === bestScore && passCount < bestHint);
+
+  if (newRecord) {
+    bestScore = correct;
+    bestHint = passCount;
+    saveBest();
+  }
+
+  document.getElementById("result").textContent =
+    newRecord
+      ? `🏆 ニューレコード！ 終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「スタート」を押してください`
+      : `終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「スタート」を押してください`;
+
+  showNextButton();
+}
+
+  function startGame() {
+  gameStarted = true;
+  // 初期化
+  correct = 0;
+  hintTotal = 0;
+  hintCount = 0;
+  passCount = 0;
+  wasWrong = false;
+  answered = false;
+  revealAfterAnswer = false;
+
+  const mode = document.getElementById("mode").value;
+
+  // コンプリート系
+  if (isStageClearMode()) {
+    pool = buildPool(mode);
+    remaining = [...pool];
+    totalCount = remaining.length;
+  }
+
+  // タイマー
+  resetTimer();
+
+  if (gameMode !== "endless") {
+    startTimer();
+  }
+
+  updateScore();
+  showCheckButton();
+  nextQuiz();
+}
+
+  function clearQuestion() {
+  document.getElementById("enemies").innerHTML = "";
+  document.getElementById("result").textContent = "";
+  document.getElementById("answer").value = "";
+  document.getElementById("suggest").innerHTML = "";
+}
+
+  function toggleStartWaitMode() {
+  enableStartWait = document.getElementById("startWaitToggle").checked;
+  localStorage.setItem("startWaitMode", enableStartWait);
+}
+
+  function afterModeChanged() {
+  updateScore();
+  clearQuestion();
+
+  if (gameMode === "endless") {
+    gameStarted = true;
+    showCheckButton();
+    nextQuiz();
+    return;
+  }
+
+  if (enableStartWait) {
+    gameStarted = false;
+    showStartButton();
+  } else {
+    startGame();
+  }
+}
   
 init();
 </script>
@@ -2116,6 +2337,11 @@ init();
 間違えても失敗にならず、答えも表示されません<br>
 その他基本的なルールはコンプリートと同じ<br><br>
 
+■ 10分チャレンジ<br>
+10分以内に何問正解できるかを試すゲーム<br>
+問題の重複ありで間違えても失敗にならず、答えも表示されません<br>
+ヒントボタンがパスボタンに変わります<br><br>
+
 
 <b>【敵表示】</b><br><br>
 
@@ -2141,7 +2367,11 @@ init();
 【モード】が全て以外の時は1つの問題につき1回まで使用可能<br>
 章名が表示されます<br><br>
 
-なお、ヒントを使用するとヒントカウントが1つ進みます<br>
+なお、ヒントを使用するとヒントカウントが1つ進みます<br><br>
+
+<b>【パス】</b><br><br>
+10分チャレンジの際に、ヒントボタンの代わりに出てくる<br>
+1ゲームにつき、3回までパス可能<br><br>
 
     </div>
   </div>
