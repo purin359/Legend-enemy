@@ -836,21 +836,16 @@ function nextQuiz() {
 
   document.getElementById("result").textContent =
     newRecord
-      ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`
-      : `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「次の問題」を押してください`;
+      ? `🏆 ニューレコード！ 🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「スタート」を押してください`
+      : `🎉 クリア！ タイム: ${formatTime(timer)}\nもう一度挑戦する場合は「スタート」を押してください`;
 
   saveCompleteRecord();
 
   showNextButton();
-  document.getElementById("nextBtn").disabled = false;
   document.getElementById("checkBtn").disabled = true;
   document.getElementById("giveUpBtn").disabled = true;
 
   return;
-}
-
-  if (isStageClearMode()) {
-  startTimer();
 }
 
   let q;
@@ -1262,7 +1257,6 @@ if (gameMode === "endless") {
     if (isTimeAttackMode()) {
   document.getElementById("timer").style.display = "block";
   resetTimer();
-  startTimer();
 }
     
   updateScore();
@@ -1482,11 +1476,11 @@ function formatTime(sec) {
     timerEl.style.display = "none";
     remainingEl.textContent = "";
   } else {
-    timerEl.style.display = "block";
-    remainingEl.style.display = "block";
-    startTimer();
-  }
-
+  timerEl.style.display = "block";
+  remainingEl.style.display = "block";
+  resetTimer();
+}
+   
   loadBest();
   updateScore();
 
@@ -1513,12 +1507,12 @@ if (gameMode === "endless") {
   
   function lockButtons() {
   document.getElementById("checkBtn").disabled = true;
-  document.getElementById("nextBtn").disabled = true;
+  document.getElementById("startBtn").disabled = true;
 }
 
 function unlockButtons() {
   document.getElementById("checkBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("startBtn").disabled = false;
 }
 
 function showCheckButton() {
@@ -1539,6 +1533,9 @@ function showNextButton() {
 }
 
   function showStartButton() {
+  gameStarted = false;
+  stopTimer();
+
   document.getElementById("checkBtn").style.display = "none";
   document.getElementById("startBtn").style.display = "inline-block";
   document.getElementById("giveUpBtn").style.display = "none";
@@ -1779,11 +1776,10 @@ function getSameStageLabels(current) {
   loadBest();
 
   if (isTimeAttackMode()) {
-    document.getElementById("timer").style.display = "block";
-    resetTimer();
-    startTimer();
-  }
-
+  document.getElementById("timer").style.display = "block";
+  resetTimer();
+}
+    
   updateScore();
 
   if (gameMode === "endless") {
