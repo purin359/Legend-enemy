@@ -1526,10 +1526,6 @@ function showCheckButton() {
   document.getElementById("startBtn").style.display = "none";
   document.getElementById("giveUpBtn").style.display =
     (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
-
-  document.getElementById("checkBtn").disabled = false;
-  document.getElementById("nextBtn").disabled = false;
-  document.getElementById("giveUpBtn").disabled = false;
 }
   
 function showNextButton() {
@@ -1539,7 +1535,6 @@ function showNextButton() {
   document.getElementById("giveUpBtn").style.display = "none";
 
   document.getElementById("checkBtn").disabled = true;
-  document.getElementById("nextBtn").disabled = false;
   document.getElementById("giveUpBtn").disabled = true;
 }
 
@@ -1783,14 +1778,22 @@ function getSameStageLabels(current) {
 
   loadBest();
 
-    if (isTimeAttackMode()) {
-  document.getElementById("timer").style.display = "block";
-  resetTimer();
-  startTimer();
-}
-    
+  if (isTimeAttackMode()) {
+    document.getElementById("timer").style.display = "block";
+    resetTimer();
+    startTimer();
+  }
+
   updateScore();
-  showStartButton();
+
+  if (gameMode === "endless") {
+    gameStarted = true;
+    showCheckButton();
+    nextQuiz();
+  } else {
+    gameStarted = false;
+    showStartButton();
+  }
 }
   
   function getAttributeColors(enemyName) {
