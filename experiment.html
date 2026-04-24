@@ -547,14 +547,13 @@ body.dark .settingsMenu {
     </select>
   </div>
 
-  <div class="selectWrap">
-    <select id="playMode" onchange="changePlayMode()">
-      <option value="endless">エンドレス</option>
-      <option value="complete">コンプリート</option>
-      <option value="practice">練習用</option>
-    </select>
-  </div>
-
+  <select id="playMode" onchange="changePlayMode()">
+    <option value="endless">エンドレス</option>
+    <option value="complete">コンプリート</option>
+    <option value="practice">練習用</option>
+    <option value="timeAttack10">10分チャレンジ</option>
+  </select>
+    
   <div class="selectWrap">
 <select id="hideMode" onchange="changeHideMode()">
   <option value="normal">敵隠しなし</option>
@@ -623,6 +622,9 @@ let revealAfterAnswer = false;
 let suggestIndex = -1;
 let currentSuggestList = [];
 let enableEnterSubmit = localStorage.getItem("enterSubmit") !== "false";
+let passCount = 0;
+const maxPassCount = 3;
+const timeAttackLimit = 600; // 10分
 
 
 // 画像用
@@ -913,6 +915,7 @@ if (isHiddenEnemy) {
   wasWrong = false;
   hintCount = 0;
 document.querySelector(".hintBtn").disabled = false;
+  updateHintPassButton();
 
   unlockButtons();
   showCheckButton();
@@ -1072,6 +1075,14 @@ result.style.color = "green";
   if ((gameMode === "complete" || gameMode === "practice") && alreadyUsedName && !nameOK && !idOK) {
   result.textContent = `その答えは使いました：${alreadyUsedName}`;
   result.style.color = "orange";
+  return;
+}
+
+if (isTimeAttackMode()) {
+  result.textContent = "残念！";
+  result.style.color = "red";
+  answered = false;
+  nextQuiz();
   return;
 }
     
@@ -1264,6 +1275,11 @@ if (gameMode === "endless") {
 }
   
   function showHint() {
+    if (isTimeAttackMode()) {
+  passQuestion();
+  return;
+}
+    
   const mode = document.getElementById("mode").value;
   const result = document.getElementById("result");
   const hintBtn = document.querySelector(".hintBtn");
@@ -1330,6 +1346,10 @@ if (gameMode === "endless") {
     const s = String(sec % 60).padStart(2, "0");
 
     document.getElementById("timer").textContent = `${m}:${s}`;
+    if (isTimeAttackMode() && timer >= timeAttackLimit) {
+  finishTimeAttack();
+  return;
+}
   }, 1000);
 }
 
@@ -1386,6 +1406,7 @@ function formatTime(sec) {
   pool = [];
   remaining = [];
   totalCount = 0;
+  passCount = 0;
 
   if (isStageClearMode()) {
     pool = buildPool(mode);
@@ -2070,6 +2091,56 @@ function applySelectedSuggest() {
   }
 
   localStorage.setItem("darkMode", isDark);
+}
+
+  function isTimeAttackMode() {
+  return gameMode === "timeAttack10";
+}
+
+  function updateHintPassButton() {
+  const btn = document.querySelector(".hintBtn");
+
+  if (isTimeAttackMode()) {
+    btn.textContent = `パス ${maxPassCount - passCount}/${maxPassCount}`;
+    btn.disabled = passCount >= maxPassCount;
+  } else {
+    btn.textContent = "ヒント";
+    btn.disabled = false;
+  }
+}
+
+  function passQuestion() {
+  if (!isTimeAttackMode()) return;
+  if (passCount >= maxPassCount) return;
+
+  passCount++;
+  document.getElementById("result").textContent =
+    `パスしました（残り${maxPassCount - passCount}回）`;
+  document.getElementById("result").style.color = "orange";
+
+  updateHintPassButton();
+  nextQuiz();
+}
+
+  function finishTimeAttack() {
+  stopTimer();
+
+  const newRecord =
+    correct > bestScore ||
+    (correct === bestScore && passCount < bestHint);
+
+  if (newRecord) {
+    bestScore = correct;
+    bestHint = passCount;
+    saveBest();
+  }
+
+  document.getElementById("result").textContent =
+    newRecord
+      ? `🏆 ニューレコード！ 終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「次の問題」を押してください`
+      : `終了！\n正解数: ${correct}\nパス: ${passCount}回\nもう一度挑戦する場合は「次の問題」を押してください`;
+
+  showNextButton();
 }
   
 init();
