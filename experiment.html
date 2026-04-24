@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ステージ当てクイズ(実験用)１</title>
+<title>ステージ当てクイズ(実験用)</title>
 
 <style>
 body {
@@ -571,17 +571,6 @@ body.dark .settingsMenu {
 
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
-
-  <div class="topBar1">
-  <select id="endlessTime" onchange="changeEndlessTime()" style="display:none;">
-    <option value="unlimited">無制限</option>
-    <option value="5">5秒</option>
-    <option value="10">10秒</option>
-    <option value="20">20秒</option>
-    <option value="30">30秒</option>
-  </select>
-</div>
-  
 <div class="topBar2">
   <div class="leftBox">
     <div id="score"></div>
@@ -790,6 +779,15 @@ buildStageList(mode);
 }
   
 updateScore();
+
+if (gameMode === "endless") {
+  gameStarted = true;
+  showCheckButton();
+  nextQuiz();
+} else {
+  gameStarted = false;
+  showStartButton();
+}
   
 hideMode = document.getElementById("hideMode").value;
 document.getElementById("enterToggle").checked = enableEnterSubmit;
@@ -800,10 +798,6 @@ document.getElementById("darkToggle").checked = isDark;
 if (isDark) {
   document.body.classList.add("dark");
 }
-  endlessTimeLimit = document.getElementById("endlessTime").value;
-updateEndlessTimeSelect();
-
-afterModeChanged();
 }
   
 function isTargetChapter(ch, mode) {
@@ -826,11 +820,6 @@ function isTargetChapter(ch, mode) {
 }
 
 function nextQuiz() {
-  if (isEndlessTimedMode()) {
-  resetTimer();
-  startTimer();
-}
-  
   if (!gameStarted) return;
 
   const mode = document.getElementById("mode").value;
@@ -1072,11 +1061,6 @@ result.style.color = "green";
 
   correct++;
 
-    if (isEndlessTimedMode()) {
-  resetTimer();
-  startTimer();
-}
-
   const subCount = isTimeAttackMode() ? passCount : hintTotal;
 
 if (
@@ -1280,9 +1264,7 @@ if (gameMode === "endless") {
   document.getElementById("timer").style.display = "block";
   resetTimer();
 }
-
-  endlessTimeLimit = document.getElementById("endlessTime").value;
-  updateEndlessTimeSelect();
+    
   afterModeChanged();
 }
   
@@ -1375,34 +1357,6 @@ if (gameMode === "endless") {
 }
   
   function startTimer() {
-    if (isEndlessTimedMode()) {
-  if (timerId) clearInterval(timerId);
-
-  const limit = Number(endlessTimeLimit) * 60;
-  startTime = Date.now();
-
-  timerId = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const remain = Math.max(0, limit - elapsed);
-    timer = remain;
-
-    // 秒だけ表示
-    document.getElementById("timer").textContent = remain;
-
-    timer = elapsed;
-
-    const m = String(Math.floor(remain / 60)).padStart(2, "0");
-    const s = String(remain % 60).padStart(2, "0");
-    document.getElementById("timer").textContent = `${m}:${s}`;
-
-    if (remain <= 0) {
-      finishEndlessTimed();
-    }
-  }, 1000);
-
-  return;
-}
-    
     if (isTimeAttackMode()) {
   document.getElementById("timer").textContent = "10:00";
 }
@@ -1452,12 +1406,8 @@ function stopTimer() {
   stopTimer();
   timer = 0;
 
-  if (isTimeAttackMode()) {
-    document.getElementById("timer").textContent = "10:00";
-  } else if (isEndlessTimedMode()) {
   document.getElementById("timer").textContent =
-    Number(endlessTimeLimit);
-}
+    isTimeAttackMode() ? "10:00" : "00:00";
 }
 
 function formatTime(sec) {
@@ -1519,11 +1469,8 @@ function formatTime(sec) {
   const timerEl = document.getElementById("timer");
   const remainingEl = document.getElementById("remaining");
 
-  if (gameMode === "endless" && endlessTimeLimit === "unlimited") {
-  timerEl.style.display = "none";
-} else {
-  timerEl.style.display = "block";
-}
+  if (gameMode === "endless") {
+    timerEl.style.display = "none";
     remainingEl.textContent = "";
   } else {
   timerEl.style.display = "block";
@@ -1532,8 +1479,6 @@ function formatTime(sec) {
 }
    
   loadBest();
-  endlessTimeLimit = document.getElementById("endlessTime").value;
-  updateEndlessTimeSelect();
   afterModeChanged();
 }
   
@@ -1563,6 +1508,9 @@ function showCheckButton() {
   document.getElementById("startBtn").style.display = "none";
   document.getElementById("giveUpBtn").style.display =
     (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
+
+  updateHintPassButton();
+  setHintPassDisabled(false);
 }
   
 function showNextButton() {
@@ -1578,6 +1526,9 @@ function showNextButton() {
   function showStartButton() {
   gameStarted = false;
   stopTimer();
+
+  updateHintPassButton();
+  setHintPassDisabled(true);
 
   document.getElementById("checkBtn").style.display = "none";
   document.getElementById("startBtn").style.display = "inline-block";
@@ -1822,9 +1773,7 @@ function getSameStageLabels(current) {
   document.getElementById("timer").style.display = "block";
   resetTimer();
 }
-
-  endlessTimeLimit = document.getElementById("endlessTime").value;
-  updateEndlessTimeSelect();
+    
   afterModeChanged();
 }
   
@@ -2087,16 +2036,9 @@ window.addEventListener("click", e => {
 }
 
   function getHideScoreSuffix() {
-  let suffix = "";
-
-  if (hideMode === "hidden_hard") suffix = "_hidden_hard";
-  else if (hideMode === "hidden_easy") suffix = "_hidden";
-
-  if (gameMode === "endless" && endlessTimeLimit !== "unlimited") {
-    suffix += "_time_" + endlessTimeLimit;
-  }
-
-  return suffix;
+  if (hideMode === "hidden_hard") return "_hidden_hard";
+  if (hideMode === "hidden_easy") return "_hidden";
+  return "";
 }
 
 function clearAnswerInput() {
@@ -2317,9 +2259,9 @@ document.getElementById("result").textContent =
   // タイマー
   resetTimer();
 
-  if (gameMode !== "endless" || isEndlessTimedMode()) {
-  startTimer();
-}
+  if (gameMode !== "endless") {
+    startTimer();
+  }
 
   updateScore();
   showCheckButton();
@@ -2341,26 +2283,12 @@ document.getElementById("result").textContent =
   function afterModeChanged() {
   updateScore();
   clearQuestion();
-  updateEndlessTimeSelect();
+  updateHintPassButton();
 
-  if (gameMode === "endless" && endlessTimeLimit === "unlimited") {
-    document.getElementById("timer").style.display = "none";
+  if (gameMode === "endless") {
     gameStarted = true;
     showCheckButton();
     nextQuiz();
-    return;
-  }
-
-  if (gameMode === "endless" && endlessTimeLimit !== "unlimited") {
-    document.getElementById("timer").style.display = "block";
-
-    if (enableStartWait) {
-      gameStarted = false;
-      resetTimer();
-      showStartButton();
-    } else {
-      startGame();
-    }
     return;
   }
 
@@ -2372,59 +2300,8 @@ document.getElementById("result").textContent =
   }
 }
 
-  function updateEndlessTimeSelect() {
-  const sel = document.getElementById("endlessTime");
-  sel.style.display = gameMode === "endless" ? "inline-block" : "none";
-}
-
-  function changeEndlessTime() {
-  endlessTimeLimit = document.getElementById("endlessTime").value;
-
-  correct = 0;
-  hintTotal = 0;
-  hintCount = 0;
-  gameStarted = false;
-
-  stopTimer();
-  clearQuestion();
-  loadBest();
-  updateScore();
-
-  if (gameMode === "endless" && endlessTimeLimit === "unlimited") {
-    document.getElementById("timer").style.display = "none";
-    gameStarted = true;
-    showCheckButton();
-    nextQuiz();
-  } else if (gameMode === "endless") {
-    document.getElementById("timer").style.display = "block";
-    resetTimer();
-    if (enableStartWait) {
-      showStartButton();
-    } else {
-      startGame();
-    }
-  }
-}
-
-  function isEndlessTimedMode() {
-  return gameMode === "endless" && endlessTimeLimit !== "unlimited";
-}
-
-  function finishEndlessTimed() {
-  stopTimer();
-
-  if (
-    correct > bestScore ||
-    (correct === bestScore && hintTotal < bestHint)
-  ) {
-    bestScore = correct;
-    bestHint = hintTotal;
-    saveBest();
-  }
-
-  document.getElementById("result").textContent =`終了！`;
-
-  showNextButton();
+  function setHintPassDisabled(disabled) {
+  document.querySelector(".hintBtn").disabled = disabled;
 }
   
 init();
