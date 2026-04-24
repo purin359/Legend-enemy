@@ -1050,15 +1050,17 @@ result.style.color = "green";
 
   correct++;
 
-  if (
-    correct > bestScore ||
-    (correct === bestScore && hintTotal < bestHint)
-  ) {
-    bestScore = correct;
-    bestHint = hintTotal;
-    saveBest();
-  }
+  const subCount = isTimeAttackMode() ? passCount : hintTotal;
 
+if (
+  correct > bestScore ||
+  (correct === bestScore && subCount < bestHint)
+) {
+  bestScore = correct;
+  bestHint = subCount;
+  saveBest();
+}
+    
   justCorrect = true;
   wasWrong = false;
 
