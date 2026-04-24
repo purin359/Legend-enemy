@@ -1508,6 +1508,9 @@ function showCheckButton() {
   document.getElementById("startBtn").style.display = "none";
   document.getElementById("giveUpBtn").style.display =
     (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
+
+  updateHintPassButton();
+  setHintPassDisabled(false);
 }
   
 function showNextButton() {
@@ -1523,6 +1526,9 @@ function showNextButton() {
   function showStartButton() {
   gameStarted = false;
   stopTimer();
+
+  updateHintPassButton();
+  setHintPassDisabled(true);
 
   document.getElementById("checkBtn").style.display = "none";
   document.getElementById("startBtn").style.display = "inline-block";
@@ -2277,6 +2283,7 @@ document.getElementById("result").textContent =
   function afterModeChanged() {
   updateScore();
   clearQuestion();
+  updateHintPassButton();
 
   if (gameMode === "endless") {
     gameStarted = true;
@@ -2291,6 +2298,10 @@ document.getElementById("result").textContent =
   } else {
     startGame();
   }
+}
+
+  function setHintPassDisabled(disabled) {
+  document.querySelector(".hintBtn").disabled = disabled;
 }
   
 init();
