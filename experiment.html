@@ -246,9 +246,11 @@ img {
 
 /* ヒントを右端へ */
 .hintBtn {
-  margin-left: auto;
+  min-width: 80px;
+  white-space: nowrap;   /* ←改行禁止 */
+  text-align: center;
 }
-
+  
   .hintText {
   color: blue;
 }
@@ -1340,6 +1342,10 @@ if (gameMode === "endless") {
 }
   
   function startTimer() {
+    if (isTimeAttackMode()) {
+  document.getElementById("timer").textContent = "10:00";
+}
+    
   if (timerId) clearInterval(timerId);
 
   if (isTimeAttackMode()) {
@@ -2139,7 +2145,7 @@ function applySelectedSuggest() {
   const btn = document.querySelector(".hintBtn");
 
   if (isTimeAttackMode()) {
-    btn.textContent = `パス ${maxPassCount - passCount}/${maxPassCount}`;
+    btn.innerHTML = `パス<br>${maxPassCount - passCount}/${maxPassCount}`;
     btn.disabled = passCount >= maxPassCount;
   } else {
     btn.textContent = "ヒント";
@@ -2255,7 +2261,7 @@ init();
 【モード】が全て以外の時は1つの問題につき1回まで使用可能<br>
 章名が表示されます<br><br>
 
-なお、ヒントを使用するとヒントカウントが1つ進みます<br>
+なお、ヒントを使用するとヒントカウントが1つ進みます<br><br>
 
 <b>【パス】</b><br><br>
 10分チャレンジの際に、ヒントボタンの代わりに出てくる<br>
