@@ -580,6 +580,11 @@ body.dark .settingsMenu {
     <option value="20">20秒</option>
     <option value="30">30秒</option>
   </select>
+
+  <select id="suggestMode" onchange="changeSuggestMode()">
+    <option value="on">予測変換あり</option>
+    <option value="off">予測変換なし</option>
+  </select>
 </div>
   
 <div class="topBar2">
@@ -643,6 +648,7 @@ let passCount = 0;
 let gameStarted = false;
 let enableStartWait = localStorage.getItem("startWaitMode") === "true";
 let endlessTimeLimit = "unlimited";
+let suggestMode = "on";
 const maxPassCount = 3;
 const timeAttackLimit = 600; // 10分
 
@@ -751,7 +757,12 @@ buildStageList(mode);
   suggestIndex = -1;
   currentSuggestList = [];
 
-  if (!input) return;
+  if (suggestMode === "off") {
+  suggest.innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+  return;
+}
 
   const keyword = normalizeSearch(input);
 
@@ -793,6 +804,7 @@ buildStageList(mode);
 updateScore();
 endlessTimeLimit = document.getElementById("endlessTime").value;
 updateEndlessTimeSelect();
+suggestMode = document.getElementById("suggestMode").value;
 afterModeChanged();
   
 hideMode = document.getElementById("hideMode").value;
@@ -2091,6 +2103,10 @@ window.addEventListener("click", e => {
     suffix += "_time_" + endlessTimeLimit;
   }
 
+  if (suggestMode === "off") {
+  suffix += "_no_suggest";
+  }
+
   return suffix;
 }
 
@@ -2427,6 +2443,29 @@ function changeEndlessTime() {
     `終了！\n正解数: ${correct}\nもう一度挑戦する場合は「スタート」を押してください`;
 
   showNextButton();
+}
+
+  function changeSuggestMode() {
+  suggestMode = document.getElementById("suggestMode").value;
+
+  document.getElementById("suggest").innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+
+  correct = 0;
+  hintTotal = 0;
+  hintCount = 0;
+  passCount = 0;
+
+  loadBest();
+  updateScore();
+
+  if (enableStartWait && gameMode !== "endless") {
+    clearQuestion();
+    showStartButton();
+  } else {
+    afterModeChanged();
+  }
 }
   
 init();
