@@ -572,26 +572,18 @@ body.dark .settingsMenu {
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
 
-<!-- 1段目 -->
 <div class="topBar1">
-  <!-- mode / playMode / hideMode -->
-</div>
-
-<div class="topBar1">
-  <select id="suggestMode" onchange="changeSuggestMode()">
-    <option value="on">予測変換あり</option>
-    <option value="off">予測変換なし</option>
-  </select>
-</div>
-
-<!-- エンドレスのみ -->
-<div class="topBar1" id="endlessTimeRow" style="display:none;">
-  <select id="endlessTime" onchange="changeEndlessTime()">
+  <select id="endlessTime" onchange="changeEndlessTime()" style="display:none;">
     <option value="unlimited">無制限</option>
     <option value="5">5秒</option>
     <option value="10">10秒</option>
     <option value="20">20秒</option>
     <option value="30">30秒</option>
+  </select>
+  
+  <select id="suggestMode" onchange="changeSuggestMode()">
+    <option value="on">予測変換あり</option>
+    <option value="off">予測変換なし</option>
   </select>
 </div>
   
@@ -673,6 +665,7 @@ function getFileName(name) {
 // 比較用
 function normalizeName(str) {
   return String(str)
+    .replace(/\[EX\]/g, "")
     .replace(/\r?\n/g, "")
     .replace(/[：:]/g, "")
     .replace(/[ 　]/g, "")
@@ -1027,9 +1020,12 @@ const availableStages =
     ? getAvailableStages(current)
     : sameStages;
 
-const matchedName = availableStages.find(name =>
-  inputNorm === normalize(name)
-);
+const matchedName = availableStages.find(name => {
+  if (suggestMode === "off") {
+    return inputNorm === normalizeName(name);
+  }
+  return inputNorm === normalize(name);
+});
   
 const nameOK = !!matchedName;
 
@@ -1044,8 +1040,9 @@ const alreadyUsedName =
     : null;
 
   const idText = `${current.chapterId}-${current.stageId}`;
-  const idOK = inputNorm === normalize(idText);
-
+  const idOK = suggestMode === "off"
+  ? inputNorm === normalizeName(idText)
+  : inputNorm === normalize(idText);
   const ok = nameOK || idOK;
 
   const result = document.getElementById("result");
@@ -1268,6 +1265,7 @@ if (!data && !isEndlessTimedMode()) {
   passCount = 0;
 
   resetTimer();
+  suggestMode = document.getElementById("suggestMode").value;
   loadBest();
 
   const mode = document.getElementById("mode").value;
@@ -1539,7 +1537,8 @@ function formatTime(sec) {
   remainingEl.style.display = "block";
   resetTimer();
 }
-   
+
+  suggestMode = document.getElementById("suggestMode").value;
   loadBest();
   endlessTimeLimit = document.getElementById("endlessTime").value;
   updateEndlessTimeSelect();
@@ -1831,6 +1830,7 @@ function getSameStageLabels(current) {
     document.getElementById("remaining").textContent = "";
   }
 
+  suggestMode = document.getElementById("suggestMode").value;
   loadBest();
 
   if (isTimeAttackMode()) {
@@ -2399,10 +2399,10 @@ document.getElementById("result").textContent =
 }
 
 function updateEndlessTimeSelect() {
-  const row = document.getElementById("endlessTimeRow");
-  row.style.display = gameMode === "endless" ? "flex" : "none";
+  const sel = document.getElementById("endlessTime");
+  sel.style.display = gameMode === "endless" ? "inline-block" : "none";
 }
-
+  
 function changeEndlessTime() {
   endlessTimeLimit = document.getElementById("endlessTime").value;
 
@@ -2465,6 +2465,7 @@ function changeEndlessTime() {
   hintCount = 0;
   passCount = 0;
 
+  suggestMode = document.getElementById("suggestMode").value;
   loadBest();
   updateScore();
 
