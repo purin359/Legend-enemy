@@ -572,6 +572,19 @@ body.dark .settingsMenu {
   <button class="hintBtn" onclick="showHint()">ヒント</button>
 </div>
 
+<!-- 1段目 -->
+<div class="topBar1">
+  <!-- mode / playMode / hideMode -->
+</div>
+
+<div class="topBar1">
+  <select id="suggestMode" onchange="changeSuggestMode()">
+    <option value="on">予測変換あり</option>
+    <option value="off">予測変換なし</option>
+  </select>
+</div>
+
+<!-- エンドレスのみ -->
 <div class="topBar1" id="endlessTimeRow" style="display:none;">
   <select id="endlessTime" onchange="changeEndlessTime()">
     <option value="unlimited">無制限</option>
@@ -579,11 +592,6 @@ body.dark .settingsMenu {
     <option value="10">10秒</option>
     <option value="20">20秒</option>
     <option value="30">30秒</option>
-  </select>
-
-  <select id="suggestMode" onchange="changeSuggestMode()">
-    <option value="on">予測変換あり</option>
-    <option value="off">予測変換なし</option>
   </select>
 </div>
   
@@ -2534,6 +2542,15 @@ init();
 隠されるのは全体の敵数の50%～70%程度<br><br>
 
 なお、どのステージも最低1体は残ります<br><br>
+
+<b>【予測変換】</b><br><br>
+■ 予測変換あり<br>
+予測変換サジェストが表示されます<br>
+
+■ 予測変換なし<br>
+予測変換サジェストが表示されません<br>
+誤字、脱字、ひらがなカタカナの違い
+全角半角の違いでミスになるので上級者向け
 
 <b>【ヒント】</b><br><br>
 
