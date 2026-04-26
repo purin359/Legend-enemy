@@ -1164,6 +1164,10 @@ result.style.color = "red";
     stopTimer();
   }
 
+  if (isEndlessTimedMode()) {
+    stopTimer();
+  }
+
   showNextButton();
 }
 }
