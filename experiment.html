@@ -1222,7 +1222,7 @@ function loadBest() {
 
   // 旧スコア引き継ぎ
 // ただし、エンドレス時間制限ありは無制限スコアを引き継がない
-if (!data && !isEndlessTimedMode()) {
+if (!data && !isEndlessTimedMode() && suggestMode !== "off") {
   if (hideMode === "normal") {
     const oldKey = "quizBest_" + mode + "_" + gameMode;
     data = localStorage.getItem(oldKey);
