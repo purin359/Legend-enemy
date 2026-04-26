@@ -1204,15 +1204,16 @@ function loadBest() {
   let data = localStorage.getItem(key);
 
   // 旧スコア引き継ぎ
-  if (!data) {
-    if (hideMode === "normal") {
-      const oldKey = "quizBest_" + mode + "_" + gameMode;
-      data = localStorage.getItem(oldKey);
-    } else if (hideMode === "hidden_easy") {
-      const oldHiddenKey = "quizBest_" + mode + "_" + gameMode + "_hidden";
-      data = localStorage.getItem(oldHiddenKey);
-    }
+// ただし、エンドレス時間制限ありは無制限スコアを引き継がない
+if (!data && !isEndlessTimedMode()) {
+  if (hideMode === "normal") {
+    const oldKey = "quizBest_" + mode + "_" + gameMode;
+    data = localStorage.getItem(oldKey);
+  } else if (hideMode === "hidden_easy") {
+    const oldHiddenKey = "quizBest_" + mode + "_" + gameMode + "_hidden";
+    data = localStorage.getItem(oldHiddenKey);
   }
+}
 
   if (data) {
     try {
