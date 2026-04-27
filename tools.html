@@ -57,6 +57,10 @@ body {
   background: #eee;
 }
 
+  .suggestItem.active {
+  background: #cfe8ff;
+}
+
 canvas {
   margin-top: 20px;
 }
@@ -93,11 +97,11 @@ canvas {
   <div id="info"></div>
 
   <canvas id="chart"></canvas>
-<label>
+<label id="showStageEnemiesLabel" style="display:none;">
   <input type="checkbox" id="showStageEnemies" onchange="redrawStageList()">
   構成あり
 </label>
-  <div id="stageList"></div>
+<div id="stageList"></div>
 </div>
 
 <script>
@@ -109,9 +113,23 @@ let chart;
 let graphStageMap = {};
 let maxStage = 0;
 let lastSelectedPos = null;
+let suggestIndex = -1;
+let currentSuggestList = [];
 
 function normalize(str) {
-  return String(str).replace(/\s/g, "");
+  return String(str)
+    .replace(/\r?\n/g, "")
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    )
+    .replace(/[ァ-ン]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)
+    )
+    .replace(/[：:]/g, "")
+    .replace(/ー/g, "")
+    .replace(/[ 　]+/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 function openFunc(id) {
@@ -135,24 +153,61 @@ function setupSuggest() {
   input.addEventListener("input", () => {
     const key = normalize(input.value);
     suggest.innerHTML = "";
+    suggestIndex = -1;
+    currentSuggestList = [];
 
     if (!key) return;
 
-    enemyNames
+    currentSuggestList = enemyNames
       .filter(n => normalize(n).includes(key))
-      .slice(0,20)
-      .forEach(name => {
-        const div = document.createElement("div");
-        div.className = "suggestItem";
-        div.textContent = name;
-        div.onclick = () => {
-          selectedEnemy = name;
-          input.value = name;
-          suggest.innerHTML = "";
-          drawGraph();
-        };
-        suggest.appendChild(div);
-      });
+      .slice(0, 20);
+
+    currentSuggestList.forEach((name, i) => {
+      const div = document.createElement("div");
+      div.className = "suggestItem";
+      div.textContent = name;
+      div.onclick = () => selectSuggest(name);
+      suggest.appendChild(div);
+    });
+  });
+
+  input.addEventListener("keydown", e => {
+    if (e.isComposing || e.keyCode === 229) return;
+    if (currentSuggestList.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      suggestIndex = (suggestIndex + 1) % currentSuggestList.length;
+      updateSuggestSelection();
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      suggestIndex = (suggestIndex - 1 + currentSuggestList.length) % currentSuggestList.length;
+      updateSuggestSelection();
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (suggestIndex < 0) suggestIndex = 0;
+      selectSuggest(currentSuggestList[suggestIndex]);
+    }
+  });
+}
+
+function selectSuggest(name) {
+  selectedEnemy = name;
+  document.getElementById("enemyInput").value = name;
+  document.getElementById("suggest").innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+  drawGraph();
+}
+
+function updateSuggestSelection() {
+  document.querySelectorAll(".suggestItem").forEach((item, i) => {
+    item.classList.toggle("active", i === suggestIndex);
+    if (i === suggestIndex) item.scrollIntoView({ block: "nearest" });
   });
 }
 
@@ -197,13 +252,21 @@ function drawGraph() {
     });
   });
 
-  const labels = [];
-  const data = [];
+  let lastNonZero = 0;
 
-  for (let i = 1; i <= maxStage; i++) {
-    labels.push(i);
-    data.push(counts[i] || 0);
-  }
+for (let i = 1; i <= maxStage; i++) {
+  if ((counts[i] || 0) > 0) lastNonZero = i;
+}
+
+const displayMax = Math.max(6, lastNonZero);
+
+const labels = [];
+const data = [];
+
+for (let i = 1; i <= displayMax; i++) {
+  labels.push(i);
+  data.push(counts[i] || 0);
+}
 
   document.getElementById("info").textContent =
     `${selectedEnemy} 出現数: ${total}`;
@@ -219,28 +282,33 @@ function drawGraph() {
       datasets: [{ label: "回数", data }]
     },
     options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1,
-            precision: 0
-          }
-        }
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1,
+        precision: 0,
+        maxTicksLimit: 5
       },
-      onClick: (event, elements) => {
-        if (elements.length === 0) return;
-
-        const index = elements[0].index;
-        const pos = labels[index];
-
-        showStageList(pos);
+      grid: {
+        drawTicks: true
       }
     }
+  },
+  onClick: (event, elements) => {
+    if (elements.length === 0) return;
+
+    const index = elements[0].index;
+    const pos = labels[index];
+
+    showStageList(pos);
+  }
+}
   });
 }
 
 function showStageList(pos) {
+  document.getElementById("showStageEnemiesLabel").style.display = "block";
   lastSelectedPos = pos;
   const area = document.getElementById("stageList");
   const stages = graphStageMap[pos] || [];
@@ -306,6 +374,10 @@ function redrawStageList() {
     showStageList(lastSelectedPos);
   }
 }
+
+  document.getElementById("stageList").innerHTML = "";
+document.getElementById("showStageEnemiesLabel").style.display = "none";
+lastSelectedPos = null;
   
 init();
 </script>
