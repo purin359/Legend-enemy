@@ -210,32 +210,16 @@ async function init() {
 function normalize(str) {
   return str
     .toString()
-
-    // 改行削除
     .replace(/\r?\n/g, "")
-
-    // 全角英数 → 半角
     .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
       String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
     )
-
-    // カタカナ → ひらがな
     .replace(/[ァ-ン]/g, s =>
       String.fromCharCode(s.charCodeAt(0) - 0x60)
     )
-
-    // 記号削除（コロンなど）
     .replace(/[：:]/g, "")
-
-    // 長音削除（ー）
-    .replace(/ー/g, "")
-
-    // スペース削除（全角・半角）
     .replace(/[ 　]+/g, "")
-
-    // 小文字化
     .toLowerCase()
-
     .trim();
 }
 
