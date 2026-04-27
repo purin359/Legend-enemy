@@ -43,12 +43,116 @@ img {
   margin-right: 5px;
 }
 
+  .filterRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.attrBtn {
+  padding: 6px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.attrBtn.active {
+  background: #dff0df;
+  border-color: #4CAF50;
+}
+
+.attrBtn img {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+  .attrSelect {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.attrSelectBtn {
+  min-height: 36px;
+  min-width: 180px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.attrMenu {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 20;
+  min-width: 220px;
+}
+
+.attrMenu.open {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.attrOption {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.attrOption img {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+}
+
+.attrOption.active {
+  border-color: #4CAF50;
+  background: #eaf7ea;
+}
+
+#attrSelectedView img {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+  #attrSelectedView {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+  
 </style>
 </head>
 <body>
 <button onclick="goBack()">戻る</button>
 
 <h2>全ステージ一覧</h2>
+
+  <div id="countInfo" style="margin:10px 0; font-weight:bold;"></div>
 
 <select id="mode" onchange="load()">
   <option value="ALL">全て</option>
@@ -67,10 +171,108 @@ img {
   初登場敵のみ表示
 </label>
 
+<div class="attrSelect" id="attrSelect">
+  <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
+    <span id="attrSelectedView">属性で絞り込み</span>
+  </button>
+
+  <div id="attrMenu" class="attrMenu">
+    <div class="attrOption" onclick="toggleAttr('赤')"><img src="image_type/赤.png" alt="赤"></div>
+    <div class="attrOption" onclick="toggleAttr('浮き')"><img src="image_type/浮き.png" alt="浮き"></div>
+    <div class="attrOption" onclick="toggleAttr('黒')"><img src="image_type/黒.png" alt="黒"></div>
+    <div class="attrOption" onclick="toggleAttr('メタル')"><img src="image_type/メタル.png" alt="メタル"></div>
+    <div class="attrOption" onclick="toggleAttr('天使')"><img src="image_type/天使.png" alt="天使"></div>
+    <div class="attrOption" onclick="toggleAttr('エイリアン')"><img src="image_type/エイリアン.png" alt="エイリアン"></div>
+    <div class="attrOption" onclick="toggleAttr('ゾンビ')"><img src="image_type/ゾンビ.png" alt="ゾンビ"></div>
+    <div class="attrOption" onclick="toggleAttr('悪魔')"><img src="image_type/悪魔.png" alt="悪魔"></div>
+    <div class="attrOption" onclick="toggleAttr('古代種')"><img src="image_type/古代種.png" alt="古代種"></div>
+    <div class="attrOption" onclick="toggleAttr('無属性')"><img src="image_type/無属性.png" alt="無属性"></div>
+    <div class="attrOption" onclick="toggleAttr('超生命体')"><img src="image_type/超生命体.png" alt="超生命体"></div>
+    <div class="attrOption" onclick="toggleAttr('超獣')"><img src="image_type/超獣.png" alt="超獣"></div>
+    <div class="attrOption" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png" alt="超賢者"></div>
+    <div class="attrOption" onclick="toggleAttr('城')"><span>城</span></div>
+  </div>
+</div>
+  <button id="toggleListBtn" onclick="toggleList()">リスト非表示</button>
+
 <div id="list"></div>
 
 <script>
 let initialized = false;
+let stageCount = 0;
+let chapterCount = 0;
+let selectedAttrs = [];
+
+  const attrImageMap = {
+  "赤": "image_type/赤.png",
+  "浮き": "image_type/浮き.png",
+  "黒": "image_type/黒.png",
+  "メタル": "image_type/メタル.png",
+  "天使": "image_type/天使.png",
+  "エイリアン": "image_type/エイリアン.png",
+  "ゾンビ": "image_type/ゾンビ.png",
+  "悪魔": "image_type/悪魔.png",
+  "古代種": "image_type/古代種.png",
+  "無属性": "image_type/無属性.png",
+  "超生命体": "image_type/超生命体.png",
+  "超獣": "image_type/超獣.png",
+  "超賢者": "image_type/超賢者.png"
+};
+
+function toggleAttrMenu() {
+  document.getElementById("attrMenu").classList.toggle("open");
+}
+
+function toggleAttr(attr) {
+  if (selectedAttrs.includes(attr)) {
+    selectedAttrs = selectedAttrs.filter(a => a !== attr);
+  } else {
+    selectedAttrs.push(attr);
+  }
+
+  updateAttrSelectedView();
+  updateAttrOptionState();
+  load();
+}
+
+function updateAttrSelectedView() {
+  const view = document.getElementById("attrSelectedView");
+
+  if (selectedAttrs.length === 0) {
+    view.textContent = "属性で絞り込み";
+    return;
+  }
+
+  view.innerHTML = "";
+
+  selectedAttrs.forEach(attr => {
+    if (attrImageMap[attr]) {
+      const img = document.createElement("img");
+      img.src = attrImageMap[attr];
+      img.alt = attr;
+      view.appendChild(img);
+    } else {
+      const span = document.createElement("span");
+      span.textContent = attr;
+      view.appendChild(span);
+    }
+  });
+}
+
+function updateAttrOptionState() {
+  document.querySelectorAll(".attrOption").forEach(option => {
+    const img = option.querySelector("img");
+    const attr = img ? img.alt : option.textContent.trim();
+    option.classList.toggle("active", selectedAttrs.includes(attr));
+  });
+}
+
+window.addEventListener("click", e => {
+  const select = document.getElementById("attrSelect");
+  if (!select.contains(e.target)) {
+    document.getElementById("attrMenu").classList.remove("open");
+  }
+});
   
 function normalize(str) {
   return str
@@ -79,7 +281,17 @@ function normalize(str) {
     .trim();
 }
 
+  let enemiesData = {};
+
+async function init() {
+  enemiesData = await fetch("enemies.json").then(r=>r.json());
+  load();
+}
+
+init();
+
 async function load() {
+  let stageCount = 0;
 
   if (!initialized) {
     const params = new URLSearchParams(location.search);
@@ -130,6 +342,10 @@ async function load() {
     chapterBox.appendChild(title);
 
     ch.stages.forEach(st => {
+      if (selectedAttrs.length > 0 && !stageHasAllAttrs(st.enemies, selectedAttrs)) {
+  return;
+}
+      
       const table = document.createElement("table");
       table.className = "stageTable";
 
@@ -183,6 +399,7 @@ async function load() {
 
       if (td.childElementCount === 0) {
         return;
+        stageCount++;
       }
 
       tr2.appendChild(th);
@@ -192,6 +409,7 @@ async function load() {
       table.appendChild(tr2);
 
       chapterBox.appendChild(table);
+      stageCount++;
     });
 
     const showFirstOnly = document.getElementById("showFirstOnly").checked;
@@ -207,15 +425,67 @@ async function load() {
       chapterBox.appendChild(noEnemy);
     }
 
-    list.appendChild(chapterBox);
+    if (chapterBox.querySelectorAll(".stageTable").length > 0 || chapterBox.textContent.includes("初登場敵なし")) {
+  list.appendChild(chapterBox);
+}
   });
+  document.getElementById("countInfo").textContent =
+  `${stageCount}ステージが該当します`;
 }
   
   function goBack() {
   history.back();
 }
 
-load();
+  function stageHasAllAttrs(enemies, selectedAttrs) {
+
+  const showKanban = document.getElementById("showKanban").checked;
+  const allTypes = new Set();
+
+  enemies.forEach(name => {
+
+    // 🔥 カンバン娘除外（表示OFF時）
+    if (!showKanban && name === "カンバン娘") return;
+
+    const types = getEnemyTypes(name);
+    types.forEach(t => allTypes.add(t));
+  });
+
+  return selectedAttrs.every(attr => allTypes.has(attr));
+}
+
+  function getEnemyTypes(enemyName) {
+  const key = normalize(enemyName);
+
+  const found = Object.values(enemiesData).find(enemy =>
+    normalize(enemy.name) === key
+  );
+
+  if (!found || !found.type) return [];
+
+  return String(found.type)
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+  let isListHidden = false;
+
+function toggleList() {
+  const list = document.getElementById("list");
+  const btn = document.getElementById("toggleListBtn");
+
+  isListHidden = !isListHidden;
+
+  if (isListHidden) {
+    list.style.display = "none";
+    btn.textContent = "リスト表示";
+  } else {
+    list.style.display = "";
+    btn.textContent = "リスト非表示";
+  }
+}
+
 </script>
 
 </body>
