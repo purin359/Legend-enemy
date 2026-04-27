@@ -145,8 +145,10 @@ async function init() {
   enemyNames = Object.values(enemiesData).map(e=>e.name);
 
   setupSuggest();
-}
 
+  openFunc("graph");
+}
+  
 function setupSuggest() {
   const input = document.getElementById("enemyInput");
   const suggest = document.getElementById("suggest");
