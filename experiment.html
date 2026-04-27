@@ -183,11 +183,15 @@ img {
     <div class="attrOption" onclick="toggleAttr('城')"><span>城</span></div>
   </div>
 </div>
+
+  <div id="countInfo" style="margin:10px 0; font-weight:bold;"></div>
   
 <div id="list"></div>
 
 <script>
 let initialized = false;
+let stageCount = 0;
+let chapterCount = 0;
 let selectedAttrs = [];
 
   const attrImageMap = {
@@ -394,6 +398,7 @@ async function load() {
       table.appendChild(tr2);
 
       chapterBox.appendChild(table);
+      stageCount++;
     });
 
     const showFirstOnly = document.getElementById("showFirstOnly").checked;
@@ -411,8 +416,11 @@ async function load() {
 
     if (chapterBox.querySelectorAll(".stageTable").length > 0 || chapterBox.textContent.includes("初登場敵なし")) {
   list.appendChild(chapterBox);
+  chapterCount++;
 }
   });
+  document.getElementById("countInfo").textContent =
+  `章数: ${chapterCount}　ステージ数: ${stageCount}`;
 }
   
   function goBack() {
