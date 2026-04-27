@@ -409,7 +409,9 @@ async function load() {
       chapterBox.appendChild(noEnemy);
     }
 
-    list.appendChild(chapterBox);
+    if (chapterBox.querySelectorAll(".stageTable").length > 0 || chapterBox.textContent.includes("初登場敵なし")) {
+  list.appendChild(chapterBox);
+}
   });
 }
   
