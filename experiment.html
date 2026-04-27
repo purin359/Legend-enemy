@@ -184,6 +184,7 @@ img {
     <div class="attrOption" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png" alt="超賢者"></div>
     <div class="attrOption" onclick="toggleAttr('城')"><span>城</span></div>
   </div>
+  <button id="toggleListBtn" onclick="toggleList()">リスト非表示</button>
 </div>
 
 <div id="list"></div>
@@ -458,6 +459,23 @@ async function load() {
     .split(",")
     .map(s => s.trim())
     .filter(Boolean);
+}
+
+  let isListHidden = false;
+
+function toggleList() {
+  const list = document.getElementById("list");
+  const btn = document.getElementById("toggleListBtn");
+
+  isListHidden = !isListHidden;
+
+  if (isListHidden) {
+    list.style.display = "none";
+    btn.textContent = "リスト表示";
+  } else {
+    list.style.display = "";
+    btn.textContent = "リスト非表示";
+  }
 }
 
 </script>
