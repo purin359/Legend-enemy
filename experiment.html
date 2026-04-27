@@ -4,17 +4,7 @@
 <meta charset="UTF-8">
 <title>ステージ当てクイズ(実験用)</title>
 
-<script>
-(function () {
-  const vp = document.getElementById("vp");
-
-  if (window.innerWidth <= 768) {
-    vp.setAttribute("content", "width=device-width, initial-scale=1.1");
-  } else {
-    vp.setAttribute("content", "width=device-width, initial-scale=1.0");
-  }
-})();
-</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.1">
 
 <style>
 body {
@@ -523,6 +513,16 @@ body.dark .settingsMenu {
   body.dark .suggestItem:hover {
   background: #3a4a5a;
   color: #fff;
+}
+
+  @media (max-width: 768px) {
+  body {
+    font-size: 17px;
+  }
+
+  img {
+    width: 55px;
+  }
 }
   
 </style>
