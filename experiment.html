@@ -282,6 +282,7 @@ async function init() {
 init();
 
 async function load() {
+  let stageCount = 0;
 
   if (!initialized) {
     const params = new URLSearchParams(location.search);
@@ -389,6 +390,7 @@ async function load() {
 
       if (td.childElementCount === 0) {
         return;
+        stageCount++;
       }
 
       tr2.appendChild(th);
@@ -416,11 +418,10 @@ async function load() {
 
     if (chapterBox.querySelectorAll(".stageTable").length > 0 || chapterBox.textContent.includes("初登場敵なし")) {
   list.appendChild(chapterBox);
-  chapterCount++;
 }
   });
   document.getElementById("countInfo").textContent =
-  `章数: ${chapterCount}　ステージ数: ${stageCount}`;
+  `ステージ数: ${stageCount}`;
 }
   
   function goBack() {
