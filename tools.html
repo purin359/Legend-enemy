@@ -127,7 +127,6 @@ function normalize(str) {
       String.fromCharCode(s.charCodeAt(0) - 0x60)
     )
     .replace(/[：:]/g, "")
-    .replace(/ー/g, "")
     .replace(/[ 　]+/g, "")
     .toLowerCase()
     .trim();
