@@ -103,6 +103,7 @@ let enemyNames = [];
 let selectedEnemy = "";
 let chart;
 let graphStageMap = {};
+let maxStage = 0;
 
 function normalize(str) {
   return String(str).replace(/\s/g, "");
@@ -188,8 +189,13 @@ function drawGraph() {
     });
   });
 
-  const labels = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-  const data = labels.map(l=>counts[l]);
+  const labels = [];
+const data = [];
+
+for (let i = 1; i <= maxStage; i++) {
+  labels.push(i);
+  data.push(counts[i] || 0);
+}
 
   document.getElementById("info").textContent =
     `${selectedEnemy} 出現数: ${total}`;
@@ -211,8 +217,15 @@ function drawGraph() {
 
       showStageList(pos);
     }
+    scales: {
+  y: {
+    beginAtZero: true,
+    ticks: {
+      stepSize: 1,     // ←整数のみ
+      precision: 0     // ←小数防止
+    }
   }
-});
+};
 }
 
   function showStageList(pos) {
@@ -224,8 +237,21 @@ function drawGraph() {
     return;
   }
 
+  const enemyName = selectedEnemy;
+  const fileName = enemyName
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+
+  const imgPath = "image/" + encodeURIComponent(fileName) + ".png";
+
   area.innerHTML = `
     <h3>${pos}ステージ目の一覧</h3>
+
+    <div style="margin-bottom:10px;">
+      <img src="${imgPath}" style="width:40px;" onerror="this.src='image/noimage.png'">
+      ${enemyName}
+    </div>
+
     <ul>
       ${stages.map(st => `
         <li>
