@@ -429,15 +429,19 @@ async function load() {
 }
 
   function stageHasAllAttrs(enemies, selectedAttrs) {
-  // ステージ内の全属性を集める
+
+  const showKanban = document.getElementById("showKanban").checked;
   const allTypes = new Set();
 
   enemies.forEach(name => {
+
+    // 🔥 カンバン娘除外（表示OFF時）
+    if (!showKanban && name === "カンバン娘") return;
+
     const types = getEnemyTypes(name);
     types.forEach(t => allTypes.add(t));
   });
 
-  // AND条件
   return selectedAttrs.every(attr => allTypes.has(attr));
 }
 
