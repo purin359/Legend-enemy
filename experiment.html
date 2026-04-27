@@ -43,6 +43,33 @@ img {
   margin-right: 5px;
 }
 
+  .filterRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.attrBtn {
+  padding: 6px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.attrBtn.active {
+  background: #dff0df;
+  border-color: #4CAF50;
+}
+
+.attrBtn img {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+}
+
 </style>
 </head>
 <body>
@@ -67,10 +94,28 @@ img {
   初登場敵のみ表示
 </label>
 
+<div class="filterRow">
+  <button class="attrBtn" onclick="toggleAttr('赤')"><img src="image_type/赤.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('浮き')"><img src="image_type/浮き.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('黒')"><img src="image_type/黒.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('メタル')"><img src="image_type/メタル.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('天使')"><img src="image_type/天使.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('エイリアン')"><img src="image_type/エイリアン.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('ゾンビ')"><img src="image_type/ゾンビ.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('悪魔')"><img src="image_type/悪魔.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('古代種')"><img src="image_type/古代種.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('無属性')"><img src="image_type/無属性.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('超生命体')"><img src="image_type/超生命体.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('超獣')"><img src="image_type/超獣.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png"></button>
+  <button class="attrBtn" onclick="toggleAttr('城')">城</button>
+</div>
+
 <div id="list"></div>
 
 <script>
 let initialized = false;
+let selectedAttrs = [];
   
 function normalize(str) {
   return str
@@ -203,11 +248,8 @@ async function load() {
       chapterBox.appendChild(table);
     });
 
-    // 属性ANDフィルター
-if (selectedAttrs.length > 0) {
-  if (!stageHasAllAttrs(st.enemies, selectedAttrs)) {
-    return; // このステージは表示しない
-  }
+    if (selectedAttrs.length > 0 && !stageHasAllAttrs(st.enemies, selectedAttrs)) {
+  return;
 }
 
     const showFirstOnly = document.getElementById("showFirstOnly").checked;
@@ -259,7 +301,29 @@ if (selectedAttrs.length > 0) {
     .filter(Boolean);
 }
 
-load();
+  function toggleAttr(attr) {
+  if (selectedAttrs.includes(attr)) {
+    selectedAttrs = selectedAttrs.filter(a => a !== attr);
+  } else {
+    selectedAttrs.push(attr);
+  }
+
+  updateAttrButtons();
+  load();
+}
+
+function updateAttrButtons() {
+  document.querySelectorAll(".attrBtn").forEach(btn => {
+    const img = btn.querySelector("img");
+    if (!img) return;
+
+    const attr = img.getAttribute("src")
+      .replace("image_type/", "")
+      .replace(".png", "");
+
+    btn.classList.toggle("active", selectedAttrs.includes(attr));
+  });
+}
 </script>
 
 </body>
