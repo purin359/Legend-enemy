@@ -515,16 +515,6 @@ body.dark .settingsMenu {
 
   <meta name="viewport" content="width=device-width, initial-scale=1.1">
   
-    @media (max-width: 768px) {
-  body {
-    font-size: 17px;
-  }
-
-  img {
-    width: 55px;
-  }
-}
-  
 </style>
 </head>
 <body>
@@ -2492,6 +2482,15 @@ function changeEndlessTime() {
     afterModeChanged();
   }
 }
+
+(function () {
+  const isSmallScreen = window.innerWidth <= 768;
+
+  if (isSmallScreen) {
+    const meta = document.querySelector("meta[name='viewport']");
+    meta.setAttribute("content", "width=device-width, initial-scale=1.2");
+  }
+})();
   
 init();
 </script>
