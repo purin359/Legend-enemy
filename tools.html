@@ -93,6 +93,7 @@ canvas {
   <div id="info"></div>
 
   <canvas id="chart"></canvas>
+  <div id="stageList"></div>
 </div>
 
 <script>
@@ -101,6 +102,7 @@ let enemiesData = [];
 let enemyNames = [];
 let selectedEnemy = "";
 let chart;
+let graphStageMap = {};
 
 function normalize(str) {
   return String(str).replace(/\s/g, "");
@@ -155,6 +157,7 @@ function drawGraph() {
   const key = normalize(selectedEnemy);
 
   const counts = {};
+  graphStageMap = {};
   let total = 0;
 
   stagesData.forEach(ch => {
@@ -170,8 +173,17 @@ function drawGraph() {
     ch.stages.forEach((st,i) => {
       if (st.enemies.some(e => normalize(e)===key)) {
         const pos = i+1;
-        counts[pos] = (counts[pos]||0)+1;
+        counts[pos] = (counts[pos] || 0) + 1;
         total++;
+
+        if (!graphStageMap[pos]) graphStageMap[pos] = [];
+
+        graphStageMap[pos].push({
+          chapterName: ch.chapterName,
+          chapterId: ch.chapterId,
+          stageId: st.stageId,
+          stageName: st.stageName
+        });
       }
     });
   });
@@ -185,12 +197,44 @@ function drawGraph() {
   if (chart) chart.destroy();
 
   chart = new Chart(document.getElementById("chart"), {
-    type: "bar",
-    data: {
-      labels: labels.map(n=>`${n}ステージ目`),
-      datasets: [{ label:"回数", data }]
+  type: "bar",
+  data: {
+    labels: labels.map(n => `${n}ステージ目`),
+    datasets: [{ label: "回数", data }]
+  },
+  options: {
+    onClick: (event, elements) => {
+      if (elements.length === 0) return;
+
+      const index = elements[0].index;
+      const pos = labels[index];
+
+      showStageList(pos);
     }
-  });
+  }
+});
+}
+
+  function showStageList(pos) {
+  const area = document.getElementById("stageList");
+  const stages = graphStageMap[pos] || [];
+
+  if (stages.length === 0) {
+    area.innerHTML = "";
+    return;
+  }
+
+  area.innerHTML = `
+    <h3>${pos}ステージ目の一覧</h3>
+    <ul>
+      ${stages.map(st => `
+        <li>
+          ${st.chapterId}-${st.stageId}
+          ${st.chapterName} - ${st.stageName}
+        </li>
+      `).join("")}
+    </ul>
+  `;
 }
 
 init();
