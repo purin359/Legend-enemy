@@ -305,6 +305,9 @@ for (let i = 1; i <= displayMax; i++) {
   }
 }
   });
+  document.getElementById("stageList").innerHTML = "";
+document.getElementById("showStageEnemiesLabel").style.display = "none";
+lastSelectedPos = null;
 }
 
 function showStageList(pos) {
@@ -374,10 +377,6 @@ function redrawStageList() {
     showStageList(lastSelectedPos);
   }
 }
-
-  document.getElementById("stageList").innerHTML = "";
-document.getElementById("showStageEnemiesLabel").style.display = "none";
-lastSelectedPos = null;
   
 init();
 </script>
