@@ -4,7 +4,17 @@
 <meta charset="UTF-8">
 <title>ステージ当てクイズ(実験用)</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.1">
+  <meta name="viewport" id="vp">
+
+<script>
+(function () {
+  const vp = document.getElementById("vp");
+
+  vp.content = window.innerWidth <= 768
+    ? "width=device-width, initial-scale=1.15, minimum-scale=1.0, maximum-scale=3.0, user-scalable=yes"
+    : "width=device-width, initial-scale=1.0";
+})();
+</script>
 
 <style>
 body {
@@ -28,7 +38,6 @@ input {
   border-radius: 8px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
-  min-width: 540px;
 }
 
 /* ボタン */
@@ -207,7 +216,6 @@ img {
   flex-wrap: wrap;
   gap: 6px;
   justify-content: center;
-  min-width: 575px;
 
   background: #eaf4ff;         /* ←色で囲む */
 }
