@@ -26,19 +26,29 @@ button {
   gap: 10px;
   margin-top: 20px;
 }
+
+  .mainBtn {
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+.mainBtn:hover {
+  background: #45a049;
+}
 </style>
 </head>
 <body>
 
-<button onclick="location.href='index.html'">戻る</button>
-
+<button class="mainBtn" onclick="location.href='index.html'">戻る</button>
+  
 <h2>その他の機能</h2>
 
-<div class="menu">
-  <button onclick="location.href='allStages.html'">全ステージ一覧</button>
-  <button onclick="location.href='detail.html'">敵詳細検索</button>
-  <button onclick="alert('ここに新機能を追加できます')">準備中</button>
-</div>
+
 
 </body>
 </html>
