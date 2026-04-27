@@ -4,18 +4,6 @@
 <meta charset="UTF-8">
 <title>ステージ当てクイズ(実験用)</title>
 
-  <meta name="viewport" id="vp">
-
-<script>
-(function () {
-  const vp = document.getElementById("vp");
-
-  vp.content = window.innerWidth <= 768
-    ? "width=device-width, initial-scale=1.1, minimum-scale=1.0, maximum-scale=3.0, user-scalable=yes"
-    : "width=device-width, initial-scale=1.0";
-})();
-</script>
-
 <style>
 body {
   font-family: sans-serif;
@@ -524,6 +512,12 @@ body.dark .settingsMenu {
   background: #3a4a5a;
   color: #fff;
 }
+
+  @media (max-width:768px) {
+    .container {
+      zoom:1.15;
+    }
+  }
   
 </style>
 </head>
