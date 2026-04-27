@@ -70,6 +70,82 @@ img {
   margin: 0;
 }
 
+  .attrSelect {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.attrSelectBtn {
+  min-height: 38px;
+  min-width: 260px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+#attrSelectedView {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+#attrSelectedView img {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+.attrMenu {
+  display: none;
+  position: absolute;
+  top: 42px;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 20;
+  min-width: 330px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.attrMenu.open {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.attrOption {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.attrOption img {
+  width: 36px;
+  height: 36px;
+  margin: 0;
+}
+
+.attrOption.active {
+  border-color: #4CAF50;
+  background: #eaf7ea;
+}
+
 </style>
 </head>
 <body>
@@ -94,28 +170,105 @@ img {
   初登場敵のみ表示
 </label>
 
-<div class="filterRow">
-  <button class="attrBtn" onclick="toggleAttr('赤')"><img src="image_type/赤.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('浮き')"><img src="image_type/浮き.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('黒')"><img src="image_type/黒.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('メタル')"><img src="image_type/メタル.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('天使')"><img src="image_type/天使.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('エイリアン')"><img src="image_type/エイリアン.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('ゾンビ')"><img src="image_type/ゾンビ.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('悪魔')"><img src="image_type/悪魔.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('古代種')"><img src="image_type/古代種.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('無属性')"><img src="image_type/無属性.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('超生命体')"><img src="image_type/超生命体.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('超獣')"><img src="image_type/超獣.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png"></button>
-  <button class="attrBtn" onclick="toggleAttr('城')">城</button>
-</div>
+<div class="attrSelect" id="attrSelect">
+  <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
+    <span id="attrSelectedView">属性で絞り込み</span>
+  </button>
 
+  <div id="attrMenu" class="attrMenu">
+    <div class="attrOption" onclick="toggleAttr('赤')"><img src="image_type/赤.png" alt="赤"></div>
+    <div class="attrOption" onclick="toggleAttr('浮き')"><img src="image_type/浮き.png" alt="浮き"></div>
+    <div class="attrOption" onclick="toggleAttr('黒')"><img src="image_type/黒.png" alt="黒"></div>
+    <div class="attrOption" onclick="toggleAttr('メタル')"><img src="image_type/メタル.png" alt="メタル"></div>
+    <div class="attrOption" onclick="toggleAttr('天使')"><img src="image_type/天使.png" alt="天使"></div>
+    <div class="attrOption" onclick="toggleAttr('エイリアン')"><img src="image_type/エイリアン.png" alt="エイリアン"></div>
+    <div class="attrOption" onclick="toggleAttr('ゾンビ')"><img src="image_type/ゾンビ.png" alt="ゾンビ"></div>
+    <div class="attrOption" onclick="toggleAttr('悪魔')"><img src="image_type/悪魔.png" alt="悪魔"></div>
+    <div class="attrOption" onclick="toggleAttr('古代種')"><img src="image_type/古代種.png" alt="古代種"></div>
+    <div class="attrOption" onclick="toggleAttr('無属性')"><img src="image_type/無属性.png" alt="無属性"></div>
+    <div class="attrOption" onclick="toggleAttr('超生命体')"><img src="image_type/超生命体.png" alt="超生命体"></div>
+    <div class="attrOption" onclick="toggleAttr('超獣')"><img src="image_type/超獣.png" alt="超獣"></div>
+    <div class="attrOption" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png" alt="超賢者"></div>
+    <div class="attrOption" onclick="toggleAttr('城')"><span>城</span></div>
+  </div>
+</div>
+  
 <div id="list"></div>
 
 <script>
 let initialized = false;
 let selectedAttrs = [];
+
+  const attrImageMap = {
+  "赤": "image_type/赤.png",
+  "浮き": "image_type/浮き.png",
+  "黒": "image_type/黒.png",
+  "メタル": "image_type/メタル.png",
+  "天使": "image_type/天使.png",
+  "エイリアン": "image_type/エイリアン.png",
+  "ゾンビ": "image_type/ゾンビ.png",
+  "悪魔": "image_type/悪魔.png",
+  "古代種": "image_type/古代種.png",
+  "無属性": "image_type/無属性.png",
+  "超生命体": "image_type/超生命体.png",
+  "超獣": "image_type/超獣.png",
+  "超賢者": "image_type/超賢者.png"
+};
+
+function toggleAttrMenu() {
+  document.getElementById("attrMenu").classList.toggle("open");
+}
+
+function toggleAttr(attr) {
+  if (selectedAttrs.includes(attr)) {
+    selectedAttrs = selectedAttrs.filter(a => a !== attr);
+  } else {
+    selectedAttrs.push(attr);
+  }
+
+  updateAttrSelectedView();
+  updateAttrOptionState();
+  load();
+}
+
+function updateAttrSelectedView() {
+  const view = document.getElementById("attrSelectedView");
+
+  if (selectedAttrs.length === 0) {
+    view.textContent = "属性で絞り込み";
+    return;
+  }
+
+  view.innerHTML = "";
+
+  selectedAttrs.forEach(attr => {
+    if (attrImageMap[attr]) {
+      const img = document.createElement("img");
+      img.src = attrImageMap[attr];
+      img.alt = attr;
+      view.appendChild(img);
+    } else {
+      const span = document.createElement("span");
+      span.textContent = attr;
+      view.appendChild(span);
+    }
+  });
+}
+
+function updateAttrOptionState() {
+  document.querySelectorAll(".attrOption").forEach(option => {
+    const img = option.querySelector("img");
+    const attr = img ? img.alt : option.textContent.trim();
+    option.classList.toggle("active", selectedAttrs.includes(attr));
+  });
+}
+
+window.addEventListener("click", e => {
+  const select = document.getElementById("attrSelect");
+  if (!select.contains(e.target)) {
+    document.getElementById("attrMenu").classList.remove("open");
+  }
+});
   
 function normalize(str) {
   return str
