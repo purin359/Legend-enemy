@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>その他の機能</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 body {
   font-family: sans-serif;
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
   padding: 20px;
 }
@@ -17,18 +20,181 @@ body {
   margin-top: 20px;
 }
 
+.funcBtn {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.funcArea {
+  display: none;
+  margin-top: 20px;
+}
+
+.searchWrap {
+  position: relative;
+  margin-top: 10px;
+}
+
+#suggest {
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  position: absolute;
+  width: 250px;
+  z-index: 10;
+}
+
+.suggestItem {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.suggestItem:hover {
+  background: #eee;
+}
+
+canvas {
+  margin-top: 20px;
+}
 </style>
 </head>
+
 <body>
 
-<button onclick="goBack()">戻る</button>
-  
+<button onclick="history.back()">戻る</button>
+
 <h2>その他の機能</h2>
 
-</body>
-  <script>
-    function goBack() {
-  history.back();
+<div class="menu">
+  <button class="funcBtn" onclick="openFunc('graph')">敵の登場位置グラフ</button>
+</div>
+
+<!-- グラフ機能 -->
+<div id="graph" class="funcArea">
+
+  <h3>敵の登場位置グラフ</h3>
+
+  <select id="mode">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <div class="searchWrap">
+    <input id="enemyInput" placeholder="敵名を入力">
+    <div id="suggest"></div>
+  </div>
+
+  <div id="info"></div>
+
+  <canvas id="chart"></canvas>
+</div>
+
+<script>
+let stagesData = [];
+let enemiesData = [];
+let enemyNames = [];
+let selectedEnemy = "";
+let chart;
+
+function normalize(str) {
+  return String(str).replace(/\s/g, "");
 }
-  </script>
+
+function openFunc(id) {
+  document.querySelectorAll(".funcArea").forEach(el => el.style.display = "none");
+  document.getElementById(id).style.display = "block";
+}
+
+async function init() {
+  stagesData = await fetch("stages.json").then(r=>r.json());
+  enemiesData = await fetch("enemies.json").then(r=>r.json());
+
+  enemyNames = Object.values(enemiesData).map(e=>e.name);
+
+  setupSuggest();
+}
+
+function setupSuggest() {
+  const input = document.getElementById("enemyInput");
+  const suggest = document.getElementById("suggest");
+
+  input.addEventListener("input", () => {
+    const key = normalize(input.value);
+    suggest.innerHTML = "";
+
+    if (!key) return;
+
+    enemyNames
+      .filter(n => normalize(n).includes(key))
+      .slice(0,20)
+      .forEach(name => {
+        const div = document.createElement("div");
+        div.className = "suggestItem";
+        div.textContent = name;
+        div.onclick = () => {
+          selectedEnemy = name;
+          input.value = name;
+          suggest.innerHTML = "";
+          drawGraph();
+        };
+        suggest.appendChild(div);
+      });
+  });
+}
+
+function drawGraph() {
+  if (!selectedEnemy) return;
+
+  const mode = document.getElementById("mode").value;
+  const key = normalize(selectedEnemy);
+
+  const counts = {};
+  let total = 0;
+
+  stagesData.forEach(ch => {
+
+    const ok =
+      mode==="ALL" ||
+      (mode==="N" && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA")) ||
+      (mode==="NA" && ch.chapterId.startsWith("NA")) ||
+      (mode==="ND" && ch.chapterId.startsWith("ND"));
+
+    if (!ok) return;
+
+    ch.stages.forEach((st,i) => {
+      if (st.enemies.some(e => normalize(e)===key)) {
+        const pos = i+1;
+        counts[pos] = (counts[pos]||0)+1;
+        total++;
+      }
+    });
+  });
+
+  const labels = Object.keys(counts).map(Number).sort((a,b)=>a-b);
+  const data = labels.map(l=>counts[l]);
+
+  document.getElementById("info").textContent =
+    `${selectedEnemy} 出現数: ${total}`;
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+      labels: labels.map(n=>`${n}ステージ目`),
+      datasets: [{ label:"回数", data }]
+    }
+  });
+}
+
+init();
+</script>
+
+</body>
 </html>
