@@ -160,25 +160,26 @@ function drawGraph() {
   const counts = {};
   graphStageMap = {};
   let total = 0;
+  let maxStage = 0;
 
   stagesData.forEach(ch => {
-
     const ok =
-      mode==="ALL" ||
-      (mode==="N" && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA")) ||
-      (mode==="NA" && ch.chapterId.startsWith("NA")) ||
-      (mode==="ND" && ch.chapterId.startsWith("ND"));
+      mode === "ALL" ||
+      (mode === "N" && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND")) ||
+      (mode === "NA" && ch.chapterId.startsWith("NA")) ||
+      (mode === "ND" && ch.chapterId.startsWith("ND"));
 
     if (!ok) return;
 
-    ch.stages.forEach((st,i) => {
-      if (st.enemies.some(e => normalize(e)===key)) {
-        const pos = i+1;
+    ch.stages.forEach((st, i) => {
+      const pos = i + 1;
+      if (pos > maxStage) maxStage = pos;
+
+      if (st.enemies.some(e => normalize(e) === key)) {
         counts[pos] = (counts[pos] || 0) + 1;
         total++;
 
         if (!graphStageMap[pos]) graphStageMap[pos] = [];
-
         graphStageMap[pos].push({
           chapterName: ch.chapterName,
           chapterId: ch.chapterId,
@@ -190,50 +191,54 @@ function drawGraph() {
   });
 
   const labels = [];
-const data = [];
+  const data = [];
 
-for (let i = 1; i <= maxStage; i++) {
-  labels.push(i);
-  data.push(counts[i] || 0);
-}
+  for (let i = 1; i <= maxStage; i++) {
+    labels.push(i);
+    data.push(counts[i] || 0);
+  }
 
   document.getElementById("info").textContent =
     `${selectedEnemy} 出現数: ${total}`;
 
+  document.getElementById("stageList").innerHTML = "";
+
   if (chart) chart.destroy();
 
   chart = new Chart(document.getElementById("chart"), {
-  type: "bar",
-  data: {
-    labels: labels.map(n => `${n}ステージ目`),
-    datasets: [{ label: "回数", data }]
-  },
-  options: {
-    onClick: (event, elements) => {
-      if (elements.length === 0) return;
+    type: "bar",
+    data: {
+      labels: labels.map(n => `${n}ステージ目`),
+      datasets: [{ label: "回数", data }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            precision: 0
+          }
+        }
+      },
+      onClick: (event, elements) => {
+        if (elements.length === 0) return;
 
-      const index = elements[0].index;
-      const pos = labels[index];
+        const index = elements[0].index;
+        const pos = labels[index];
 
-      showStageList(pos);
+        showStageList(pos);
+      }
     }
-    scales: {
-  y: {
-    beginAtZero: true,
-    ticks: {
-      stepSize: 1,     // ←整数のみ
-      precision: 0     // ←小数防止
-    }
-  }
-};
+  });
 }
 
-  function showStageList(pos) {
+function showStageList(pos) {
   const area = document.getElementById("stageList");
   const stages = graphStageMap[pos] || [];
 
   if (stages.length === 0) {
-    area.innerHTML = "";
+    area.innerHTML = `<h3>${pos}ステージ目の一覧</h3><p>該当なし</p>`;
     return;
   }
 
@@ -262,7 +267,7 @@ for (let i = 1; i <= maxStage; i++) {
     </ul>
   `;
 }
-
+  
 init();
 </script>
 
