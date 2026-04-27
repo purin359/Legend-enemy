@@ -93,11 +93,11 @@ canvas {
   <div id="info"></div>
 
   <canvas id="chart"></canvas>
-  <div id="stageList"></div>
-  <label>
+<label>
   <input type="checkbox" id="showStageEnemies" onchange="redrawStageList()">
   構成あり
 </label>
+  <div id="stageList"></div>
 </div>
 
 <script>
@@ -184,13 +184,15 @@ function drawGraph() {
         counts[pos] = (counts[pos] || 0) + 1;
         total++;
 
+        if (!graphStageMap[pos]) graphStageMap[pos] = [];
+
         graphStageMap[pos].push({
-  chapterName: ch.chapterName,
-  chapterId: ch.chapterId,
-  stageId: st.stageId,
-  stageName: st.stageName,
-  enemies: st.enemies
-});
+          chapterName: ch.chapterName,
+          chapterId: ch.chapterId,
+          stageId: st.stageId,
+          stageName: st.stageName,
+          enemies: st.enemies
+        });
       }
     });
   });
