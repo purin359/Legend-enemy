@@ -314,6 +314,7 @@ lastSelectedPos = null;
 function showStageList(pos) {
   document.getElementById("showStageEnemiesLabel").style.display = "block";
   lastSelectedPos = pos;
+
   const area = document.getElementById("stageList");
   const stages = graphStageMap[pos] || [];
 
@@ -324,11 +325,12 @@ function showStageList(pos) {
 
   const enemyName = selectedEnemy;
   const fileName = enemyName
+    .replace(/\r?\n/g, "")
+    .trim()
     .replace(/[：:]/g, " ")
     .replace(/[ 　]+/g, "");
 
   const imgPath = "image/" + encodeURIComponent(fileName) + ".png";
-
   const showEnemies = document.getElementById("showStageEnemies").checked;
 
   area.innerHTML = `
@@ -339,37 +341,35 @@ function showStageList(pos) {
       ${enemyName}
     </div>
 
-    <ul>
+    <ul style="${showEnemies ? 'padding-left:0;' : ''}">
       ${stages.map(st => `
-  <li style="
-    margin-bottom:10px;
-    ${showEnemies ? 'border:1px solid #ccc; border-radius:8px; padding:8px; list-style:none;' : ''}
-  ">
-    ${st.chapterId}-${st.stageId}
-    ${st.chapterName} - ${st.stageName}
+        <li style="
+          margin-bottom:10px;
+          ${showEnemies ? 'border:1px solid #ccc; border-radius:8px; padding:8px; list-style:none;' : ''}
+        ">
+          <div>
+            ${st.chapterId}-${st.stageId}
+            ${st.chapterName} - ${st.stageName}
+          </div>
 
-    ${showEnemies ? `
-      <div style="margin-top:6px;">
-        ${st.enemies
-          .filter(e => e !== "カンバン娘")
-          .map(enemy => `
-            <img src="${getEnemyImagePath(enemy)}"
-                 title="${enemy}"
-                 style="width:36px; margin-right:4px;"
-                 onerror="this.src='image/noimage.png'">
-          `).join("")}
-      </div>
-    ` : ""}
-  </li>
-`).join("")}
-    </div>
-  ` : ""}
-</li>
+          ${showEnemies ? `
+            <div style="margin-top:6px;">
+              ${st.enemies
+                .filter(e => e !== "カンバン娘")
+                .map(enemy => `
+                  <img src="${getEnemyImagePath(enemy)}"
+                       title="${enemy}"
+                       style="width:36px; margin-right:4px;"
+                       onerror="this.src='image/noimage.png'">
+                `).join("")}
+            </div>
+          ` : ""}
+        </li>
       `).join("")}
     </ul>
   `;
 }
-
+  
   function getEnemyImagePath(enemyName) {
   const fileName = enemyName
     .replace(/\r?\n/g, "")
