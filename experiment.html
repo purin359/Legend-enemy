@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <title>ステージ当てクイズ(実験用)</title>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+(function () {
+  const isSmallScreen = window.innerWidth <= 768;
+
+  if (isSmallScreen) {
+    const meta = document.querySelector("meta[name='viewport']");
+    meta.setAttribute("content", "width=device-width, initial-scale=1.2");
+  }
+})();
+</script>
+
 <style>
 body {
   font-family: sans-serif;
@@ -651,9 +664,6 @@ let endlessTimeLimit = "unlimited";
 let suggestMode = "on";
 const maxPassCount = 3;
 const timeAttackLimit = 600; // 10分
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 
 // 画像用
 function getFileName(name) {
@@ -2482,15 +2492,6 @@ function changeEndlessTime() {
     afterModeChanged();
   }
 }
-
-(function () {
-  const isSmallScreen = window.innerWidth <= 768;
-
-  if (isSmallScreen) {
-    const meta = document.querySelector("meta[name='viewport']");
-    meta.setAttribute("content", "width=device-width, initial-scale=1.2");
-  }
-})();
   
 init();
 </script>
