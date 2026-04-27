@@ -94,6 +94,10 @@ canvas {
 
   <canvas id="chart"></canvas>
   <div id="stageList"></div>
+  <label>
+  <input type="checkbox" id="showStageEnemies" onchange="redrawStageList()">
+  構成あり
+</label>
 </div>
 
 <script>
@@ -104,6 +108,7 @@ let selectedEnemy = "";
 let chart;
 let graphStageMap = {};
 let maxStage = 0;
+let lastSelectedPos = null;
 
 function normalize(str) {
   return String(str).replace(/\s/g, "");
@@ -179,13 +184,13 @@ function drawGraph() {
         counts[pos] = (counts[pos] || 0) + 1;
         total++;
 
-        if (!graphStageMap[pos]) graphStageMap[pos] = [];
         graphStageMap[pos].push({
-          chapterName: ch.chapterName,
-          chapterId: ch.chapterId,
-          stageId: st.stageId,
-          stageName: st.stageName
-        });
+  chapterName: ch.chapterName,
+  chapterId: ch.chapterId,
+  stageId: st.stageId,
+  stageName: st.stageName,
+  enemies: st.enemies
+});
       }
     });
   });
@@ -234,6 +239,7 @@ function drawGraph() {
 }
 
 function showStageList(pos) {
+  lastSelectedPos = pos;
   const area = document.getElementById("stageList");
   const stages = graphStageMap[pos] || [];
 
@@ -249,6 +255,8 @@ function showStageList(pos) {
 
   const imgPath = "image/" + encodeURIComponent(fileName) + ".png";
 
+  const showEnemies = document.getElementById("showStageEnemies").checked;
+
   area.innerHTML = `
     <h3>${pos}ステージ目の一覧</h3>
 
@@ -259,13 +267,42 @@ function showStageList(pos) {
 
     <ul>
       ${stages.map(st => `
-        <li>
-          ${st.chapterId}-${st.stageId}
-          ${st.chapterName} - ${st.stageName}
-        </li>
+        <li style="margin-bottom:10px;">
+  ${st.chapterId}-${st.stageId}
+  ${st.chapterName} - ${st.stageName}
+
+  ${showEnemies ? `
+    <div style="margin-top:6px;">
+      ${st.enemies
+        .filter(e => e !== "カンバン娘")
+        .map(enemy => `
+          <img src="${getEnemyImagePath(enemy)}"
+               title="${enemy}"
+               style="width:36px; margin-right:4px;"
+               onerror="this.src='image/noimage.png'">
+        `).join("")}
+    </div>
+  ` : ""}
+</li>
       `).join("")}
     </ul>
   `;
+}
+
+  function getEnemyImagePath(enemyName) {
+  const fileName = enemyName
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+
+  return "image/" + encodeURIComponent(fileName) + ".png";
+}
+
+function redrawStageList() {
+  if (lastSelectedPos !== null) {
+    showStageList(lastSelectedPos);
+  }
 }
   
 init();
