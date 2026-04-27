@@ -74,15 +74,15 @@ canvas {
 <h2>その他の機能</h2>
 
 <div class="menu">
-  <button class="funcBtn" onclick="openFunc('graph')">敵の登場位置グラフ</button>
+  <button class="funcBtn" onclick="openFunc('graph')">敵の登場ステージグラフ</button>
 </div>
 
 <!-- グラフ機能 -->
 <div id="graph" class="funcArea">
 
-  <h3>敵の登場位置グラフ</h3>
+  <h3>敵の登場ステージグラフ</h3>
 
-  <select id="mode">
+  <select id="mode" onchange="drawGraph()">
     <option value="ALL">全て</option>
     <option value="N">レジェンド</option>
     <option value="NA">真レジェンド</option>
@@ -90,9 +90,10 @@ canvas {
   </select>
 
   <div class="searchWrap">
-    <input id="enemyInput" placeholder="敵名を入力">
-    <div id="suggest"></div>
-  </div>
+  <input id="enemyInput" placeholder="敵名を入力">
+  <button type="button" onclick="clearEnemyInput()">×</button>
+  <div id="suggest"></div>
+</div>
 
   <div id="info"></div>
 
@@ -340,20 +341,27 @@ function showStageList(pos) {
 
     <ul>
       ${stages.map(st => `
-        <li style="margin-bottom:10px;">
-  ${st.chapterId}-${st.stageId}
-  ${st.chapterName} - ${st.stageName}
+  <li style="
+    margin-bottom:10px;
+    ${showEnemies ? 'border:1px solid #ccc; border-radius:8px; padding:8px; list-style:none;' : ''}
+  ">
+    ${st.chapterId}-${st.stageId}
+    ${st.chapterName} - ${st.stageName}
 
-  ${showEnemies ? `
-    <div style="margin-top:6px;">
-      ${st.enemies
-        .filter(e => e !== "カンバン娘")
-        .map(enemy => `
-          <img src="${getEnemyImagePath(enemy)}"
-               title="${enemy}"
-               style="width:36px; margin-right:4px;"
-               onerror="this.src='image/noimage.png'">
-        `).join("")}
+    ${showEnemies ? `
+      <div style="margin-top:6px;">
+        ${st.enemies
+          .filter(e => e !== "カンバン娘")
+          .map(enemy => `
+            <img src="${getEnemyImagePath(enemy)}"
+                 title="${enemy}"
+                 style="width:36px; margin-right:4px;"
+                 onerror="this.src='image/noimage.png'">
+          `).join("")}
+      </div>
+    ` : ""}
+  </li>
+`).join("")}
     </div>
   ` : ""}
 </li>
@@ -375,6 +383,24 @@ function showStageList(pos) {
 function redrawStageList() {
   if (lastSelectedPos !== null) {
     showStageList(lastSelectedPos);
+  }
+}
+
+  function clearEnemyInput() {
+  document.getElementById("enemyInput").value = "";
+  document.getElementById("suggest").innerHTML = "";
+  document.getElementById("info").textContent = "";
+  document.getElementById("stageList").innerHTML = "";
+  document.getElementById("showStageEnemiesLabel").style.display = "none";
+
+  selectedEnemy = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+  lastSelectedPos = null;
+
+  if (chart) {
+    chart.destroy();
+    chart = null;
   }
 }
   
