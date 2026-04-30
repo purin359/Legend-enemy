@@ -1573,8 +1573,12 @@ function unlockButtons() {
 function showCheckButton() {
   document.getElementById("checkBtn").style.display = "inline-block";
   document.getElementById("startBtn").style.display = "none";
-  document.getElementById("giveUpBtn").style.display =
+
+  const giveUpBtn = document.getElementById("giveUpBtn");
+  giveUpBtn.style.display =
     (gameMode === "practice" || isTimeAttackMode()) ? "inline-block" : "none";
+
+  giveUpBtn.disabled = false;
 
   updateHintPassButton();
   setHintPassDisabled(false);
