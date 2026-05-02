@@ -76,17 +76,10 @@ const backgroundsData = await fetch("backgrounds.json").then(r=>r.json());
 const detailMap = {};
 stageDetailsData.forEach(ch => {
   ch.stages.forEach(st => {
-    const detailKey = `${ch.chapterId}-${st.stageId}`;
-    const detail = detailMap[detailKey];
-    const showDetail = document.getElementById("showDetail").checked;
-
-    const bossList = detail && detail.bosses && detail.bosses !== "なし"
-      ? detail.bosses.split(",").map(s => normalize(s))
-      : [];
     detailMap[`${ch.chapterId}-${st.stageId}`] = st;
   });
 });
-
+  
 const castleMap = {};
 castlesData.forEach(c => {
   castleMap[c.castleId] = c.image;
@@ -123,6 +116,14 @@ backgroundsData.forEach(bg => {
     if (!isTarget) return;
 
     ch.stages.forEach(st => {
+
+      const detailKey = `${ch.chapterId}-${st.stageId}`;
+      const detail = detailMap[detailKey];
+      const showDetail = document.getElementById("showDetail").checked;
+
+      const bossList = detail && detail.bosses && detail.bosses !== "なし"
+        ? String(detail.bosses).split(",").map(s => normalize(s))
+        : [];
 
       if (st.enemies.map(normalize).includes(normalize(name))) {
 
