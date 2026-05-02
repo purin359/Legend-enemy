@@ -69,9 +69,9 @@ async function load() {
   document.getElementById("title").textContent = name;
 
  const stagesData = await fetch("stages.json").then(r=>r.json());
-const stageDetailsData = await fetch("stageDetails.json").then(r=>r.json());
-const castlesData = await fetch("castle.json").then(r=>r.json());
-const backgroundsData = await fetch("backgrounds.json").then(r=>r.json());
+const stageDetailsData = await fetch("stageDetails.json").then(r=>r.ok ? r.json());
+const castlesData = await fetch("castle.json").then(r=>r.ok ? r.json());
+const backgroundsData = await fetch("backgrounds.json").then(r=>r.ok ? r.json());
 
 const detailMap = {};
 
