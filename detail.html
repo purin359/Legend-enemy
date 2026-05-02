@@ -199,7 +199,7 @@ if (mode === "ALL") {
 
  const imgWrap = document.createElement("span");
 imgWrap.style.display = "inline-block";
-imgWrap.style.padding = "3px";
+imgWrap.style.padding = "0";
 imgWrap.style.borderRadius = "6px";
 imgWrap.style.marginRight = "5px";
 
@@ -210,6 +210,7 @@ if (showDetail && bossList.includes(normalize(enemyName))) {
 const img = document.createElement("img");
 img.src = "image/" + encodeURIComponent(fileName) + ".png";
 img.onerror = () => img.src = "image/noimage.png";
+img.style.display = "block";
 
 imgWrap.appendChild(img);
 td.appendChild(imgWrap);
