@@ -96,6 +96,11 @@ th { cursor:pointer; }
   height: 90px;
   object-fit: cover;
 }
+
+  tbody td:first-child {
+    text-align: center;
+    vertical-align: middle;
+  }
   
 </style>
 </head>
@@ -403,14 +408,11 @@ function goDetail(name) {
 
  function changeSort() {
   sortMode = document.getElementById("sort").value;
-  const type = document.getElementById("listType").value;
 
   const btn = document.getElementById("orderBtn");
 
-  // ▼ 城・背景は常に表示
-  btn.style.display = (sortMode === "count" || type !== "enemy")
-    ? "inline-block"
-    : "none";
+  btn.style.display =
+    (sortMode === "count") ? "inline-block" : "none";
 
   load();
 }
