@@ -90,18 +90,18 @@ th { cursor:pointer; }
   border-color: #4CAF50;
   background: #eaf7ea;
 }
+
+  .bgImg {
+  width: 160px;
+  height: 90px;
+  object-fit: cover;
+}
   
 </style>
 </head>
 <body>
 
 <h2>敵出現一覧</h2>
-
-<div class="filterRow">
-  <button onclick="changeListType('enemy')">敵</button>
-  <button onclick="changeListType('castle')">城</button>
-  <button onclick="changeListType('background')">背景</button>
-</div>
 
 <div class="filterRow">
   <input id="searchBox" placeholder="敵名で絞り込み" oninput="load()">
@@ -163,6 +163,12 @@ th { cursor:pointer; }
   <option value="N">レジェンド</option>
   <option value="NA">真レジェンド</option>
   <option value="ND" selected>レジェンド0</option>
+</select>
+
+<select id="listType" onchange="changeListType(this.value)">
+  <option value="enemy">敵</option>
+  <option value="castle">城</option>
+  <option value="background">背景</option>
 </select>
 
 <select id="sort" onchange="changeSort()">
@@ -246,6 +252,29 @@ function normalize(str) {
 }
   
 function load() {
+  const sortSelect = document.getElementById("sort");
+
+if (type === "enemy") {
+  sortSelect.innerHTML = `
+    <option value="count">登場回数順</option>
+    <option value="first">初出ステージ順</option>
+    <option value="order">図鑑順</option>
+  `;
+} else {
+  sortSelect.innerHTML = `
+    <option value="count">使用回数順</option>
+    <option value="first">初出ステージ順</option>
+  `;
+}
+  
+  const type = document.getElementById("listType").value;
+
+document.getElementById("searchBox").style.display =
+  (type === "enemy") ? "" : "none";
+
+document.getElementById("attrSelect").style.display =
+  (type === "enemy") ? "" : "none";
+  
   if (listType === "castle") {
   loadCastleList();
   return;
@@ -352,9 +381,11 @@ list = list.map(e => {
   }
 
   if (sortMode === "first") {
-    return a.firstNum - b.firstNum; // 固定（昇順のみ）
+    return a.firstNum - b.firstNum;
   }
 
+});
+  
   if (sortMode === "order") {
     return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
   }
@@ -390,25 +421,27 @@ img.onerror = () => img.src = "image/noimage.png";
     window.location.href = url.toString();
   });
 
+    document.querySelector("thead tr").innerHTML = `
+  <th>画像</th>
+  <th>使用回数</th>
+  <th>初出ステージ</th>
+`;
+
   const tr = document.createElement("tr");
 
-  const tdImg = document.createElement("td");
-  tdImg.appendChild(img);
+const tdImg = document.createElement("td");
+tdImg.appendChild(img);
 
-  const tdName = document.createElement("td");
-  tdName.textContent = e.name;
+const tdCount = document.createElement("td");
+tdCount.textContent = e.count;
 
-  const tdCount = document.createElement("td");
-  tdCount.textContent = e.count;
+const tdFirst = document.createElement("td");
+tdFirst.textContent = e.first;
 
-  const tdFirst = document.createElement("td");
-  tdFirst.textContent = e.first;
-
-  tr.appendChild(tdImg);
-  tr.appendChild(tdName);
-  tr.appendChild(tdCount);
-  tr.appendChild(tdFirst);
-
+tr.appendChild(tdImg);
+tr.appendChild(tdCount);
+tr.appendChild(tdFirst);
+    
   tbody.appendChild(tr);
 });
 }
@@ -428,13 +461,17 @@ function goDetail(name) {
   location.href = url.toString();
 }
 
-  function changeSort() {
+ function changeSort() {
   sortMode = document.getElementById("sort").value;
+  const type = document.getElementById("listType").value;
 
-  // ▼ 回数以外は昇降非表示
   const btn = document.getElementById("orderBtn");
-btn.style.display = (sortMode === "count") ? "inline-block" : "none";
-    
+
+  // ▼ 城・背景は常に表示
+  btn.style.display = (sortMode === "count" || type !== "enemy")
+    ? "inline-block"
+    : "none";
+
   load();
 }
 
@@ -547,6 +584,9 @@ window.addEventListener("click", e => {
 
   function changeListType(type) {
   listType = type;
+
+  document.getElementById("listType").value = type;
+
   load();
 }
 
