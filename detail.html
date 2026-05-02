@@ -131,11 +131,17 @@ img {
   object-fit: contain;
 }
 
-  .titleIconLarge {
-    width: 120px;
-    height: auto;
-    object-fit: contain;
-  }
+  .titleIconCastle {
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+}
+
+.titleIconBg {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+}
   
 </style>
 </head>
@@ -227,10 +233,11 @@ backgroundList.forEach(bg => {
 
   document.getElementById("title").textContent = name || "";
 
-const titleIcon = document.getElementById("titleIcon");
+// 一旦リセット
+titleIcon.classList.remove("titleIconLarge", "titleIconCastle", "titleIconBg");
 
 if (name) {
-  titleIcon.classList.remove("titleIconLarge");
+  // 敵
   const titleFileName = name
     .replace(/\r?\n/g, "")
     .trim()
@@ -239,20 +246,20 @@ if (name) {
 
   titleIcon.src = "image/" + encodeURIComponent(titleFileName) + ".png";
   titleIcon.onerror = () => titleIcon.src = "image/noimage.png";
-} else {
-  if (castleParam) {
-    titleIcon.src = castleMap[String(castleParam)] || "";
-    titleIcon.classList.add("titleIconLarge");
-    titleIcon.onerror = () => titleIcon.style.display = "none";
-  } else if (backgroundParam) {
-    titleIcon.src = backgroundMap[String(backgroundParam)] || "";
-    titleIcon.classList.add("titleIconLarge");
-    titleIcon.onerror = () => titleIcon.style.display = "none";
-  } else {
-    titleIcon.style.display = "none";
-  }
-}
 
+} else if (castleParam) {
+  // 城
+  titleIcon.src = castleMap[String(castleParam)] || "";
+  titleIcon.classList.add("titleIconCastle");
+
+} else if (backgroundParam) {
+  // 背景
+  titleIcon.src = backgroundMap[String(backgroundParam)] || "";
+  titleIcon.classList.add("titleIconBg");
+
+} else {
+  titleIcon.style.display = "none";
+}
   
   const ul = document.getElementById("list");
   ul.innerHTML = "";
