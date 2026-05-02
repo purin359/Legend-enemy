@@ -130,6 +130,12 @@ img {
   height: 45px;
   object-fit: contain;
 }
+
+  .titleIconLarge {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+  }
   
 </style>
 </head>
@@ -235,9 +241,11 @@ if (name) {
 } else {
   if (castleParam) {
     titleIcon.src = castleMap[String(castleParam)] || "";
+    titleIcon.classList.add("titleIconLarge");
     titleIcon.onerror = () => titleIcon.style.display = "none";
   } else if (backgroundParam) {
     titleIcon.src = backgroundMap[String(backgroundParam)] || "";
+    titleIcon.classList.add("titleIconLarge");
     titleIcon.onerror = () => titleIcon.style.display = "none";
   } else {
     titleIcon.style.display = "none";
