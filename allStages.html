@@ -451,6 +451,17 @@ backgroundsData.forEach(bg => {
     chapterBox.appendChild(title);
 
     ch.stages.forEach(st => {
+      const showDetail = document.getElementById("showDetail").checked;
+const detailKey = `${ch.chapterId}-${st.stageId}`;
+const detail = detailMap[detailKey];
+
+const bossList = detail && detail.bosses && detail.bosses !== "なし"
+  ? String(detail.bosses)
+      .split(/[,\、]/)
+      .map(s => normalize(s))
+      .filter(Boolean)
+  : [];
+      
       if (selectedAttrs.length > 0 && !stageHasAllAttrs(st.enemies, selectedAttrs)) {
   return;
 }
@@ -519,6 +530,10 @@ if (showDetail && detail) {
         const img = document.createElement("img");
         img.src = "image/" + encodeURIComponent(fileName) + ".png";
         img.onerror = () => img.src = "image/noimage.png";
+
+        if (showDetail && bossList.includes(normalize(enemyName))) {
+        img.style.outline = "3px solid #ffE500";
+      }
 
         img.addEventListener("click", () => {
           const url = new URL("detail.html", location.href);
