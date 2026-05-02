@@ -2,48 +2,18 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>全ステージ一覧</title>
+<title>敵出現一覧</title>
 
 <style>
-body {
-  font-family: sans-serif;
-  max-width: 1400px;
-  margin: auto;
-  padding: 20px;
-}
+body { font-family: sans-serif; padding:20px; }
 
-.stageTable th, .stageTable td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
+table { border-collapse: collapse; width:100%; }
+th, td { border:1px solid #ccc; padding:5px; }
+img { width:50px; cursor:pointer; }
 
-.stageTable th {
-  width: 120px;
-  background: #f0f0f0;
-}
+th { cursor:pointer; }
 
-  .stageTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 10px;
-}
-
-h3 {
-  margin: 0 0 10px 0;
-  padding: 5px;
-  background: #eee;
-}
-  
-.stageRow {
-  margin-bottom: 10px;
-}
-
-img {
-  width: 45px;
-  margin-right: 5px;
-}
-
-  .filterRow {
+.filterRow {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -51,35 +21,14 @@ img {
   margin-bottom: 10px;
 }
 
-.attrBtn {
-  padding: 6px;
-  border: 1px solid #ccc;
-  background: #f8f8f8;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.attrBtn.active {
-  background: #dff0df;
-  border-color: #4CAF50;
-}
-
-.attrBtn img {
-  width: 24px;
-  height: 24px;
-  margin: 0;
-}
-
-  .attrSelect {
+.attrSelect {
   position: relative;
-  display: inline-block;
-  margin-top: 8px;
 }
 
 .attrSelectBtn {
-  min-height: 36px;
+  min-height: 38px;
   min-width: 180px;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   background: white;
@@ -88,10 +37,22 @@ img {
   align-items: center;
 }
 
+#attrSelectedView {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+#attrSelectedView img {
+  width: 24px;
+  height: 24px;
+}
+
 .attrMenu {
   display: none;
   position: absolute;
-  top: 40px;
+  top: 42px;
   left: 0;
   background: white;
   border: 1px solid #ccc;
@@ -99,6 +60,8 @@ img {
   padding: 6px;
   z-index: 20;
   min-width: 220px;
+  max-height: 240px;
+  overflow-y: auto;
 }
 
 .attrMenu.open {
@@ -108,11 +71,9 @@ img {
 }
 
 .attrOption {
-  width: 44px;
-  height: 44px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 4px;
+  padding: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -123,163 +84,395 @@ img {
 .attrOption img {
   width: 28px;
   height: 28px;
-  margin: 0;
 }
 
 .attrOption.active {
   border-color: #4CAF50;
   background: #eaf7ea;
 }
-
-#attrSelectedView img {
-  width: 24px;
-  height: 24px;
-  margin: 0;
-}
-
-  #attrSelectedView {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-  .stageTable {
-  table-layout: fixed;
-}
-
-.stageTable td:nth-child(3) {
-  width: 300px;
-}
-
-.sideInfoTable {
-  width: 100%;
-  height: 100%;
-  border-collapse: collapse;
-}
-
-.sideInfoTable th,
-.sideInfoTable td {
-  border: 1px solid #ccc;
-  padding: 6px;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.sideLabel {
-  width: 60px;
-  background: #f0f0f0;
-  white-space: nowrap;
-  line-height: 1.4;
-}
-
-.sideImages {
-  white-space: nowrap;
-}
-
-.castleImg {
-  width: 60px;
-  height: 80px;
-  object-fit: contain;
-  vertical-align: middle;
-}
-
-.bgImg {
-  width: 100px;
-  height: 55px;
-  object-fit: cover;
-  vertical-align: middle;
-}
-
-.detailGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.detailGrid > div {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px;
-  text-align: center;
-  background: #fafafa;
-}
-
-.detailLabel {
-  font-size: 13px;
-  color: #555;
-}
-
-.detailValue {
-  font-size: 16px;
-  font-weight: bold;
-}
   
 </style>
 </head>
 <body>
-<button onclick="goBack()">戻る</button>
 
-<h2>全ステージ一覧</h2>
+<h2>敵出現一覧</h2>
 
-  <div id="countInfo" style="margin:10px 0; font-weight:bold;"></div>
+<div class="filterRow">
+  <button onclick="changeListType('enemy')">敵</button>
+  <button onclick="changeListType('castle')">城</button>
+  <button onclick="changeListType('background')">背景</button>
+</div>
 
+<div class="filterRow">
+  <input id="searchBox" placeholder="敵名で絞り込み" oninput="load()">
+
+  <div class="attrSelect" id="attrSelect">
+    <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
+      <span id="attrSelectedView">属性で絞り込み</span>
+    </button>
+    <div id="attrMenu" class="attrMenu">
+  <div class="attrOption" onclick="toggleAttr('赤')">
+    <img src="image_type/赤.png" alt="赤">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('浮き')">
+    <img src="image_type/浮き.png" alt="浮き">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('黒')">
+    <img src="image_type/黒.png" alt="黒">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('メタル')">
+    <img src="image_type/メタル.png" alt="メタル">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('天使')">
+    <img src="image_type/天使.png" alt="天使">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('エイリアン')">
+    <img src="image_type/エイリアン.png" alt="エイリアン">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('ゾンビ')">
+    <img src="image_type/ゾンビ.png" alt="ゾンビ">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('悪魔')">
+    <img src="image_type/悪魔.png" alt="悪魔">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('古代種')">
+    <img src="image_type/古代種.png" alt="古代種">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('無属性')">
+    <img src="image_type/無属性.png" alt="無属性">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('超生命体')">
+    <img src="image_type/超生命体.png" alt="超生命体">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('超獣')">
+    <img src="image_type/超獣.png" alt="超獣">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('超賢者')">
+    <img src="image_type/超賢者.png" alt="超賢者">
+  </div>
+  <div class="attrOption" onclick="toggleAttr('城')">
+    <span>城</span>
+  </div>
+</div>
+          
+  </div>
+</div>
+  
 <select id="mode" onchange="load()">
   <option value="ALL">全て</option>
   <option value="N">レジェンド</option>
   <option value="NA">真レジェンド</option>
-  <option value="ND">レジェンド0</option>
+  <option value="ND" selected>レジェンド0</option>
 </select>
 
-<label>
-  <input type="checkbox" id="showKanban" onchange="load()">
-  カンバン娘を表示
-</label>
+<select id="sort" onchange="changeSort()">
+  <option value="count">登場回数順</option>
+  <option value="first">初出ステージ順</option>
+  <option value="order">図鑑順</option>
+</select>
 
-<label>
-  <input type="checkbox" id="showDetail" onchange="load()">
-  詳細表示
-</label>
+<button id="orderBtn" onclick="toggleOrder()">降順</button>
+  
+  <button onclick="goAllStages()">全ステージ一覧へ</button>
 
-<label>
-  <input type="checkbox" id="showFirstOnly" onchange="load()">
-  初登場敵のみ表示
-</label>
+  <button onclick="location.href='tools.html'">その他の機能</button>
 
-<div class="attrSelect" id="attrSelect">
-  <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
-    <span id="attrSelectedView">属性で絞り込み</span>
-  </button>
-
-  <div id="attrMenu" class="attrMenu">
-    <div class="attrOption" onclick="toggleAttr('赤')"><img src="image_type/赤.png" alt="赤"></div>
-    <div class="attrOption" onclick="toggleAttr('浮き')"><img src="image_type/浮き.png" alt="浮き"></div>
-    <div class="attrOption" onclick="toggleAttr('黒')"><img src="image_type/黒.png" alt="黒"></div>
-    <div class="attrOption" onclick="toggleAttr('メタル')"><img src="image_type/メタル.png" alt="メタル"></div>
-    <div class="attrOption" onclick="toggleAttr('天使')"><img src="image_type/天使.png" alt="天使"></div>
-    <div class="attrOption" onclick="toggleAttr('エイリアン')"><img src="image_type/エイリアン.png" alt="エイリアン"></div>
-    <div class="attrOption" onclick="toggleAttr('ゾンビ')"><img src="image_type/ゾンビ.png" alt="ゾンビ"></div>
-    <div class="attrOption" onclick="toggleAttr('悪魔')"><img src="image_type/悪魔.png" alt="悪魔"></div>
-    <div class="attrOption" onclick="toggleAttr('古代種')"><img src="image_type/古代種.png" alt="古代種"></div>
-    <div class="attrOption" onclick="toggleAttr('無属性')"><img src="image_type/無属性.png" alt="無属性"></div>
-    <div class="attrOption" onclick="toggleAttr('超生命体')"><img src="image_type/超生命体.png" alt="超生命体"></div>
-    <div class="attrOption" onclick="toggleAttr('超獣')"><img src="image_type/超獣.png" alt="超獣"></div>
-    <div class="attrOption" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png" alt="超賢者"></div>
-    <div class="attrOption" onclick="toggleAttr('城')"><span>城</span></div>
-  </div>
-</div>
-  <button id="toggleListBtn" onclick="toggleList()">リスト非表示</button>
-
-<div id="list"></div>
+<table>
+<thead>
+<tr>
+  <th>画像</th>
+  <th>敵名</th>
+  <th>登場回数</th>
+  <th>初出ステージ</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
 
 <script>
-let initialized = false;
-let stageCount = 0;
-let chapterCount = 0;
+let stagesData = [];
+let desc = true;
+let enemiesData = {};
+let sortMode = "count";
+let orderMap = {};
 let selectedAttrs = [];
+let listType = "enemy";
 
-  const attrImageMap = {
+async function init() {
+  enemiesData = await fetch("enemies.json").then(r=>r.json());
+  stagesData = await fetch("stages.json").then(r=>r.json());
+
+  // 順番記録
+  let i = 0;
+  for (let key in enemiesData) {
+    orderMap[enemiesData[key].name] = i++;
+  }
+
+  changeSort();
+  
+  load();
+}
+  
+// 比較専用（スペース無視）
+function normalize(str) {
+  return str
+    .toString()
+    .replace(/\r?\n/g, "")
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    )
+    .replace(/[ァ-ン]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)
+    )
+    .replace(/[：:]/g, "")
+    .replace(/[ 　]+/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+  function getEnemyTypes(enemyName) {
+  const key = normalize(enemyName);
+
+  const found = Object.values(enemiesData).find(enemy =>
+    normalize(enemy.name) === key
+  );
+
+  if (!found || !found.type) return [];
+
+  return String(found.type)
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+  
+function load() {
+  if (listType === "castle") {
+  loadCastleList();
+  return;
+}
+
+if (listType === "background") {
+  loadBackgroundList();
+  return;
+}
+  
+  const mode = document.getElementById("mode").value;
+  const map = {};
+
+  stagesData.forEach(ch => {
+
+    const isTarget =
+  (mode === "ALL") ||
+
+  (mode === "N" && (
+    (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+    || ch.chapterId === "E026"
+  )) ||
+
+  (mode === "NA" && (
+    ch.chapterId.startsWith("NA")
+    || ch.chapterId === "E068"
+    || ch.chapterId === "E069"
+  )) ||
+
+  (mode === "ND" && ch.chapterId.startsWith("ND"));
+
+    if (!isTarget) return;
+
+    ch.stages.forEach(st => {
+      st.enemies.forEach(enemyName => {
+
+        const key = normalize(enemyName);
+
+        const displayName = enemyName
+  .replace(/\r?\n/g, "")
+  .replace(/[ 　\u00A0]+/g, " ") // ←これ追加（超重要）
+  .trim();
+
+        if (!map[key]) {
+          map[key] = {
+            name: enemyName,
+            count: 0,
+            first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+          };
+        }
+
+        map[key].count++;
+      });
+    });
+
+  });
+
+let list = Object.values(map);
+
+const search = document.getElementById("searchBox").value.trim();
+
+if (search) {
+  const keyword = normalize(search);
+
+  list = list.filter(e =>
+    normalize(e.name).includes(keyword)
+  );
+}
+
+if (selectedAttrs.length > 0) {
+  list = list.filter(e => {
+    const types = getEnemyTypes(e.name);
+    return selectedAttrs.some(attr => types.includes(attr)); // OR
+  });
+}
+  
+list = list.map(e => {
+
+  const match = e.first.match(/([A-Z]+)(\d+)-(\d+)/);
+
+  let firstNum = 999999;
+
+  if (match) {
+    const prefix = match[1];
+    const chap = parseInt(match[2]);
+    const stage = parseInt(match[3]);
+
+    const base =
+      prefix === "N"  ? 0 :
+      prefix === "NA" ? 100000 :
+      prefix === "ND" ? 200000 :
+      prefix === "E"  ? 300000 : 400000;
+
+    firstNum = base + chap * 100 + stage;
+  }
+
+  return { ...e, firstNum };
+});
+  
+ list.sort((a, b) => {
+
+  if (sortMode === "count") {
+    return desc ? b.count - a.count : a.count - b.count;
+  }
+
+  if (sortMode === "first") {
+    return a.firstNum - b.firstNum; // 固定（昇順のみ）
+  }
+
+  if (sortMode === "order") {
+    return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
+  }
+
+});
+
+  const tbody = document.getElementById("table");
+  tbody.innerHTML = "";
+
+  list.forEach(e => {
+
+  const baseName = e.name
+  .replace(/\r?\n/g, "")
+  .trim();
+
+// ▼画像用
+const fileName = baseName
+  .replace(/[：:]/g, " ")   // ← ★ここ重要（全角＋半角対応）
+  .replace(/[ 　]+/g, "");  // スペース削除
+const img = document.createElement("img");
+img.src = "image/" + encodeURIComponent(fileName) + ".png";
+
+img.onerror = () => img.src = "image/noimage.png";
+
+  // ★ここ重要（確実に動くクリック）
+  img.addEventListener("click", () => {
+    const mode = document.getElementById("mode").value;
+
+    const url = new URL("detail.html", location.href);
+    url.searchParams.set("name", e.name);
+    url.searchParams.set("mode", mode);
+
+    window.location.href = url.toString();
+  });
+
+  const tr = document.createElement("tr");
+
+  const tdImg = document.createElement("td");
+  tdImg.appendChild(img);
+
+  const tdName = document.createElement("td");
+  tdName.textContent = e.name;
+
+  const tdCount = document.createElement("td");
+  tdCount.textContent = e.count;
+
+  const tdFirst = document.createElement("td");
+  tdFirst.textContent = e.first;
+
+  tr.appendChild(tdImg);
+  tr.appendChild(tdName);
+  tr.appendChild(tdCount);
+  tr.appendChild(tdFirst);
+
+  tbody.appendChild(tr);
+});
+}
+
+function toggleSort() {
+  desc = !desc;
+  load();
+}
+
+function goDetail(name) {
+  const mode = document.getElementById("mode").value;
+
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("name", name);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
+}
+
+  function changeSort() {
+  sortMode = document.getElementById("sort").value;
+
+  // ▼ 回数以外は昇降非表示
+  const btn = document.getElementById("orderBtn");
+btn.style.display = (sortMode === "count") ? "inline-block" : "none";
+    
+  load();
+}
+
+function changeOrder() {
+  const val = document.getElementById("order").value;
+  desc = (val === "desc");
+  load();
+}
+
+  function setAsc() {
+  desc = false;
+  load();
+}
+
+function setDesc() {
+  desc = true;
+  load();
+}
+
+  function goAllStages() {
+  const mode = document.getElementById("mode").value;
+
+  const url = new URL("allStages.html", location.href);
+  url.searchParams.set("mode", mode);
+
+  location.href = url.toString();
+}
+
+  function toggleOrder() {
+  desc = !desc;
+
+  const btn = document.getElementById("orderBtn");
+  btn.textContent = desc ? "降順" : "昇順";
+
+  load();
+}
+
+const attrImageMap = {
   "赤": "image_type/赤.png",
   "浮き": "image_type/浮き.png",
   "黒": "image_type/黒.png",
@@ -337,8 +530,10 @@ function updateAttrSelectedView() {
 
 function updateAttrOptionState() {
   document.querySelectorAll(".attrOption").forEach(option => {
+    const text = option.textContent.trim();
     const img = option.querySelector("img");
-    const attr = img ? img.alt : option.textContent.trim();
+    const attr = img ? img.alt : text;
+
     option.classList.toggle("active", selectedAttrs.includes(attr));
   });
 }
@@ -349,303 +544,156 @@ window.addEventListener("click", e => {
     document.getElementById("attrMenu").classList.remove("open");
   }
 });
-  
-function normalize(str) {
-  return str
-    .replace(/\r?\n/g, "")
-    .replace(/[ 　]+/g, "")
-    .trim();
-}
 
-  let enemiesData = {};
-
-async function init() {
-  enemiesData = await fetch("enemies.json").then(r=>r.json());
+  function changeListType(type) {
+  listType = type;
   load();
 }
 
-init();
-
-async function load() {
-  let stageCount = 0;
-
-  const stageDetailsData = await fetch("stageDetails.json")
-  .then(r => r.ok ? r.json() : [])
-  .catch(() => []);
-
-const castlesData = await fetch("castles.json")
-  .then(r => r.ok ? r.json() : [])
-  .catch(() => []);
-
-const backgroundsData = await fetch("backgrounds.json")
-  .then(r => r.ok ? r.json() : [])
-  .catch(() => []);
-
-  const detailMap = {};
-stageDetailsData.forEach(ch => {
-  ch.stages.forEach(st => {
-    detailMap[`${ch.chapterId}-${st.stageId}`] = st;
-  });
-});
-
-const castleMap = {};
-castlesData.forEach(c => {
-  castleMap[String(c.castleId)] = c.image;
-});
-
-const backgroundMap = {};
-backgroundsData.forEach(bg => {
-  backgroundMap[String(bg.background)] = bg.image;
-});
-
-  if (!initialized) {
-    const params = new URLSearchParams(location.search);
-    const modeParam = params.get("mode");
-    if (modeParam) {
-      document.getElementById("mode").value = modeParam;
-    }
-    initialized = true;
-  }
-
+  async function loadCastleList() {
   const mode = document.getElementById("mode").value;
-  const stagesData = await fetch("stages.json").then(r => r.json());
 
-  const list = document.getElementById("list");
-  list.innerHTML = "";
+  const stageDetailsData = await fetch("stageDetails.json").then(r => r.json());
+  const castlesData = await fetch("castles.json").then(r => r.json());
 
-  const shownInRange = new Set();
+  const castleMap = {};
+  castlesData.forEach(c => {
+    castleMap[String(c.castleId)] = c.image;
+  });
 
-  stagesData.forEach(ch => {
+  const map = {};
 
-    const isTarget =
-      (mode === "ALL") ||
-
-      (mode === "N" && (
-        (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
-        || ch.chapterId === "E026"
-      )) ||
-
-      (mode === "NA" && (
-        ch.chapterId.startsWith("NA")
-        || ch.chapterId === "E068"
-        || ch.chapterId === "E069"
-      )) ||
-
-      (mode === "ND" && ch.chapterId.startsWith("ND"));
-
-    if (!isTarget) return;
-
-    const chapterBox = document.createElement("div");
-    chapterBox.style.border = "2px solid #ccc";
-    chapterBox.style.padding = "10px";
-    chapterBox.style.marginBottom = "20px";
-
-    let hasAnyEnemyInChapter = false;
-
-    const title = document.createElement("h3");
-    title.textContent = ch.chapterName;
-    chapterBox.appendChild(title);
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
-      if (selectedAttrs.length > 0 && !stageHasAllAttrs(st.enemies, selectedAttrs)) {
-  return;
-}
-      
-      const table = document.createElement("table");
-      table.className = "stageTable";
+      const id = String(st.castleId);
 
-      const tr1 = document.createElement("tr");
-      tr1.innerHTML = `
-        <th>ステージ</th>
-        <td>${st.stageName}</td>
-      `;
-
-      const showDetail = document.getElementById("showDetail").checked;
-const detailKey = `${ch.chapterId}-${st.stageId}`;
-const detail = detailMap[detailKey];
-
-if (showDetail && detail) {
-  const castleImg = castleMap[String(detail.castleId)] || "";
-  const bgImg = backgroundMap[String(detail.background)] || "";
-
-  const sideTd = document.createElement("td");
-  sideTd.rowSpan = 2;
-  sideTd.innerHTML = `
-    <table class="sideInfoTable">
-      <tr>
-        <th class="sideLabel">敵城<br>背景</th>
-        <td class="sideImages">
-          ${castleImg ? `<img class="castleImg" src="${castleImg}">` : ""}
-          ${bgImg ? `<img class="bgImg" src="${bgImg}">` : ""}
-        </td>
-      </tr>
-    </table>
-  `;
-
-  tr1.appendChild(sideTd);
-}
-
-      const tr2 = document.createElement("tr");
-      const th = document.createElement("th");
-
-      const showKanban = document.getElementById("showKanban").checked;
-      const showFirstOnly = document.getElementById("showFirstOnly").checked;
-
-      th.textContent = showFirstOnly ? "初登場の敵" : "出現する敵";
-
-      const td = document.createElement("td");
-
-      st.enemies.forEach(enemyName => {
-        if (!showKanban && enemyName === "カンバン娘") return;
-
-        const enemyKey = normalize(enemyName);
-
-        if (showFirstOnly && shownInRange.has(enemyKey)) {
-          return;
-        }
-
-        shownInRange.add(enemyKey);
-
-        const baseName = enemyName.replace(/\r?\n/g, "").trim();
-
-        const fileName = baseName
-          .replace(/[：:]/g, " ")
-          .replace(/[ 　]+/g, "");
-
-        const img = document.createElement("img");
-        img.src = "image/" + encodeURIComponent(fileName) + ".png";
-        img.onerror = () => img.src = "image/noimage.png";
-
-        img.addEventListener("click", () => {
-          const url = new URL("detail.html", location.href);
-          url.searchParams.set("name", enemyName);
-          url.searchParams.set("mode", mode);
-          location.href = url;
-        });
-
-        td.appendChild(img);
-        hasAnyEnemyInChapter = true;
-      });
-
-      if (td.childElementCount === 0) {
-        return;
-        stageCount++;
+      if (!map[id]) {
+        map[id] = {
+          id,
+          count: 0,
+          image: castleMap[id] || "",
+          first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+        };
       }
 
-      tr2.appendChild(th);
-      tr2.appendChild(td);
+      map[id].count++;
+    });
+  });
 
-      table.appendChild(tr1);
-      table.appendChild(tr2);
+  renderSpecialList(Object.values(map), "castle");
+}
 
-      if (showDetail && detail) {
-  const tr3 = document.createElement("tr");
+  async function loadBackgroundList() {
+  const mode = document.getElementById("mode").value;
 
-  tr3.innerHTML = `
-    <th>詳細</th>
-    <td colspan="2">
-      <div class="detailGrid">
-        <div>
-          <div class="detailLabel">城体力</div>
-          <div class="detailValue">${Number(detail.castleHP).toLocaleString()}</div>
-        </div>
-        <div>
-          <div class="detailLabel">城距離</div>
-          <div class="detailValue">${detail.castleDistance}</div>
-        </div>
-        <div>
-          <div class="detailLabel">統率力</div>
-          <div class="detailValue">${detail.energy}</div>
-        </div>
-        <div>
-          <div class="detailLabel">出撃制限</div>
-          <div class="detailValue">${detail.unitLimit}</div>
-        </div>
-      </div>
-    </td>
+  const stageDetailsData = await fetch("stageDetails.json").then(r => r.json());
+  const backgroundsData = await fetch("backgrounds.json").then(r => r.json());
+
+  const backgroundMap = {};
+  backgroundsData.forEach(bg => {
+    backgroundMap[String(bg.background)] = bg.image;
+  });
+
+  const map = {};
+
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      const id = String(st.background);
+
+      if (!map[id]) {
+        map[id] = {
+          id,
+          count: 0,
+          image: backgroundMap[id] || "",
+          first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+        };
+      }
+
+      map[id].count++;
+    });
+  });
+
+  renderSpecialList(Object.values(map), "background");
+}
+
+  function renderSpecialList(list, type) {
+  const tbody = document.getElementById("table");
+  tbody.innerHTML = "";
+
+  document.querySelector("thead tr").innerHTML = `
+    <th>画像</th>
+    <th>${type === "castle" ? "城ID" : "背景ID"}</th>
+    <th>使用回数</th>
+    <th>初出ステージ</th>
   `;
 
-  table.appendChild(tr3);
-}
-      
-      chapterBox.appendChild(table);
-      stageCount++;
+  list.sort((a, b) => desc ? b.count - a.count : a.count - b.count);
+
+  list.forEach(e => {
+    const img = document.createElement("img");
+    img.src = e.image;
+    img.onerror = () => img.src = "image/noimage.png";
+
+    img.addEventListener("click", () => {
+      const mode = document.getElementById("mode").value;
+
+      const url = new URL("detail.html", location.href);
+      url.searchParams.set(type, e.id);
+      url.searchParams.set("mode", mode);
+      url.searchParams.set("detail", "1");
+
+      location.href = url.toString();
     });
 
-    const showFirstOnly = document.getElementById("showFirstOnly").checked;
+    const tr = document.createElement("tr");
 
-    if (showFirstOnly && !hasAnyEnemyInChapter) {
-      const noEnemy = document.createElement("div");
-      noEnemy.textContent = "初登場敵なし";
-      noEnemy.style.padding = "10px";
-      noEnemy.style.color = "#666";
-      noEnemy.style.background = "#f8f8f8";
-      noEnemy.style.border = "1px dashed #ccc";
-      noEnemy.style.textAlign = "center";
-      chapterBox.appendChild(noEnemy);
-    }
+    const tdImg = document.createElement("td");
+    tdImg.appendChild(img);
 
-    if (chapterBox.querySelectorAll(".stageTable").length > 0 || chapterBox.textContent.includes("初登場敵なし")) {
-  list.appendChild(chapterBox);
-}
+    const tdName = document.createElement("td");
+    tdName.textContent = e.id;
+
+    const tdCount = document.createElement("td");
+    tdCount.textContent = e.count;
+
+    const tdFirst = document.createElement("td");
+    tdFirst.textContent = e.first;
+
+    tr.appendChild(tdImg);
+    tr.appendChild(tdName);
+    tr.appendChild(tdCount);
+    tr.appendChild(tdFirst);
+
+    tbody.appendChild(tr);
   });
-  document.getElementById("countInfo").textContent =
-  `${stageCount}ステージが該当します`;
-}
-  
-  function goBack() {
-  history.back();
 }
 
-  function stageHasAllAttrs(enemies, selectedAttrs) {
+  function isTargetChapter(ch, mode) {
+  return (
+    mode === "ALL" ||
 
-  const showKanban = document.getElementById("showKanban").checked;
-  const allTypes = new Set();
+    (mode === "N" && (
+      (ch.chapterId.startsWith("N") &&
+       !ch.chapterId.startsWith("NA") &&
+       !ch.chapterId.startsWith("ND")) ||
+      ch.chapterId === "E026"
+    )) ||
 
-  enemies.forEach(name => {
+    (mode === "NA" && (
+      ch.chapterId.startsWith("NA") ||
+      ch.chapterId === "E068" ||
+      ch.chapterId === "E069"
+    )) ||
 
-    // 🔥 カンバン娘除外（表示OFF時）
-    if (!showKanban && name === "カンバン娘") return;
-
-    const types = getEnemyTypes(name);
-    types.forEach(t => allTypes.add(t));
-  });
-
-  return selectedAttrs.every(attr => allTypes.has(attr));
-}
-
-  function getEnemyTypes(enemyName) {
-  const key = normalize(enemyName);
-
-  const found = Object.values(enemiesData).find(enemy =>
-    normalize(enemy.name) === key
+    (mode === "ND" && ch.chapterId.startsWith("ND"))
   );
-
-  if (!found || !found.type) return [];
-
-  return String(found.type)
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
 }
 
-  let isListHidden = false;
-
-function toggleList() {
-  const list = document.getElementById("list");
-  const btn = document.getElementById("toggleListBtn");
-
-  isListHidden = !isListHidden;
-
-  if (isListHidden) {
-    list.style.display = "none";
-    btn.textContent = "リスト表示";
-  } else {
-    list.style.display = "";
-    btn.textContent = "リスト非表示";
-  }
-}
-
+init();
 </script>
 
 </body>
