@@ -72,6 +72,37 @@ img {
   font-weight: bold;
 }
 
+  .sideInfoTable {
+  border-collapse: collapse;
+  margin-left: auto;
+  width: auto;
+}
+
+.sideInfoTable th,
+.sideInfoTable td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.sideInfoTable th {
+  background: #f0f0f0;
+  width: 60px;
+}
+
+.castleImg {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.bgImg {
+  width: 100px;
+  height: 55px;
+  object-fit: cover;
+}
+
 </style>
 </head>
 <body>
@@ -224,9 +255,21 @@ if (mode === "ALL") {
   imgTd.style.whiteSpace = "nowrap";
 
   imgTd.innerHTML = `
-    ${castleImg ? `<img class="castleImg" src="${castleImg}" onerror="this.style.display='none'">` : ""}
-    ${bgImg ? `<img class="bgImg" src="${bgImg}" onerror="this.style.display='none'">` : ""}
-  `;
+  <table class="sideInfoTable">
+    <tr>
+      <th>敵城</th>
+      <td>
+        ${castleImg ? `<img class="castleImg" src="${castleImg}" onerror="this.style.display='none'">` : ""}
+      </td>
+    </tr>
+    <tr>
+      <th>背景</th>
+      <td>
+        ${bgImg ? `<img class="bgImg" src="${bgImg}" onerror="this.style.display='none'">` : ""}
+      </td>
+    </tr>
+  </table>
+`;
 
   tr1.appendChild(imgTd);
 }
