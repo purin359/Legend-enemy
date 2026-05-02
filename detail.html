@@ -74,20 +74,33 @@ const castlesData = await fetch("castle.json").then(r=>r.json());
 const backgroundsData = await fetch("backgrounds.json").then(r=>r.json());
 
 const detailMap = {};
-stageDetailsData.forEach(ch => {
+
+const stageDetailList = Array.isArray(stageDetailsData)
+  ? stageDetailsData
+  : Object.values(stageDetailsData);
+
+stageDetailList.forEach(ch => {
   ch.stages.forEach(st => {
     detailMap[`${ch.chapterId}-${st.stageId}`] = st;
   });
 });
   
 const castleMap = {};
-castlesData.forEach(c => {
-  castleMap[c.castleId] = c.image;
+const castleList = Array.isArray(castlesData)
+  ? castlesData
+  : Object.values(castlesData);
+
+castleList.forEach(c => {
+  castleMap[String(c.castleId)] = c.image;
 });
 
 const backgroundMap = {};
-backgroundsData.forEach(bg => {
-  backgroundMap[bg.background] = bg.image;
+const backgroundList = Array.isArray(backgroundsData)
+  ? backgroundsData
+  : Object.values(backgroundsData);
+
+backgroundList.forEach(bg => {
+  backgroundMap[String(bg.background)] = bg.image;
 });
   
   const ul = document.getElementById("list");
