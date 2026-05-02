@@ -10,28 +10,41 @@ body { font-family: sans-serif; padding:20px; }
 ul { list-style:none; padding-left:0; }
 
 .stageTable {
-  width:100%;
+  width: 100%;
   border-collapse: collapse;
-  margin-bottom:15px;
+  margin-bottom: 15px;
+  table-layout: fixed;
 }
 
-.stageTable th, .stageTable td {
-  border:1px solid #ccc;
-  padding:8px;
+.stageTable th,
+.stageTable td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
 .stageTable th {
-  width:120px;
-  background:#f0f0f0;
+  width: 120px;
+  background: #f0f0f0;
+}
+
+/* 左側：ステージ名・敵構成 */
+.stageTable td:nth-child(2) {
+  width: calc(100% - 420px);
+}
+
+/* 右側：敵城背景 */
+.stageTable td:nth-child(3) {
+  width: 300px;
 }
 
 img {
-  width:40px;
-  margin-right:5px;
+  width: 40px;
+  margin-right: 5px;
 }
 
 .highlight {
-  border:2px solid red;
+  border: 2px solid red;
 }
 
 .detailGrid {
@@ -58,20 +71,20 @@ img {
   font-weight: bold;
 }
 
-  .sideInfoTable {
+.sideInfoTable {
   border-collapse: collapse;
   width: 100%;
   height: 100%;
-  margin-left: auto;
+  table-layout: fixed;
 }
 
 .sideInfoTable th,
 .sideInfoTable td {
-  height: 100%;
   border: 1px solid #ccc;
   padding: 6px;
   text-align: center;
   vertical-align: middle;
+  box-sizing: border-box;
 }
 
 .sideInfoTable th {
@@ -80,8 +93,8 @@ img {
 }
 
 .castleImg {
+  width: 60px;
   height: 80px;
-  width: 80px;
   object-fit: contain;
 }
 
@@ -91,7 +104,7 @@ img {
   object-fit: cover;
 }
 
-  .sideLabel {
+.sideLabel {
   white-space: nowrap;
   line-height: 1.4;
   width: 60px;
@@ -105,7 +118,7 @@ img {
   margin-right: 6px;
   vertical-align: middle;
 }
-
+  
 </style>
 </head>
 <body>
