@@ -252,71 +252,43 @@ function normalize(str) {
 }
   
 function load() {
-  const sortSelect = document.getElementById("sort");
-
-if (type === "enemy") {
-  sortSelect.innerHTML = `
-    <option value="count">登場回数順</option>
-    <option value="first">初出ステージ順</option>
-    <option value="order">図鑑順</option>
-  `;
-} else {
-  sortSelect.innerHTML = `
-    <option value="count">使用回数順</option>
-    <option value="first">初出ステージ順</option>
-  `;
-}
-  
   const type = document.getElementById("listType").value;
+  listType = type;
 
-document.getElementById("searchBox").style.display =
-  (type === "enemy") ? "" : "none";
+  document.getElementById("searchBox").style.display =
+    type === "enemy" ? "" : "none";
 
-document.getElementById("attrSelect").style.display =
-  (type === "enemy") ? "" : "none";
-  
-  if (listType === "castle") {
-  loadCastleList();
-  return;
-}
+  document.getElementById("attrSelect").style.display =
+    type === "enemy" ? "" : "none";
 
-if (listType === "background") {
-  loadBackgroundList();
-  return;
-}
-  
+  updateSortOptions(type);
+
+  if (type === "castle") {
+    loadCastleList();
+    return;
+  }
+
+  if (type === "background") {
+    loadBackgroundList();
+    return;
+  }
+
+  document.querySelector("thead tr").innerHTML = `
+    <th>画像</th>
+    <th>敵名</th>
+    <th>登場回数</th>
+    <th>初出ステージ</th>
+  `;
+
   const mode = document.getElementById("mode").value;
   const map = {};
 
   stagesData.forEach(ch => {
-
-    const isTarget =
-  (mode === "ALL") ||
-
-  (mode === "N" && (
-    (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
-    || ch.chapterId === "E026"
-  )) ||
-
-  (mode === "NA" && (
-    ch.chapterId.startsWith("NA")
-    || ch.chapterId === "E068"
-    || ch.chapterId === "E069"
-  )) ||
-
-  (mode === "ND" && ch.chapterId.startsWith("ND"));
-
-    if (!isTarget) return;
+    if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
       st.enemies.forEach(enemyName => {
-
         const key = normalize(enemyName);
-
-        const displayName = enemyName
-  .replace(/\r?\n/g, "")
-  .replace(/[ 　\u00A0]+/g, " ") // ←これ追加（超重要）
-  .trim();
 
         if (!map[key]) {
           map[key] = {
@@ -329,68 +301,90 @@ if (listType === "background") {
         map[key].count++;
       });
     });
-
   });
 
-let list = Object.values(map);
+  let list = Object.values(map);
 
-const search = document.getElementById("searchBox").value.trim();
+  const search = document.getElementById("searchBox").value.trim();
 
-if (search) {
-  const keyword = normalize(search);
+  if (search) {
+    const keyword = normalize(search);
+    list = list.filter(e => normalize(e.name).includes(keyword));
+  }
 
-  list = list.filter(e =>
-    normalize(e.name).includes(keyword)
-  );
-}
+  if (selectedAttrs.length > 0) {
+    list = list.filter(e => {
+      const types = getEnemyTypes(e.name);
+      return selectedAttrs.some(attr => types.includes(attr));
+    });
+  }
 
-if (selectedAttrs.length > 0) {
-  list = list.filter(e => {
-    const types = getEnemyTypes(e.name);
-    return selectedAttrs.some(attr => types.includes(attr)); // OR
+  list = list.map(e => {
+    return { ...e, firstNum: getFirstNum(e.first) };
+  });
+
+  list.sort((a, b) => {
+    if (sortMode === "count") {
+      return desc ? b.count - a.count : a.count - b.count;
+    }
+
+    if (sortMode === "first") {
+      return a.firstNum - b.firstNum;
+    }
+
+    if (sortMode === "order") {
+      return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
+    }
+
+    return 0;
+  });
+
+  const tbody = document.getElementById("table");
+  tbody.innerHTML = "";
+
+  list.forEach(e => {
+    const baseName = e.name.replace(/\r?\n/g, "").trim();
+
+    const fileName = baseName
+      .replace(/[：:]/g, " ")
+      .replace(/[ 　]+/g, "");
+
+    const img = document.createElement("img");
+    img.src = "image/" + encodeURIComponent(fileName) + ".png";
+    img.onerror = () => img.src = "image/noimage.png";
+
+    img.addEventListener("click", () => {
+      const mode = document.getElementById("mode").value;
+
+      const url = new URL("detail.html", location.href);
+      url.searchParams.set("name", e.name);
+      url.searchParams.set("mode", mode);
+
+      location.href = url.toString();
+    });
+
+    const tr = document.createElement("tr");
+
+    const tdImg = document.createElement("td");
+    tdImg.appendChild(img);
+
+    const tdName = document.createElement("td");
+    tdName.textContent = e.name;
+
+    const tdCount = document.createElement("td");
+    tdCount.textContent = e.count;
+
+    const tdFirst = document.createElement("td");
+    tdFirst.textContent = e.first;
+
+    tr.appendChild(tdImg);
+    tr.appendChild(tdName);
+    tr.appendChild(tdCount);
+    tr.appendChild(tdFirst);
+
+    tbody.appendChild(tr);
   });
 }
-  
-list = list.map(e => {
-
-  const match = e.first.match(/([A-Z]+)(\d+)-(\d+)/);
-
-  let firstNum = 999999;
-
-  if (match) {
-    const prefix = match[1];
-    const chap = parseInt(match[2]);
-    const stage = parseInt(match[3]);
-
-    const base =
-      prefix === "N"  ? 0 :
-      prefix === "NA" ? 100000 :
-      prefix === "ND" ? 200000 :
-      prefix === "E"  ? 300000 : 400000;
-
-    firstNum = base + chap * 100 + stage;
-  }
-
-  return { ...e, firstNum };
-});
-  
- list.sort((a, b) => {
-
-  if (sortMode === "count") {
-    return desc ? b.count - a.count : a.count - b.count;
-  }
-
-  if (sortMode === "first") {
-    return a.firstNum - b.firstNum;
-  }
-
-});
-  
-  if (sortMode === "order") {
-    return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
-  }
-
-});
 
   const tbody = document.getElementById("table");
   tbody.innerHTML = "";
@@ -666,16 +660,31 @@ window.addEventListener("click", e => {
 
   document.querySelector("thead tr").innerHTML = `
     <th>画像</th>
-    <th>${type === "castle" ? "城ID" : "背景ID"}</th>
     <th>使用回数</th>
     <th>初出ステージ</th>
   `;
 
-  list.sort((a, b) => desc ? b.count - a.count : a.count - b.count);
+  list = list.map(e => ({
+    ...e,
+    firstNum: getFirstNum(e.first)
+  }));
+
+  list.sort((a, b) => {
+    if (sortMode === "count") {
+      return desc ? b.count - a.count : a.count - b.count;
+    }
+
+    if (sortMode === "first") {
+      return a.firstNum - b.firstNum;
+    }
+
+    return 0;
+  });
 
   list.forEach(e => {
     const img = document.createElement("img");
     img.src = e.image;
+    img.className = type === "background" ? "bgImg" : "";
     img.onerror = () => img.src = "image/noimage.png";
 
     img.addEventListener("click", () => {
@@ -694,9 +703,6 @@ window.addEventListener("click", e => {
     const tdImg = document.createElement("td");
     tdImg.appendChild(img);
 
-    const tdName = document.createElement("td");
-    tdName.textContent = e.id;
-
     const tdCount = document.createElement("td");
     tdCount.textContent = e.count;
 
@@ -704,14 +710,13 @@ window.addEventListener("click", e => {
     tdFirst.textContent = e.first;
 
     tr.appendChild(tdImg);
-    tr.appendChild(tdName);
     tr.appendChild(tdCount);
     tr.appendChild(tdFirst);
 
     tbody.appendChild(tr);
   });
 }
-
+  
   function isTargetChapter(ch, mode) {
   return (
     mode === "ALL" ||
@@ -731,6 +736,49 @@ window.addEventListener("click", e => {
 
     (mode === "ND" && ch.chapterId.startsWith("ND"))
   );
+}
+
+  function getFirstNum(first) {
+  const match = first.match(/([A-Z]+)(\d+)-(\d+)/);
+
+  if (!match) return 999999;
+
+  const prefix = match[1];
+  const chap = parseInt(match[2]);
+  const stage = parseInt(match[3]);
+
+  const base =
+    prefix === "N"  ? 0 :
+    prefix === "NA" ? 100000 :
+    prefix === "ND" ? 200000 :
+    prefix === "E"  ? 300000 : 400000;
+
+  return base + chap * 100 + stage;
+}
+
+function updateSortOptions(type) {
+  const sortSelect = document.getElementById("sort");
+  const current = sortSelect.value;
+
+  if (type === "enemy") {
+    sortSelect.innerHTML = `
+      <option value="count">登場回数順</option>
+      <option value="first">初出ステージ順</option>
+      <option value="order">図鑑順</option>
+    `;
+  } else {
+    sortSelect.innerHTML = `
+      <option value="count">使用回数順</option>
+      <option value="first">初出ステージ順</option>
+    `;
+  }
+
+  if ([...sortSelect.options].some(o => o.value === current)) {
+    sortSelect.value = current;
+  } else {
+    sortSelect.value = "count";
+    sortMode = "count";
+  }
 }
 
 init();
