@@ -230,6 +230,7 @@ backgroundList.forEach(bg => {
 const titleIcon = document.getElementById("titleIcon");
 
 if (name) {
+  titleIcon.classList.remove("titleIconLarge");
   const titleFileName = name
     .replace(/\r?\n/g, "")
     .trim()
