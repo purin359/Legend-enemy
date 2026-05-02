@@ -46,6 +46,10 @@ img {
   <input type="checkbox" id="showKanban" onchange="load()">
   カンバン娘を表示
 </label>
+<label>
+  <input type="checkbox" id="showDetail" onchange="load()">
+  詳細表示
+</label>
 
 <ul id="list"></ul>
 
@@ -64,7 +68,28 @@ async function load() {
 
   document.getElementById("title").textContent = name;
 
-  const stagesData = await fetch("stages.json").then(r=>r.json());
+ const stagesData = await fetch("stages.json").then(r=>r.json());
+const stageDetailsData = await fetch("stageDetails.json").then(r=>r.json());
+const castlesData = await fetch("castle.json").then(r=>r.json());
+const backgroundsData = await fetch("backgrounds.json").then(r=>r.json());
+
+const detailMap = {};
+stageDetailsData.forEach(ch => {
+  ch.stages.forEach(st => {
+    detailMap[`${ch.chapterId}-${st.stageId}`] = st;
+  });
+});
+  
+const castleMap = {};
+castlesData.forEach(c => {
+  castleMap[c.castleId] = c.image;
+});
+
+const backgroundMap = {};
+backgroundsData.forEach(bg => {
+  backgroundMap[bg.background] = bg.image;
+});
+  
   const ul = document.getElementById("list");
   ul.innerHTML = "";
 
@@ -91,6 +116,14 @@ async function load() {
     if (!isTarget) return;
 
     ch.stages.forEach(st => {
+
+      const detailKey = `${ch.chapterId}-${st.stageId}`;
+      const detail = detailMap[detailKey];
+      const showDetail = document.getElementById("showDetail").checked;
+
+      const bossList = detail && detail.bosses && detail.bosses !== "なし"
+        ? String(detail.bosses).split(",").map(s => normalize(s))
+        : [];
 
       if (st.enemies.map(normalize).includes(normalize(name))) {
 
@@ -142,11 +175,22 @@ if (mode === "ALL") {
     .replace(/[：:]/g, "")
     .replace(/[ 　]+/g, "");
 
-  const img = document.createElement("img");
-  img.src = "image/" + encodeURIComponent(fileName) + ".png";
-  img.onerror = () => img.src = "image/noimage.png";
+ const imgWrap = document.createElement("span");
+imgWrap.style.display = "inline-block";
+imgWrap.style.padding = "3px";
+imgWrap.style.borderRadius = "6px";
+imgWrap.style.marginRight = "5px";
 
-  td.appendChild(img);
+if (bossList.includes(normalize(enemyName))) {
+  imgWrap.style.background = "#fff3b0"; // 薄い黄色
+}
+
+const img = document.createElement("img");
+img.src = "image/" + encodeURIComponent(fileName) + ".png";
+img.onerror = () => img.src = "image/noimage.png";
+
+imgWrap.appendChild(img);
+td.appendChild(imgWrap);
 });
         
         tr2.appendChild(th);
@@ -155,6 +199,30 @@ if (mode === "ALL") {
         table.appendChild(tr1);
         table.appendChild(tr2);
 
+        if (showDetail && detail) {
+  const castleImg = castleMap[detail.castleId] || "";
+  const bgImg = backgroundMap[detail.background] || "";
+
+  const tr3 = document.createElement("tr");
+  tr3.innerHTML = `
+    <th>詳細</th>
+    <td>
+      <div>
+        ${castleImg ? `<img src="${castleImg}" style="width:50px;" onerror="this.style.display='none'">` : ""}
+        ${bgImg ? `<img src="${bgImg}" style="width:80px;" onerror="this.style.display='none'">` : ""}
+      </div>
+      城ID: ${detail.castleId}<br>
+      背景: ${detail.background}<br>
+      城体力: ${detail.castleHP}<br>
+      城距離: ${detail.castleDistance}<br>
+      統率力: ${detail.energy}<br>
+      出撃制限数: ${detail.unitLimit}<br>
+      ボス: ${detail.bosses}
+    </td>
+  `;
+  table.appendChild(tr3);
+}
+        
         li.appendChild(table);
         ul.appendChild(li);
       }
