@@ -475,10 +475,6 @@ const bossList = detail && detail.bosses && detail.bosses !== "なし"
         <td>${st.stageName}</td>
       `;
 
-      const showDetail = document.getElementById("showDetail").checked;
-const detailKey = `${ch.chapterId}-${st.stageId}`;
-const detail = detailMap[detailKey];
-
 if (showDetail && detail) {
   const castleImg = castleMap[String(detail.castleId)] || "";
   const bgImg = backgroundMap[String(detail.background)] || "";
