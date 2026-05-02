@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細1</title>
+<title>敵詳細</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -35,10 +35,41 @@ img {
 }
 
 .castleImg {
+  height: 90px;
   width: auto;
-  height: 80px;
   object-fit: contain;
-  vertical-align: top;
+  vertical-align: middle;
+}
+
+.bgImg {
+  width: 100px;
+  height: 60px;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.detailGrid > div {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  background: #fafafa;
+}
+
+.detailLabel {
+  font-size: 13px;
+  color: #555;
+}
+
+.detailValue {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 </style>
@@ -182,6 +213,24 @@ if (mode === "ALL") {
           <td>${ch.chapterName}-${st.stageName}</td>
         `;
 
+        if (showDetail && detail) {
+  const castleImg = castleMap[String(detail.castleId)] || "";
+  const bgImg = backgroundMap[String(detail.background)] || "";
+
+  const imgTd = document.createElement("td");
+  imgTd.rowSpan = 2;
+  imgTd.style.textAlign = "right";
+  imgTd.style.verticalAlign = "middle";
+  imgTd.style.whiteSpace = "nowrap";
+
+  imgTd.innerHTML = `
+    ${castleImg ? `<img class="castleImg" src="${castleImg}" onerror="this.style.display='none'">` : ""}
+    ${bgImg ? `<img class="bgImg" src="${bgImg}" onerror="this.style.display='none'">` : ""}
+  `;
+
+  tr1.appendChild(imgTd);
+}
+
         // 敵
         const tr2 = document.createElement("tr");
         const th = document.createElement("th");
@@ -222,23 +271,32 @@ td.appendChild(img);
         table.appendChild(tr2);
 
         if (showDetail && detail) {
-  const castleImg = castleMap[detail.castleId] || "";
-  const bgImg = backgroundMap[detail.background] || "";
-
   const tr3 = document.createElement("tr");
+
   tr3.innerHTML = `
     <th>詳細</th>
-    <td>
-      <div>
-        ${castleImg ? `<img slass="castleImg" src="${castleImg}" onerror="this.style.display='none'">` : ""}
-        ${bgImg ? `<img src="${bgImg}" style="width:80px;" onerror="this.style.display='none'">` : ""}
+    <td colspan="2">
+      <div class="detailGrid">
+        <div>
+          <div class="detailLabel">城体力</div>
+          <div class="detailValue">${detail.castleHP}</div>
+        </div>
+        <div>
+          <div class="detailLabel">城距離</div>
+          <div class="detailValue">${detail.castleDistance}</div>
+        </div>
+        <div>
+          <div class="detailLabel">統率力</div>
+          <div class="detailValue">${detail.energy}</div>
+        </div>
+        <div>
+          <div class="detailLabel">出撃制限</div>
+          <div class="detailValue">${detail.unitLimit}</div>
+        </div>
       </div>
-      城体力: ${detail.castleHP}<br>
-      城距離: ${detail.castleDistance}<br>
-      統率力: ${detail.energy}<br>
-      出撃制限数: ${detail.unitLimit}<br>
     </td>
   `;
+
   table.appendChild(tr3);
 }
         
