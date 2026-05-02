@@ -2,278 +2,58 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>全ステージ一覧</title>
+<title>敵詳細(実験用)</title>
 
 <style>
-body {
-  font-family: sans-serif;
-  max-width: 1400px;
-  margin: auto;
-  padding: 20px;
+body { font-family: sans-serif; padding:20px; }
+
+ul { list-style:none; padding-left:0; }
+
+.stageTable {
+  width:100%;
+  border-collapse: collapse;
+  margin-bottom:15px;
 }
 
 .stageTable th, .stageTable td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border:1px solid #ccc;
+  padding:8px;
 }
 
 .stageTable th {
-  width: 120px;
-  background: #f0f0f0;
-}
-
-  .stageTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 10px;
-}
-
-h3 {
-  margin: 0 0 10px 0;
-  padding: 5px;
-  background: #eee;
-}
-  
-.stageRow {
-  margin-bottom: 10px;
+  width:120px;
+  background:#f0f0f0;
 }
 
 img {
-  width: 45px;
-  margin-right: 5px;
+  width:40px;
+  margin-right:5px;
 }
 
-  .filterRow {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+.highlight {
+  border:2px solid red;
 }
 
-.attrBtn {
-  padding: 6px;
-  border: 1px solid #ccc;
-  background: #f8f8f8;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.attrBtn.active {
-  background: #dff0df;
-  border-color: #4CAF50;
-}
-
-.attrBtn img {
-  width: 24px;
-  height: 24px;
-  margin: 0;
-}
-
-  .attrSelect {
-  position: relative;
-  display: inline-block;
-  margin-top: 8px;
-}
-
-.attrSelectBtn {
-  min-height: 36px;
-  min-width: 180px;
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.attrMenu {
-  display: none;
-  position: absolute;
-  top: 40px;
-  left: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 6px;
-  z-index: 20;
-  min-width: 220px;
-}
-
-.attrMenu.open {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-}
-
-.attrOption {
-  width: 44px;
-  height: 44px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f8f8f8;
-  cursor: pointer;
-}
-
-.attrOption img {
-  width: 28px;
-  height: 28px;
-  margin: 0;
-}
-
-.attrOption.active {
-  border-color: #4CAF50;
-  background: #eaf7ea;
-}
-
-#attrSelectedView img {
-  width: 24px;
-  height: 24px;
-  margin: 0;
-}
-
-  #attrSelectedView {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-  
 </style>
 </head>
 <body>
+
 <button onclick="goBack()">戻る</button>
 
-<h2>全ステージ一覧</h2>
-
-  <div id="countInfo" style="margin:10px 0; font-weight:bold;"></div>
-
-<select id="mode" onchange="load()">
-  <option value="ALL">全て</option>
-  <option value="N">レジェンド</option>
-  <option value="NA">真レジェンド</option>
-  <option value="ND">レジェンド0</option>
-</select>
-
-<label>
+<h2 id="title"></h2>
+<p id="count"></p>
+  <label>
   <input type="checkbox" id="showKanban" onchange="load()">
   カンバン娘を表示
 </label>
-
 <label>
-  <input type="checkbox" id="showFirstOnly" onchange="load()">
-  初登場敵のみ表示
+  <input type="checkbox" id="showDetail" onchange="load()">
+  詳細表示
 </label>
 
-<div class="attrSelect" id="attrSelect">
-  <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
-    <span id="attrSelectedView">属性で絞り込み</span>
-  </button>
-
-  <div id="attrMenu" class="attrMenu">
-    <div class="attrOption" onclick="toggleAttr('赤')"><img src="image_type/赤.png" alt="赤"></div>
-    <div class="attrOption" onclick="toggleAttr('浮き')"><img src="image_type/浮き.png" alt="浮き"></div>
-    <div class="attrOption" onclick="toggleAttr('黒')"><img src="image_type/黒.png" alt="黒"></div>
-    <div class="attrOption" onclick="toggleAttr('メタル')"><img src="image_type/メタル.png" alt="メタル"></div>
-    <div class="attrOption" onclick="toggleAttr('天使')"><img src="image_type/天使.png" alt="天使"></div>
-    <div class="attrOption" onclick="toggleAttr('エイリアン')"><img src="image_type/エイリアン.png" alt="エイリアン"></div>
-    <div class="attrOption" onclick="toggleAttr('ゾンビ')"><img src="image_type/ゾンビ.png" alt="ゾンビ"></div>
-    <div class="attrOption" onclick="toggleAttr('悪魔')"><img src="image_type/悪魔.png" alt="悪魔"></div>
-    <div class="attrOption" onclick="toggleAttr('古代種')"><img src="image_type/古代種.png" alt="古代種"></div>
-    <div class="attrOption" onclick="toggleAttr('無属性')"><img src="image_type/無属性.png" alt="無属性"></div>
-    <div class="attrOption" onclick="toggleAttr('超生命体')"><img src="image_type/超生命体.png" alt="超生命体"></div>
-    <div class="attrOption" onclick="toggleAttr('超獣')"><img src="image_type/超獣.png" alt="超獣"></div>
-    <div class="attrOption" onclick="toggleAttr('超賢者')"><img src="image_type/超賢者.png" alt="超賢者"></div>
-    <div class="attrOption" onclick="toggleAttr('城')"><span>城</span></div>
-  </div>
-</div>
-  <button id="toggleListBtn" onclick="toggleList()">リスト非表示</button>
-
-<div id="list"></div>
+<ul id="list"></ul>
 
 <script>
-let initialized = false;
-let stageCount = 0;
-let chapterCount = 0;
-let selectedAttrs = [];
-
-  const attrImageMap = {
-  "赤": "image_type/赤.png",
-  "浮き": "image_type/浮き.png",
-  "黒": "image_type/黒.png",
-  "メタル": "image_type/メタル.png",
-  "天使": "image_type/天使.png",
-  "エイリアン": "image_type/エイリアン.png",
-  "ゾンビ": "image_type/ゾンビ.png",
-  "悪魔": "image_type/悪魔.png",
-  "古代種": "image_type/古代種.png",
-  "無属性": "image_type/無属性.png",
-  "超生命体": "image_type/超生命体.png",
-  "超獣": "image_type/超獣.png",
-  "超賢者": "image_type/超賢者.png"
-};
-
-function toggleAttrMenu() {
-  document.getElementById("attrMenu").classList.toggle("open");
-}
-
-function toggleAttr(attr) {
-  if (selectedAttrs.includes(attr)) {
-    selectedAttrs = selectedAttrs.filter(a => a !== attr);
-  } else {
-    selectedAttrs.push(attr);
-  }
-
-  updateAttrSelectedView();
-  updateAttrOptionState();
-  load();
-}
-
-function updateAttrSelectedView() {
-  const view = document.getElementById("attrSelectedView");
-
-  if (selectedAttrs.length === 0) {
-    view.textContent = "属性で絞り込み";
-    return;
-  }
-
-  view.innerHTML = "";
-
-  selectedAttrs.forEach(attr => {
-    if (attrImageMap[attr]) {
-      const img = document.createElement("img");
-      img.src = attrImageMap[attr];
-      img.alt = attr;
-      view.appendChild(img);
-    } else {
-      const span = document.createElement("span");
-      span.textContent = attr;
-      view.appendChild(span);
-    }
-  });
-}
-
-function updateAttrOptionState() {
-  document.querySelectorAll(".attrOption").forEach(option => {
-    const img = option.querySelector("img");
-    const attr = img ? img.alt : option.textContent.trim();
-    option.classList.toggle("active", selectedAttrs.includes(attr));
-  });
-}
-
-window.addEventListener("click", e => {
-  const select = document.getElementById("attrSelect");
-  if (!select.contains(e.target)) {
-    document.getElementById("attrMenu").classList.remove("open");
-  }
-});
-  
 function normalize(str) {
   return str
     .replace(/\r?\n/g, "")
@@ -281,209 +61,183 @@ function normalize(str) {
     .trim();
 }
 
-  let enemiesData = {};
-
-async function init() {
-  enemiesData = await fetch("enemies.json").then(r=>r.json());
-  load();
-}
-
-init();
-
 async function load() {
-  let stageCount = 0;
+  const params = new URLSearchParams(location.search);
+  const name = params.get("name");
+  const mode = params.get("mode");
 
-  if (!initialized) {
-    const params = new URLSearchParams(location.search);
-    const modeParam = params.get("mode");
-    if (modeParam) {
-      document.getElementById("mode").value = modeParam;
-    }
-    initialized = true;
-  }
+  document.getElementById("title").textContent = name;
 
-  const mode = document.getElementById("mode").value;
-  const stagesData = await fetch("stages.json").then(r => r.json());
+ const stagesData = await fetch("stages.json").then(r=>r.json());
+const stageDetailsData = await fetch("stageDetails.json").then(r=>r.json());
+const castlesData = await fetch("castle.json").then(r=>r.json());
+const backgroundsData = await fetch("backgrounds.json").then(r=>r.json());
 
-  const list = document.getElementById("list");
-  list.innerHTML = "";
+const detailMap = {};
+stageDetailsData.forEach(ch => {
+  ch.stages.forEach(st => {
+    const detailKey = `${ch.chapterId}-${st.stageId}`;
+    const detail = detailMap[detailKey];
+    const showDetail = document.getElementById("showDetail").checked;
 
-  const shownInRange = new Set();
+    const bossList = detail && detail.bosses && detail.bosses !== "なし"
+      ? detail.bosses.split(",").map(s => normalize(s))
+      : [];
+    detailMap[`${ch.chapterId}-${st.stageId}`] = st;
+  });
+});
+
+const castleMap = {};
+castlesData.forEach(c => {
+  castleMap[c.castleId] = c.image;
+});
+
+const backgroundMap = {};
+backgroundsData.forEach(bg => {
+  backgroundMap[bg.background] = bg.image;
+});
+  
+  const ul = document.getElementById("list");
+  ul.innerHTML = "";
+
+  let total = 0;
 
   stagesData.forEach(ch => {
 
     const isTarget =
-      (mode === "ALL") ||
+  (mode === "ALL") ||
 
-      (mode === "N" && (
-        (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
-        || ch.chapterId === "E026"
-      )) ||
+  (mode === "N" && (
+    (ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND"))
+    || ch.chapterId === "E026"
+  )) ||
 
-      (mode === "NA" && (
-        ch.chapterId.startsWith("NA")
-        || ch.chapterId === "E068"
-        || ch.chapterId === "E069"
-      )) ||
+  (mode === "NA" && (
+    ch.chapterId.startsWith("NA")
+    || ch.chapterId === "E068"
+    || ch.chapterId === "E069"
+  )) ||
 
-      (mode === "ND" && ch.chapterId.startsWith("ND"));
-
+  (mode === "ND" && ch.chapterId.startsWith("ND"));
+    
     if (!isTarget) return;
 
-    const chapterBox = document.createElement("div");
-    chapterBox.style.border = "2px solid #ccc";
-    chapterBox.style.padding = "10px";
-    chapterBox.style.marginBottom = "20px";
-
-    let hasAnyEnemyInChapter = false;
-
-    const title = document.createElement("h3");
-    title.textContent = ch.chapterName;
-    chapterBox.appendChild(title);
-
     ch.stages.forEach(st => {
-      if (selectedAttrs.length > 0 && !stageHasAllAttrs(st.enemies, selectedAttrs)) {
-  return;
+
+      if (st.enemies.map(normalize).includes(normalize(name))) {
+
+        total++;
+
+        const li = document.createElement("li");
+
+        const table = document.createElement("table");
+table.className = "stageTable";
+
+// ▼ ALLモードのときだけ色分け
+if (mode === "ALL") {
+
+  if (ch.chapterId.startsWith("NA") || ch.chapterId === "E068" || ch.chapterId === "E069") {
+    table.style.backgroundColor = "#ccff99"; // 真レジェンド（黄緑）
+  }
+
+  else if (ch.chapterId.startsWith("ND")) {
+    table.style.backgroundColor = "#6f95c4"; // レジェンド0（紺）
+  }
 }
-      
-      const table = document.createElement("table");
-      table.className = "stageTable";
 
-      const tr1 = document.createElement("tr");
-      tr1.innerHTML = `
-        <th>ステージ</th>
-        <td>${st.stageName}</td>
-      `;
+        // ステージ
+        const tr1 = document.createElement("tr");
+        tr1.innerHTML = `
+          <th>ステージ</th>
+          <td>${ch.chapterName}-${st.stageName}</td>
+        `;
 
-      const tr2 = document.createElement("tr");
-      const th = document.createElement("th");
+        // 敵
+        const tr2 = document.createElement("tr");
+        const th = document.createElement("th");
+        th.textContent = "出現する敵";
 
-      const showKanban = document.getElementById("showKanban").checked;
-      const showFirstOnly = document.getElementById("showFirstOnly").checked;
+        const td = document.createElement("td");
 
-      th.textContent = showFirstOnly ? "初登場の敵" : "出現する敵";
+        const showKanban = document.getElementById("showKanban").checked;
 
-      const td = document.createElement("td");
+        st.enemies.forEach(enemyName => {
 
-      st.enemies.forEach(enemyName => {
-        if (!showKanban && enemyName === "カンバン娘") return;
+  // ▼ カンバン娘は画像表示しない
+  if (!showKanban && normalize(enemyName) === normalize("カンバン娘")) return;
 
-        const enemyKey = normalize(enemyName);
+  const baseName = enemyName
+    .replace(/\r?\n/g, "")
+    .trim();
 
-        if (showFirstOnly && shownInRange.has(enemyKey)) {
-          return;
-        }
+  const fileName = baseName
+    .replace(/[：:]/g, "")
+    .replace(/[ 　]+/g, "");
 
-        shownInRange.add(enemyKey);
+ const imgWrap = document.createElement("span");
+imgWrap.style.display = "inline-block";
+imgWrap.style.padding = "3px";
+imgWrap.style.borderRadius = "6px";
+imgWrap.style.marginRight = "5px";
 
-        const baseName = enemyName.replace(/\r?\n/g, "").trim();
+if (bossList.includes(normalize(enemyName))) {
+  imgWrap.style.background = "#fff3b0"; // 薄い黄色
+}
 
-        const fileName = baseName
-          .replace(/[：:]/g, " ")
-          .replace(/[ 　]+/g, "");
+const img = document.createElement("img");
+img.src = "image/" + encodeURIComponent(fileName) + ".png";
+img.onerror = () => img.src = "image/noimage.png";
 
-        const img = document.createElement("img");
-        img.src = "image/" + encodeURIComponent(fileName) + ".png";
-        img.onerror = () => img.src = "image/noimage.png";
+imgWrap.appendChild(img);
+td.appendChild(imgWrap);
+});
+        
+        tr2.appendChild(th);
+        tr2.appendChild(td);
 
-        img.addEventListener("click", () => {
-          const url = new URL("detail.html", location.href);
-          url.searchParams.set("name", enemyName);
-          url.searchParams.set("mode", mode);
-          location.href = url;
-        });
+        table.appendChild(tr1);
+        table.appendChild(tr2);
 
-        td.appendChild(img);
-        hasAnyEnemyInChapter = true;
-      });
+        if (showDetail && detail) {
+  const castleImg = castleMap[detail.castleId] || "";
+  const bgImg = backgroundMap[detail.background] || "";
 
-      if (td.childElementCount === 0) {
-        return;
-        stageCount++;
+  const tr3 = document.createElement("tr");
+  tr3.innerHTML = `
+    <th>詳細</th>
+    <td>
+      <div>
+        ${castleImg ? `<img src="${castleImg}" style="width:50px;" onerror="this.style.display='none'">` : ""}
+        ${bgImg ? `<img src="${bgImg}" style="width:80px;" onerror="this.style.display='none'">` : ""}
+      </div>
+      城ID: ${detail.castleId}<br>
+      背景: ${detail.background}<br>
+      城体力: ${detail.castleHP}<br>
+      城距離: ${detail.castleDistance}<br>
+      統率力: ${detail.energy}<br>
+      出撃制限数: ${detail.unitLimit}<br>
+      ボス: ${detail.bosses}
+    </td>
+  `;
+  table.appendChild(tr3);
+}
+        
+        li.appendChild(table);
+        ul.appendChild(li);
       }
 
-      tr2.appendChild(th);
-      tr2.appendChild(td);
-
-      table.appendChild(tr1);
-      table.appendChild(tr2);
-
-      chapterBox.appendChild(table);
-      stageCount++;
     });
 
-    const showFirstOnly = document.getElementById("showFirstOnly").checked;
-
-    if (showFirstOnly && !hasAnyEnemyInChapter) {
-      const noEnemy = document.createElement("div");
-      noEnemy.textContent = "初登場敵なし";
-      noEnemy.style.padding = "10px";
-      noEnemy.style.color = "#666";
-      noEnemy.style.background = "#f8f8f8";
-      noEnemy.style.border = "1px dashed #ccc";
-      noEnemy.style.textAlign = "center";
-      chapterBox.appendChild(noEnemy);
-    }
-
-    if (chapterBox.querySelectorAll(".stageTable").length > 0 || chapterBox.textContent.includes("初登場敵なし")) {
-  list.appendChild(chapterBox);
-}
   });
-  document.getElementById("countInfo").textContent =
-  `${stageCount}ステージが該当します`;
+
+  document.getElementById("count").textContent =
+    total === 0 ? "見つかりませんでした" : total + "件見つかりました";
 }
-  
+
+load();
+
   function goBack() {
   history.back();
-}
-
-  function stageHasAllAttrs(enemies, selectedAttrs) {
-
-  const showKanban = document.getElementById("showKanban").checked;
-  const allTypes = new Set();
-
-  enemies.forEach(name => {
-
-    // 🔥 カンバン娘除外（表示OFF時）
-    if (!showKanban && name === "カンバン娘") return;
-
-    const types = getEnemyTypes(name);
-    types.forEach(t => allTypes.add(t));
-  });
-
-  return selectedAttrs.every(attr => allTypes.has(attr));
-}
-
-  function getEnemyTypes(enemyName) {
-  const key = normalize(enemyName);
-
-  const found = Object.values(enemiesData).find(enemy =>
-    normalize(enemy.name) === key
-  );
-
-  if (!found || !found.type) return [];
-
-  return String(found.type)
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
-}
-
-  let isListHidden = false;
-
-function toggleList() {
-  const list = document.getElementById("list");
-  const btn = document.getElementById("toggleListBtn");
-
-  isListHidden = !isListHidden;
-
-  if (isListHidden) {
-    list.style.display = "none";
-    btn.textContent = "リスト表示";
-  } else {
-    list.style.display = "";
-    btn.textContent = "リスト非表示";
-  }
 }
 
 </script>
