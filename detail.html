@@ -196,14 +196,6 @@ if (name) {
 } else {
   titleIcon.style.display = "none";
 }
-  .replace(/\r?\n/g, "")
-  .trim()
-  .replace(/[：:]/g, " ")
-  .replace(/[ 　]+/g, "");
-
-const titleIcon = document.getElementById("titleIcon");
-titleIcon.src = "image/" + encodeURIComponent(titleFileName) + ".png";
-titleIcon.onerror = () => titleIcon.src = "image/noimage.png";
 
  const stagesData = await fetch("stages.json").then(r => r.json());
 
