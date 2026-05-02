@@ -174,28 +174,6 @@ async function load() {
   if (detailParam === "1") {
     document.getElementById("showDetail").checked = true;
   }
-  
-  const titleText =
-  name ||
-  (castleParam ? `敵城ID: ${castleParam}` : "") ||
-  (backgroundParam ? `背景ID: ${backgroundParam}` : "");
-
-document.getElementById("title").textContent = titleText;
-
-const titleIcon = document.getElementById("titleIcon");
-
-if (name) {
-  const titleFileName = name
-    .replace(/\r?\n/g, "")
-    .trim()
-    .replace(/[：:]/g, " ")
-    .replace(/[ 　]+/g, "");
-
-  titleIcon.src = "image/" + encodeURIComponent(titleFileName) + ".png";
-  titleIcon.onerror = () => titleIcon.src = "image/noimage.png";
-} else {
-  titleIcon.style.display = "none";
-}
 
  const stagesData = await fetch("stages.json").then(r => r.json());
 
@@ -240,6 +218,32 @@ const backgroundList = Array.isArray(backgroundsData)
 backgroundList.forEach(bg => {
   backgroundMap[String(bg.background)] = bg.image;
 });
+
+  document.getElementById("title").textContent = name || "";
+
+const titleIcon = document.getElementById("titleIcon");
+
+if (name) {
+  const titleFileName = name
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+
+  titleIcon.src = "image/" + encodeURIComponent(titleFileName) + ".png";
+  titleIcon.onerror = () => titleIcon.src = "image/noimage.png";
+} else {
+  if (castleParam) {
+    titleIcon.src = castleMap[String(castleParam)] || "";
+    titleIcon.onerror = () => titleIcon.style.display = "none";
+  } else if (backgroundParam) {
+    titleIcon.src = backgroundMap[String(backgroundParam)] || "";
+    titleIcon.onerror = () => titleIcon.style.display = "none";
+  } else {
+    titleIcon.style.display = "none";
+  }
+}
+
   
   const ul = document.getElementById("list");
   ul.innerHTML = "";
