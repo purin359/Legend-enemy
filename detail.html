@@ -163,6 +163,14 @@ function normalize(str) {
 }
 
 async function load() {
+  const castleParam = params.get("castle");
+const backgroundParam = params.get("background");
+const detailParam = params.get("detail");
+
+if (detailParam === "1") {
+  document.getElementById("showDetail").checked = true;
+}
+  
   const params = new URLSearchParams(location.search);
   const name = params.get("name");
   const mode = params.get("mode");
@@ -258,8 +266,17 @@ backgroundList.forEach(bg => {
         ? String(detail.bosses).split(",").map(s => normalize(s))
         : [];
 
-      if (st.enemies.map(normalize).includes(normalize(name))) {
+      const matchedEnemy =
+  name && st.enemies.map(normalize).includes(normalize(name));
 
+const matchedCastle =
+  castleParam && detail && String(detail.castleId) === String(castleParam);
+
+const matchedBackground =
+  backgroundParam && detail && String(detail.background) === String(backgroundParam);
+
+if (matchedEnemy || matchedCastle || matchedBackground) {
+  
         total++;
 
         const li = document.createElement("li");
