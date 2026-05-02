@@ -88,6 +88,21 @@ img {
   object-fit: cover;
 }
 
+  .sideLabel {
+  white-space: nowrap;
+  line-height: 1.4;
+  width: 60px;
+}
+
+.sideImages {
+  white-space: nowrap;
+}
+
+.sideImages img {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 </style>
 </head>
 <body>
@@ -242,12 +257,11 @@ if (mode === "ALL") {
   imgTd.innerHTML = `
   <table class="sideInfoTable">
     <tr>
-      <th>敵城</th>
-      <td>
+      <th class="sideLabel">
+        敵城<br>背景
+      </th>
+      <td class="sideImages">
         ${castleImg ? `<img class="castleImg" src="${castleImg}" onerror="this.style.display='none'">` : ""}
-      </td>
-      <th>背景</th>
-      <td>
         ${bgImg ? `<img class="bgImg" src="${bgImg}" onerror="this.style.display='none'">` : ""}
       </td>
     </tr>
