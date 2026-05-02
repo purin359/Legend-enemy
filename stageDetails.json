@@ -3238,7 +3238,7 @@
         "castleDistance": 4000,
         "energy": 165,
         "unitLimit": 10,
-        "bosses": "わんこ城,ミスターエンジェル"
+        "bosses": "わんこ城(仮),ミスターエンジェル"
       }
     ]
   },
@@ -3338,7 +3338,7 @@
         "castleDistance": 4000,
         "energy": 155,
         "unitLimit": 2,
-        "bosses": "わんこ城"
+        "bosses": "わんこ城(仮)"
       },
       {
         "stageId": 2,
@@ -5687,7 +5687,7 @@
         "castleDistance": 4000,
         "energy": 250,
         "unitLimit": 10,
-        "bosses": "呪いのわんこ城,松 黒蔵"
+        "bosses": "呪いのわんこ城(仮),松 黒蔵"
       }
     ]
   },
@@ -5704,7 +5704,7 @@
         "castleDistance": 3800,
         "energy": 200,
         "unitLimit": 40,
-        "bosses": "呪いのわんこ城,ちびぶんぶん"
+        "bosses": "呪いのわんこ城(仮),ちびぶんぶん"
       },
       {
         "stageId": 1,
@@ -5715,7 +5715,7 @@
         "castleDistance": 3000,
         "energy": 180,
         "unitLimit": 10,
-        "bosses": "わんこ城,オールドリー"
+        "bosses": "わんこ城(仮),オールドリー"
       },
       {
         "stageId": 2,
@@ -5726,7 +5726,7 @@
         "castleDistance": 3800,
         "energy": 190,
         "unitLimit": 2,
-        "bosses": "呪いのわんこ城,パラサイトブンブン,イノシャシ,コライノくん"
+        "bosses": "呪いのわんこ城(仮),パラサイトブンブン,イノシャシ,コライノくん"
       },
       {
         "stageId": 3,
@@ -5737,7 +5737,7 @@
         "castleDistance": 5000,
         "energy": 190,
         "unitLimit": 20,
-        "bosses": "わんこ城,破壊生物クオリネン"
+        "bosses": "わんこ城(仮),破壊生物クオリネン"
       },
       {
         "stageId": 4,
@@ -5748,7 +5748,7 @@
         "castleDistance": 4800,
         "energy": 180,
         "unitLimit": 15,
-        "bosses": "呪いのわんこ城,教授"
+        "bosses": "呪いのわんこ城(仮),教授"
       },
       {
         "stageId": 5,
@@ -5759,7 +5759,7 @@
         "castleDistance": 4400,
         "energy": 250,
         "unitLimit": 20,
-        "bosses": "烈波城,師匠"
+        "bosses": "烈波城(仮),師匠"
       }
     ]
   },
@@ -5798,7 +5798,7 @@
         "castleDistance": 3700,
         "energy": 180,
         "unitLimit": 6,
-        "bosses": "烈波城"
+        "bosses": "烈波城(仮)"
       },
       {
         "stageId": 3,
@@ -5831,7 +5831,7 @@
         "castleDistance": 4200,
         "energy": 250,
         "unitLimit": 15,
-        "bosses": "烈波城,メタルコアラッキョ"
+        "bosses": "烈波城(仮),メタルコアラッキョ"
       }
     ]
   },
@@ -6208,7 +6208,7 @@
         "castleDistance": 4800,
         "energy": 190,
         "unitLimit": 4,
-        "bosses": "烈波城"
+        "bosses": "烈波城(仮)"
       },
       {
         "stageId": 1,
@@ -6219,7 +6219,7 @@
         "castleDistance": 3600,
         "energy": 180,
         "unitLimit": 20,
-        "bosses": "わんこ城,超町長"
+        "bosses": "わんこ城(仮),超町長"
       },
       {
         "stageId": 2,
