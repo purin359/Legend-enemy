@@ -118,6 +118,18 @@ img {
   margin-right: 14px;
   vertical-align: middle;
 }
+
+  .titleWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleIcon {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
   
 </style>
 </head>
@@ -125,7 +137,11 @@ img {
 
 <button onclick="goBack()">戻る</button>
 
-<h2 id="title"></h2>
+<h2 class="titleWithIcon">
+  <img id="titleIcon" class="titleIcon">
+  <span id="title"></span>
+</h2>
+  
 <p id="count"></p>
   <label>
   <input type="checkbox" id="showKanban" onchange="load()">
@@ -152,6 +168,16 @@ async function load() {
   const mode = params.get("mode");
 
   document.getElementById("title").textContent = name;
+
+  const titleFileName = name
+  .replace(/\r?\n/g, "")
+  .trim()
+  .replace(/[：:]/g, " ")
+  .replace(/[ 　]+/g, "");
+
+const titleIcon = document.getElementById("titleIcon");
+titleIcon.src = "image/" + encodeURIComponent(titleFileName) + ".png";
+titleIcon.onerror = () => titleIcon.src = "image/noimage.png";
 
  const stagesData = await fetch("stages.json").then(r => r.json());
 
