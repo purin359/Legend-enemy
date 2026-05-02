@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細1</title>
+<title>敵詳細</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -197,25 +197,15 @@ if (mode === "ALL") {
     .replace(/[：:]/g, "")
     .replace(/[ 　]+/g, "");
 
- const imgWrap = document.createElement("span");
-imgWrap.style.display = "inline-block";
-imgWrap.style.padding = "0";
-imgWrap.style.marginRight = "5px";
-
-if (showDetail && bossList.includes(normalize(enemyName))) {
-  imgWrap.style.background = "#fff3b0"; // 薄い黄色
-}
-
 const img = document.createElement("img");
 img.src = "image/" + encodeURIComponent(fileName) + ".png";
 img.onerror = () => img.src = "image/noimage.png";
-img.style.display = "block";
-img.style.marginRight = "5px";
 
-imgWrap.appendChild(img);
-td.appendChild(imgWrap);
+if (showDetail && bossList.includes(normalize(enemyName))) {
+  img.style.outline = "3px solid #fff3b0"; // 薄い黄色
+}
 
-td.style.fontSize = "0";
+td.appendChild(img);
 });
         
         tr2.appendChild(th);
