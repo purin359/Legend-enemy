@@ -1,0 +1,130 @@
+[
+  {
+    "castleId": "0",
+    "image": "image_castle/0.png"
+  },
+  {
+    "castleId": "1",
+    "image": "image_castle/1.png"
+  },
+  {
+    "castleId": "2",
+    "image": "image_castle/2.png"
+  },
+  {
+    "castleId": "3",
+    "image": "image_castle/3.png"
+  },
+  {
+    "castleId": "4",
+    "image": "image_castle/4.png"
+  },
+  {
+    "castleId": "5",
+    "image": "image_castle/5.png"
+  },
+  {
+    "castleId": "6",
+    "image": "image_castle/6.png"
+  },
+  {
+    "castleId": "7",
+    "image": "image_castle/7.png"
+  },
+  {
+    "castleId": "8",
+    "image": "image_castle/8.png"
+  },
+  {
+    "castleId": "9",
+    "image": "image_castle/9.png"
+  },
+  {
+    "castleId": "10",
+    "image": "image_castle/10.png"
+  },
+  {
+    "castleId": "11",
+    "image": "image_castle/11.png"
+  },
+  {
+    "castleId": "12",
+    "image": "image_castle/12.png"
+  },
+  {
+    "castleId": "13",
+    "image": "image_castle/13.png"
+  },
+  {
+    "castleId": "14",
+    "image": "image_castle/14.png"
+  },
+  {
+    "castleId": "15",
+    "image": "image_castle/15.png"
+  },
+  {
+    "castleId": "16",
+    "image": "image_castle/16.png"
+  },
+  {
+    "castleId": "17",
+    "image": "image_castle/17.png"
+  },
+  {
+    "castleId": "18",
+    "image": "image_castle/18.png"
+  },
+  {
+    "castleId": "19",
+    "image": "image_castle/19.png"
+  },
+  {
+    "castleId": "20",
+    "image": "image_castle/20.png"
+  },
+  {
+    "castleId": "21",
+    "image": "image_castle/21.png"
+  },
+  {
+    "castleId": "116",
+    "image": "image_castle/116.png"
+  },
+  {
+    "castleId": "117",
+    "image": "image_castle/117.png"
+  },
+  {
+    "castleId": "149",
+    "image": "image_castle/149.png"
+  },
+  {
+    "castleId": "164",
+    "image": "image_castle/164.png"
+  },
+  {
+    "castleId": "172",
+    "image": "image_castle/172.png"
+  },
+  {
+    "castleId": "1000",
+    "image": "image_castle/1000.png"
+  },
+  {
+    "castleId": "1001",
+    "image": "image_castle/1001.png"
+  },
+  {
+    "castleId": "1002",
+    "image": "image_castle/1002.png"
+  },
+  {
+    "castleId": "1003",
+    "image": "image_castle/1003.png"
+  },
+  {
+    "castleId": "1004",
+    "image": "image_castle/1004.png"
+  }
+]
