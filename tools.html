@@ -247,28 +247,30 @@ function openFunc(id, btn) {
 }
 
 async function init() {
-  stagesData = await fetch("stages.json").then(r=>r.json());
-  enemiesData = await fetch("enemies.json").then(r=>r.json());
+  stagesData = await fetch("stages.json").then(r => r.json());
+  enemiesData = await fetch("enemies.json").then(r => r.json());
 
   stageDetailsData = await fetch("stageDetails.json")
     .then(r => r.ok ? r.json() : [])
     .catch(() => []);
 
+  castlesData = await fetch("castles.json")
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => []);
+
+  castleMap = {};
   castlesData.forEach(c => {
     castleMap[String(c.castleId)] = {
-    image: c.image,
-    bossPosition: Number(c.bossPosition) || 0
-  };
-});
+      image: c.image,
+      bossPosition: c.bossPosition !== undefined ? Number(c.bossPosition) : ""
+    };
+  });
 
-  enemyNames = Object.values(enemiesData).map(e=>e.name);
+  enemyNames = Object.values(enemiesData).map(e => e.name);
 
   setupSuggest();
 
-  openFunc("detailSort", document.querySelectorAll(".funcBtn")[1]);
-
-  castlesData = await fetch("castles.json").then(r => r.json());
-
+  openFunc("detailSort", document.querySelectorAll(".funcBtn")[0]);
 }
   
 function setupSuggest() {
@@ -564,7 +566,7 @@ function redrawStageList() {
 
     ch.stages.forEach(st => {
       const bossCastleId = st.bossCastleId ?? st.castleId;
-      const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? 0;
+      const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
       rows.push({
         chapterId: ch.chapterId,
         chapterName: ch.chapterName,
