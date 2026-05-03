@@ -552,7 +552,7 @@ castlesData.forEach(c => {
     if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
-      const id = String(st.bossCastleId ?? st.castleId);
+      const id = String(st.castleId);
 
       if (!map[id]) {
         map[id] = {
