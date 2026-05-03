@@ -529,33 +529,20 @@ function redrawStageList() {
       : a[sortKey] - b[sortKey];
   });
 
-  rows.forEach((row, index) => {
-    const tr = document.createElement("tr");
+  rows.forEach(row => {
+  const tr = document.createElement("tr");
 
-    const prev = rows[index - 1];
-    const sameChapterAsPrev =
-      prev && prev.chapterId === row.chapterId;
+  tr.innerHTML = `
+    <td>${row.chapterName}</td>
+    <td>${row.stageName}</td>
+    <td>${row.castleHP.toLocaleString()}</td>
+    <td>${row.castleDistance.toLocaleString()}</td>
+    <td>${row.energy.toLocaleString()}</td>
+    <td>${row.unitLimit.toLocaleString()}</td>
+  `;
 
-    if (!sameChapterAsPrev) {
-      const sameCount = rows.filter(r => r.chapterId === row.chapterId).length;
-
-      const tdChapter = document.createElement("td");
-      tdChapter.rowSpan = sameCount;
-      tdChapter.textContent = row.chapterName;
-      tr.appendChild(tdChapter);
-    }
-
-    tr.innerHTML += `
-      <td>${row.stageName}</td>
-      <td>${row.castleHP.toLocaleString()}</td>
-      <td>${row.castleDistance.toLocaleString()}</td>
-      <td>${row.energy.toLocaleString()}</td>
-      <td>${row.unitLimit.toLocaleString()}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
+  tbody.appendChild(tr);
+});
 
 function toggleDetailOrder() {
   detailDesc = !detailDesc;
