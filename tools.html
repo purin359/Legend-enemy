@@ -89,38 +89,25 @@ canvas {
 .detailTable td {
   border: 1px solid #ccc;
   padding: 8px;
-  text-align: center;
   vertical-align: middle;
 }
 
 .detailTable th {
   background: #f0f0f0;
-}
-
-.detailTable td:nth-child(2) {
-  text-align: left;
-}
-
-.detailTable thead th {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: #f0f0f0;
-}
-
-  .detailTable td {
   text-align: center;
-  vertical-align: middle;
 }
 
-/* 章名 */
-.detailTable td:nth-child(1) {
+.detailTable td {
+  text-align: center;
+}
+
+.detailTable td.chapterCell,
+.detailTable td.stageCell {
   text-align: left;
 }
 
-/* ステージ名 */
-.detailTable td:nth-child(2) {
-  text-align: left;
+.detailTable td.numCell {
+  text-align: center;
 }
 </style>
 </head>
@@ -578,14 +565,14 @@ function redrawStageList() {
   const tr = document.createElement("tr");
 
   tr.innerHTML = `
-    <td>${row.chapterName}</td>
-    <td>${row.stageName}</td>
-    <td>${row.castleHP.toLocaleString()}</td>
-    <td>${row.castleDistance}</td>
-    <td>${row.energy}</td>
-    <td>${row.unitLimit}</td>
-  `;
-
+  <td class="chapterCell">${row.chapterName}</td>
+  <td class="stageCell">${row.stageName}</td>
+  <td class="numCell">${row.castleHP.toLocaleString()}</td>
+  <td class="numCell">${row.castleDistance}</td>
+  <td class="numCell">${row.energy}</td>
+  <td class="numCell">${row.unitLimit}</td>
+`;
+    
   tbody.appendChild(tr);
 });
 
