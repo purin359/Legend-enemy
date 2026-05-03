@@ -209,17 +209,21 @@ function normalize(str) {
 }
 
 function openFunc(id, btn) {
-  // 表示切り替え
   document.querySelectorAll(".funcArea").forEach(el => {
     el.style.display = "none";
   });
+
   document.getElementById(id).style.display = "block";
 
-  // active切り替え
   document.querySelectorAll(".funcBtn").forEach(b => {
     b.classList.remove("active");
   });
+
   btn.classList.add("active");
+
+  if (id === "detailSort") {
+    drawDetailTable();
+  }
 }
 
 async function init() {
