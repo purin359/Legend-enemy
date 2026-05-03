@@ -15,17 +15,31 @@ body {
 }
 
 .menu {
-  display: grid;
+  display: flex;          /* 横並び */
   gap: 10px;
   margin-top: 20px;
 }
 
 .funcBtn {
-  padding: 10px;
+  padding: 10px 16px;
   border-radius: 8px;
   border: 1px solid #ccc;
   background: #f5f5f5;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+/* ホバー */
+.funcBtn:hover {
+  background: #e0e0e0;
+}
+
+/* 選択中（超重要） */
+.funcBtn.active {
+  background: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+  font-weight: bold;
 }
 
 .funcArea {
@@ -96,8 +110,8 @@ canvas {
 <h2>その他</h2>
 
 <div class="menu">
-  <button class="funcBtn" onclick="openFunc('graph')">敵の登場ステージグラフ</button>
-  <button class="funcBtn" onclick="openFunc('detailSort')">ステージ詳細並び替え</button>
+  <button class="funcBtn active" onclick="openFunc('graph', this)">グラフ</button>
+  <button class="funcBtn" onclick="openFunc('sort', this)">詳細並び替え</button>
 </div>
   
 <!-- グラフ機能 -->
@@ -194,13 +208,18 @@ function normalize(str) {
     .trim();
 }
 
-function openFunc(id) {
-  document.querySelectorAll(".funcArea").forEach(el => el.style.display = "none");
+function openFunc(id, btn) {
+  // 表示切り替え
+  document.querySelectorAll(".funcArea").forEach(el => {
+    el.style.display = "none";
+  });
   document.getElementById(id).style.display = "block";
 
-  if (id === "detailSort") {
-    drawDetailTable();
-  }
+  // active切り替え
+  document.querySelectorAll(".funcBtn").forEach(b => {
+    b.classList.remove("active");
+  });
+  btn.classList.add("active");
 }
 
 async function init() {
@@ -215,7 +234,7 @@ async function init() {
 
   setupSuggest();
 
-  openFunc("graph");
+  openFunc("graph", document.querySelector(".funcBtn"));
 }
   
 function setupSuggest() {
@@ -552,6 +571,48 @@ function toggleDetailOrder() {
     detailDesc ? "降順" : "昇順";
 
   drawDetailTable();
+}
+
+  let prevChapter = null;
+let rowspanCount = 0;
+let startIndex = 0;
+
+sorted.forEach((row, i) => {
+
+  const isSame = row.chapterName === prevChapter;
+
+  if (!isSame) {
+    // 前のグループを確定
+    if (rowspanCount > 0) {
+      applyRowspan(startIndex, rowspanCount);
+    }
+
+    // 新しいグループ開始
+    prevChapter = row.chapterName;
+    rowspanCount = 1;
+    startIndex = i;
+
+  } else {
+    rowspanCount++;
+  }
+
+  // 最後の行処理
+  if (i === sorted.length - 1) {
+    applyRowspan(startIndex, rowspanCount);
+  }
+
+});
+
+  function applyRowspan(start, count) {
+  if (count <= 1) return;
+
+  const rows = document.querySelectorAll("#table tr");
+
+  rows[start].children[0].rowSpan = count;
+
+  for (let i = start + 1; i < start + count; i++) {
+    rows[i].children[0].remove(); // 同じ章は消す
+  }
 }
   
 init();
