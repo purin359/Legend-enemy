@@ -172,6 +172,7 @@ canvas {
 
   <select id="detailSortKey" onchange="drawDetailTable()">
     <option value="castleHP">城体力</option>
+    <option value="bossPosition">ボス位置</option>
     <option value="castleDistance">城距離</option>
     <option value="energy">統率力</option>
     <option value="unitLimit">出撃制限</option>
@@ -185,6 +186,7 @@ canvas {
         <th>章名</th>
         <th>ステージ名</th>
         <th>城体力</th>
+        <th>ボス位置</th>
         <th>城距離</th>
         <th>統率力</th>
         <th>出撃制限</th>
@@ -208,6 +210,8 @@ let suggestIndex = -1;
 let currentSuggestList = [];
 let stageDetailsData = [];
 let detailDesc = true;
+let castlesData = [];
+let castleMap = {};
 
 function normalize(str) {
   return String(str)
@@ -255,6 +259,15 @@ async function init() {
   setupSuggest();
 
   openFunc("detailSort", document.querySelectorAll(".funcBtn")[1]);
+
+  castlesData = await fetch("castles.json").then(r => r.json());
+
+    castlesData.forEach(c => {
+    castleMap[String(c.castleId)] = {
+    image: c.image,
+    bossPosition: Number(c.bossPosition) || 0
+  };
+});
 }
   
 function setupSuggest() {
@@ -550,11 +563,15 @@ function redrawStageList() {
 
     ch.stages.forEach(st => {
       rows.push({
+        const bossCastleId = st.bossCastleId ?? st.castleId;
+        const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? 0;
+      
         chapterId: ch.chapterId,
         chapterName: ch.chapterName,
         stageId: st.stageId,
         stageName: st.stageName,
         castleHP: Number(st.castleHP) || 0,
+        bossPosition: bossPosition,
         castleDistance: Number(st.castleDistance) || 0,
         energy: Number(st.energy) || 0,
         unitLimit: Number(st.unitLimit) || 0
@@ -575,6 +592,7 @@ function redrawStageList() {
   <td class="chapterCell">${row.chapterName}</td>
   <td class="stageCell">${row.stageName}</td>
   <td class="numCell">${row.castleHP.toLocaleString()}</td>
+  <td class="numCell">${row.bossPosition}</td>
   <td class="numCell">${row.castleDistance}</td>
   <td class="numCell">${row.energy}</td>
   <td class="numCell">${row.unitLimit}</td>
