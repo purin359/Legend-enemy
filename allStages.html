@@ -198,7 +198,7 @@ img {
 
 .detailGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
 
@@ -394,7 +394,10 @@ stageDetailsData.forEach(ch => {
 
 const castleMap = {};
 castlesData.forEach(c => {
-  castleMap[String(c.castleId)] = c.image;
+  castleMap[String(c.castleId)] = {
+    image: c.image,
+    bossPosition: Number(c.bossPosition) || 0
+  };
 });
 
 const backgroundMap = {};
@@ -476,8 +479,13 @@ const bossList = detail && detail.bosses && detail.bosses !== "なし"
       `;
 
 if (showDetail && detail) {
-  const castleImg = castleMap[String(detail.castleId)] || "";
+  const displayCastleId = detail.castleId;
+const bossCastleId = detail.bossCastleId ?? detail.castleId;
+
+const castleImg = castleMap[String(displayCastleId)]?.image || "";
   const bgImg = backgroundMap[String(detail.background)] || "";
+  const bossCastleId = detail.bossCastleId ?? detail.castleId;
+const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
 
   const sideTd = document.createElement("td");
   sideTd.rowSpan = 2;
@@ -575,6 +583,10 @@ if (showDetail && detail) {
         <div>
           <div class="detailLabel">出撃制限</div>
           <div class="detailValue">${detail.unitLimit}</div>
+        </div>
+        <div>
+          <div class="detailLabel">ボス出現位置</div>
+          <div class="detailValue">${bossPosition}</div>
         </div>
       </div>
     </td>
