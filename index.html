@@ -539,9 +539,12 @@ window.addEventListener("click", e => {
   const castlesData = await fetch("castles.json").then(r => r.json());
 
   const castleMap = {};
-  castlesData.forEach(c => {
-    castleMap[String(c.castleId)] = c.image;
-  });
+castlesData.forEach(c => {
+  castleMap[String(c.castleId)] = {
+    image: c.image,
+    bossPosition: Number(c.bossPosition) || 0
+  };
+});
 
   const map = {};
 
@@ -555,7 +558,8 @@ window.addEventListener("click", e => {
         map[id] = {
           id,
           count: 0,
-          image: castleMap[id] || "",
+          image: castleMap[id]?.image || "",
+          bossPosition: castleMap[id]?.bossPosition || 0,
           first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
         };
       }
