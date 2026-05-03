@@ -562,6 +562,35 @@ function redrawStageList() {
 
   tbody.appendChild(tr);
 });
+
+    let prevChapter = null;
+let rowspanStart = null;
+let rowspanCount = 0;
+
+const trs = tbody.querySelectorAll("tr");
+
+trs.forEach((tr, i) => {
+  const chapterCell = tr.children[0];
+  const chapter = chapterCell.textContent;
+
+  if (chapter === prevChapter) {
+    rowspanCount++;
+    chapterCell.remove();
+  } else {
+    if (rowspanStart !== null && rowspanCount > 1) {
+      trs[rowspanStart].children[0].rowSpan = rowspanCount;
+    }
+
+    prevChapter = chapter;
+    rowspanStart = i;
+    rowspanCount = 1;
+  }
+
+  // 最後の処理
+  if (i === trs.length - 1 && rowspanCount > 1) {
+    trs[rowspanStart].children[0].rowSpan = rowspanCount;
+  }
+});
   }
 
 function toggleDetailOrder() {
