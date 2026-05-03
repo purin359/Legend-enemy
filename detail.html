@@ -337,7 +337,10 @@ if (mode === "ALL") {
         `;
 
         if (showDetail && detail) {
-  const castleImg = castleMap[String(detail.castleId)]?.image || "";
+  const displayCastleId = detail.castleId;
+const bossCastleId = detail.bossCastleId ?? detail.castleId;
+
+const castleImg = castleMap[String(displayCastleId)]?.image || "";
   const bgImg = backgroundMap[String(detail.background)] || "";
 
   const imgTd = document.createElement("td");
