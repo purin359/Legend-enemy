@@ -2,110 +2,137 @@
   {
     "castleId": "0",
     "image": "image_castle/0.png"
+    "bossposition": 822.25
   },
   {
     "castleId": "1",
     "image": "image_castle/1.png"
+    "bossposition": 822.25
   },
   {
     "castleId": "2",
     "image": "image_castle/2.png"
+    "bossposition": 838
   },
   {
     "castleId": "3",
     "image": "image_castle/3.png"
+    "bossposition": 844.25
   },
   {
     "castleId": "4",
     "image": "image_castle/4.png"
+    "bossposition": 828.5
   },
   {
     "castleId": "5",
     "image": "image_castle/5.png"
+    "bossposition": 825.5
   },
   {
     "castleId": "6",
     "image": "image_castle/6.png"
+    "bossposition": 838
   },
   {
     "castleId": "7",
     "image": "image_castle/7.png"
+    "bossposition": 838
   },
   {
     "castleId": "8",
     "image": "image_castle/8.png"
+    "bossposition": 819
   },
   {
     "castleId": "9",
     "image": "image_castle/9.png"
+    "bossposition": 822.25
   },
   {
     "castleId": "10",
     "image": "image_castle/10.png"
+    "bossposition": 831.5
   },
   {
     "castleId": "11",
     "image": "image_castle/11.png"
+    "bossposition": 853.75
   },
   {
     "castleId": "12",
     "image": "image_castle/12.png"
+    "bossposition": 831.5
   },
   {
     "castleId": "13",
     "image": "image_castle/13.png"
+    "bossposition": 825.5
   },
   {
     "castleId": "14",
     "image": "image_castle/14.png"
+    "bossposition": 838
   },
   {
     "castleId": "15",
     "image": "image_castle/15.png"
+    "bossposition": 838
   },
   {
     "castleId": "16",
     "image": "image_castle/16.png"
+    "bossposition": 838
   },
   {
     "castleId": "17",
     "image": "image_castle/17.png"
+    "bossposition": 860.25
   },
   {
     "castleId": "18",
     "image": "image_castle/18.png"
+    "bossposition": 834.75
   },
   {
     "castleId": "19",
     "image": "image_castle/19.png"
+    "bossposition": 825.5
   },
   {
     "castleId": "20",
     "image": "image_castle/20.png"
+    "bossposition": 831.5
   },
   {
     "castleId": "21",
     "image": "image_castle/21.png"
+    "bossposition": 831.5
   },
   {
     "castleId": "116",
     "image": "image_castle/116.png"
+    "bossposition": 828.5
   },
   {
     "castleId": "117",
     "image": "image_castle/117.png"
+    "bossposition": 828.5
   },
   {
     "castleId": "149",
     "image": "image_castle/149.png"
+    "bossposition": 828.5
   },
   {
     "castleId": "164",
     "image": "image_castle/164.png"
+    "bossposition": 828.5
   },
   {
     "castleId": "172",
     "image": "image_castle/172.png"
+    "bossposition": 828.5
   },
   {
     "castleId": "1000",
