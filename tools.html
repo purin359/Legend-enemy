@@ -572,48 +572,6 @@ function toggleDetailOrder() {
 
   drawDetailTable();
 }
-
-  let prevChapter = null;
-let rowspanCount = 0;
-let startIndex = 0;
-
-sorted.forEach((row, i) => {
-
-  const isSame = row.chapterName === prevChapter;
-
-  if (!isSame) {
-    // 前のグループを確定
-    if (rowspanCount > 0) {
-      applyRowspan(startIndex, rowspanCount);
-    }
-
-    // 新しいグループ開始
-    prevChapter = row.chapterName;
-    rowspanCount = 1;
-    startIndex = i;
-
-  } else {
-    rowspanCount++;
-  }
-
-  // 最後の行処理
-  if (i === sorted.length - 1) {
-    applyRowspan(startIndex, rowspanCount);
-  }
-
-});
-
-  function applyRowspan(start, count) {
-  if (count <= 1) return;
-
-  const rows = document.querySelectorAll("#table tr");
-
-  rows[start].children[0].rowSpan = count;
-
-  for (let i = start + 1; i < start + count; i++) {
-    rows[i].children[0].remove(); // 同じ章は消す
-  }
-}
   
 init();
 </script>
