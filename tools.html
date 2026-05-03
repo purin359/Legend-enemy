@@ -254,6 +254,13 @@ async function init() {
     .then(r => r.ok ? r.json() : [])
     .catch(() => []);
 
+  castlesData.forEach(c => {
+    castleMap[String(c.castleId)] = {
+    image: c.image,
+    bossPosition: Number(c.bossPosition) || 0
+  };
+});
+
   enemyNames = Object.values(enemiesData).map(e=>e.name);
 
   setupSuggest();
@@ -262,12 +269,6 @@ async function init() {
 
   castlesData = await fetch("castles.json").then(r => r.json());
 
-    castlesData.forEach(c => {
-    castleMap[String(c.castleId)] = {
-    image: c.image,
-    bossPosition: Number(c.bossPosition) || 0
-  };
-});
 }
   
 function setupSuggest() {
@@ -562,10 +563,9 @@ function redrawStageList() {
     if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
+      const bossCastleId = st.bossCastleId ?? st.castleId;
+      const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? 0;
       rows.push({
-        const bossCastleId = st.bossCastleId ?? st.castleId;
-        const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? 0;
-      
         chapterId: ch.chapterId,
         chapterName: ch.chapterName,
         stageId: st.stageId,
