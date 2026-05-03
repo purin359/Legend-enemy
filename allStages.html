@@ -455,8 +455,13 @@ backgroundsData.forEach(bg => {
 
     ch.stages.forEach(st => {
       const showDetail = document.getElementById("showDetail").checked;
-const detailKey = `${ch.chapterId}-${st.stageId}`;
-const detail = detailMap[detailKey];
+      const detailKey = `${ch.chapterId}-${st.stageId}`;
+      const detail = detailMap[detailKey];
+
+      const bossCastleId = detail ? (detail.bossCastleId ?? detail.castleId) : "";
+      const bossPosition = bossCastleId
+        ? (castleMap[String(bossCastleId)]?.bossPosition ?? "")
+        : "";
 
 const bossList = detail && detail.bosses && detail.bosses !== "なし"
   ? String(detail.bosses)
@@ -484,8 +489,6 @@ const bossCastleId = detail.bossCastleId ?? detail.castleId;
 
 const castleImg = castleMap[String(displayCastleId)]?.image || "";
   const bgImg = backgroundMap[String(detail.background)] || "";
-  const bossCastleId = detail.bossCastleId ?? detail.castleId;
-const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
 
   const sideTd = document.createElement("td");
   sideTd.rowSpan = 2;
