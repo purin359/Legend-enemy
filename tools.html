@@ -126,8 +126,8 @@ canvas {
 <h2>その他</h2>
 
 <div class="menu">
-  <button class="funcBtn active" onclick="openFunc('graph', this)">グラフ</button>
   <button class="funcBtn" onclick="openFunc('detailSort', this)">詳細並び替え</button>
+  <button class="funcBtn active" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
   
 <!-- グラフ機能 -->
@@ -254,7 +254,7 @@ async function init() {
 
   setupSuggest();
 
-  openFunc("graph", document.querySelector(".funcBtn"));
+  openFunc("detailSort", document.querySelector(".funcBtn"));
 }
   
 function setupSuggest() {
