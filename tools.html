@@ -64,6 +64,28 @@ body {
 canvas {
   margin-top: 20px;
 }
+
+  .detailTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.detailTable th,
+.detailTable td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.detailTable th {
+  background: #f0f0f0;
+}
+
+.detailTable td:first-child,
+.detailTable td:nth-child(2) {
+  text-align: left;
+}
 </style>
 </head>
 
@@ -73,10 +95,11 @@ canvas {
 
 <h2>その他</h2>
 
-<!-- <div class="menu"> -->
-  <!-- <button class="funcBtn" onclick="openFunc('graph')">敵の登場ステージグラフ</button> -->
-<!-- </div> -->
-
+<div class="menu">
+  <button class="funcBtn" onclick="openFunc('graph')">敵の登場ステージグラフ</button>
+  <button class="funcBtn" onclick="openFunc('detailSort')">ステージ詳細並び替え</button>
+</div>
+  
 <!-- グラフ機能 -->
 <div id="graph" class="funcArea">
 
@@ -105,6 +128,43 @@ canvas {
 <div id="stageList"></div>
 </div>
 
+  <!-- 詳細並び替え機能 -->
+<div id="detailSort" class="funcArea">
+
+  <h3>ステージ詳細並び替え</h3>
+
+  <select id="detailMode" onchange="drawDetailTable()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <select id="detailSortKey" onchange="drawDetailTable()">
+    <option value="castleHP">城体力</option>
+    <option value="castleDistance">城距離</option>
+    <option value="energy">統率力</option>
+    <option value="unitLimit">出撃制限</option>
+  </select>
+
+  <button id="detailOrderBtn" onclick="toggleDetailOrder()">降順</button>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>章名</th>
+        <th>ステージ名</th>
+        <th>城体力</th>
+        <th>城距離</th>
+        <th>統率力</th>
+        <th>出撃制限</th>
+      </tr>
+    </thead>
+    <tbody id="detailTableBody"></tbody>
+  </table>
+
+</div>
+
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -116,6 +176,8 @@ let maxStage = 0;
 let lastSelectedPos = null;
 let suggestIndex = -1;
 let currentSuggestList = [];
+let stageDetailsData = [];
+let detailDesc = true;
 
 function normalize(str) {
   return String(str)
@@ -135,11 +197,19 @@ function normalize(str) {
 function openFunc(id) {
   document.querySelectorAll(".funcArea").forEach(el => el.style.display = "none");
   document.getElementById(id).style.display = "block";
+
+  if (id === "detailSort") {
+    drawDetailTable();
+  }
 }
 
 async function init() {
   stagesData = await fetch("stages.json").then(r=>r.json());
   enemiesData = await fetch("enemies.json").then(r=>r.json());
+
+  stageDetailsData = await fetch("stageDetails.json")
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => []);
 
   enemyNames = Object.values(enemiesData).map(e=>e.name);
 
@@ -403,6 +473,97 @@ function redrawStageList() {
     chart.destroy();
     chart = null;
   }
+}
+
+  // 詳細一覧
+  function isTargetChapter(ch, mode) {
+  return (
+    mode === "ALL" ||
+
+    (mode === "N" && (
+      (ch.chapterId.startsWith("N") &&
+       !ch.chapterId.startsWith("NA") &&
+       !ch.chapterId.startsWith("ND")) ||
+      ch.chapterId === "E026"
+    )) ||
+
+    (mode === "NA" && (
+      ch.chapterId.startsWith("NA") ||
+      ch.chapterId === "E068" ||
+      ch.chapterId === "E069"
+    )) ||
+
+    (mode === "ND" && ch.chapterId.startsWith("ND"))
+  );
+}
+
+  function drawDetailTable() {
+  const mode = document.getElementById("detailMode").value;
+  const sortKey = document.getElementById("detailSortKey").value;
+  const tbody = document.getElementById("detailTableBody");
+
+  tbody.innerHTML = "";
+
+  let rows = [];
+
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      rows.push({
+        chapterId: ch.chapterId,
+        chapterName: ch.chapterName,
+        stageId: st.stageId,
+        stageName: st.stageName,
+        castleHP: Number(st.castleHP) || 0,
+        castleDistance: Number(st.castleDistance) || 0,
+        energy: Number(st.energy) || 0,
+        unitLimit: Number(st.unitLimit) || 0
+      });
+    });
+  });
+
+  rows.sort((a, b) => {
+    return detailDesc
+      ? b[sortKey] - a[sortKey]
+      : a[sortKey] - b[sortKey];
+  });
+
+  rows.forEach((row, index) => {
+    const tr = document.createElement("tr");
+
+    const prev = rows[index - 1];
+    const sameChapterAsPrev =
+      prev && prev.chapterId === row.chapterId;
+
+    if (!sameChapterAsPrev) {
+      const sameCount = rows.filter(r => r.chapterId === row.chapterId).length;
+
+      const tdChapter = document.createElement("td");
+      tdChapter.rowSpan = sameCount;
+      tdChapter.textContent = row.chapterName;
+      tr.appendChild(tdChapter);
+    }
+
+    tr.innerHTML += `
+      <td>${row.stageName}</td>
+      <td>${row.castleHP.toLocaleString()}</td>
+      <td>${row.castleDistance.toLocaleString()}</td>
+      <td>${row.energy.toLocaleString()}</td>
+      <td>${row.unitLimit.toLocaleString()}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleDetailOrder() {
+  detailDesc = !detailDesc;
+
+  document.getElementById("detailOrderBtn").textContent =
+    detailDesc ? "降順" : "昇順";
+
+  drawDetailTable();
 }
   
 init();
