@@ -1624,7 +1624,7 @@
         "castleId": "5",
         "background": "10",
         "castleHP": 464900,
-        "castleDistance": 32000,
+        "castleDistance": 3200,
         "energy": 100,
         "unitLimit": 15,
         "bosses": "なし"
