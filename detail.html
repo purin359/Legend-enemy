@@ -49,7 +49,7 @@ img {
 
 .detailGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
 
@@ -219,7 +219,10 @@ const castleList = Array.isArray(castlesData)
   : Object.values(castlesData);
 
 castleList.forEach(c => {
-  castleMap[String(c.castleId)] = c.image;
+  castleMap[String(c.castleId)] = {
+    image: c.image,
+    bossPosition: Number(c.bossPosition) || 0
+  };
 });
 
 const backgroundMap = {};
@@ -249,7 +252,7 @@ if (name) {
 
 } else if (castleParam) {
   // 城
-  titleIcon.src = castleMap[String(castleParam)] || "";
+  titleIcon.src = castleMap[String(castleParam)]?.image || "";
   titleIcon.classList.add("titleIconCastle");
 
 } else if (backgroundParam) {
@@ -334,7 +337,7 @@ if (mode === "ALL") {
         `;
 
         if (showDetail && detail) {
-  const castleImg = castleMap[String(detail.castleId)] || "";
+  const castleImg = castleMap[String(detail.castleId)]?.image || "";
   const bgImg = backgroundMap[String(detail.background)] || "";
 
   const imgTd = document.createElement("td");
@@ -400,7 +403,10 @@ td.appendChild(img);
         table.appendChild(tr2);
 
         if (showDetail && detail) {
-  const tr3 = document.createElement("tr");
+        const tr3 = document.createElement("tr");
+
+          const bossCastleId = detail.bossCastleId ?? detail.castleId;
+          const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
 
   tr3.innerHTML = `
     <th>詳細</th>
@@ -421,6 +427,10 @@ td.appendChild(img);
         <div>
           <div class="detailLabel">出撃制限</div>
           <div class="detailValue">${detail.unitLimit}</div>
+        </div>
+        <div>
+          <div class="detailLabel">ボス出現位置</div>
+          <div class="detailValue">${bossPosition}</div>
         </div>
       </div>
     </td>
