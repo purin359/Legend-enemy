@@ -5516,8 +5516,8 @@
         "background": "10",
         "castleHP": 955000,
         "castleDistance": 4200,
-        "energy": 10,
-        "unitLimit": 5,
+        "energy": 180,
+        "unitLimit": 10,
         "bosses": "ギャラクシーニャンダム"
       },
       {
