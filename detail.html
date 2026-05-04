@@ -187,7 +187,7 @@ async function load() {
   const castleParam = params.get("castle");
   const backgroundParam = params.get("background");
   const detailParam = params.get("detail");
-
+  
   if (detailParam === "1") {
     document.getElementById("showDetail").checked = true;
   }
@@ -360,8 +360,10 @@ if (
         const table = document.createElement("table");
 table.className = "stageTable";
 
+  const from = params.get("from");
+
 // ▼ ALLモードのときだけ色分け
-if (mode === "ALL") {
+if (mode === "ALL" && from !== "tools") {
 
   if (ch.chapterId.startsWith("NA") || ch.chapterId === "E068" || ch.chapterId === "E069") {
     table.style.backgroundColor = "#ccff99"; // 真レジェンド（黄緑）
