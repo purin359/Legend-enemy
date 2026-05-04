@@ -319,7 +319,8 @@ canvas {
     カンバン娘を含める
   </label>
 
-  <div id="sameEnemyArea"></div>
+  <div id="sameCountInfo" style="margin:10px 0; font-weight:bold;"></div>
+<div id="sameEnemyArea"></div>
 </div>
 <script>
 let stagesData = [];
@@ -968,10 +969,15 @@ img.addEventListener("click", () => {
     .filter(g => g.stages.length >= 2)
     .sort((a, b) => b.stages.length - a.stages.length);
 
-  if (list.length === 0) {
-    area.textContent = "同じ構成のステージは見つかりませんでした";
-    return;
-  }
+  document.getElementById("sameCountInfo").textContent =
+  `${list.length}種類の同じ構成があります`;
+
+if (list.length === 0) {
+  document.getElementById("sameCountInfo").textContent =
+    "0種類です";
+  area.textContent = "同じ構成のステージは見つかりませんでした";
+  return;
+}
 
   list.forEach(group => {
     const box = document.createElement("div");
