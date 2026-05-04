@@ -169,7 +169,7 @@ img {
 
 <script>
 function normalize(str) {
-  return str
+  return String(str || "")
     .replace(/\r?\n/g, "")
     .replace(/[ 　]+/g, "")
     .trim();
