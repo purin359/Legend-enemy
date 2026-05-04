@@ -238,9 +238,11 @@ backgroundList.forEach(bg => {
   backgroundMap[String(bg.background)] = bg.image;
 });
 
-  document.getElementById("title").textContent = name || "";
+  const titleIcon = document.getElementById("titleIcon");
 
-// 一旦リセット
+document.getElementById("title").textContent = name || "";
+
+titleIcon.style.display = "";
 titleIcon.classList.remove("titleIconLarge", "titleIconCastle", "titleIconBg");
 
 if (name) {
@@ -271,6 +273,9 @@ if (name) {
   if (bossOnly) {
   document.getElementById("title").textContent += "（ボスのみ）";
 }
+
+  document.getElementById("title").textContent =
+  name || (chapterIdParam ? "ステージ詳細" : "");
 
   const bossCount = params.get("bossCount");
 const appearCount = params.get("appearCount");
