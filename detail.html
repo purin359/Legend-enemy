@@ -175,8 +175,8 @@ function normalize(str) {
 }
 
 async function load() {
-  const bossOnly = params.get("boss") === "1";
   const params = new URLSearchParams(location.search);
+  const bossOnly = params.get("boss") === "1";
 
   const name = params.get("name");
   const mode = params.get("mode") || "ALL";
