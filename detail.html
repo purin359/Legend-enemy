@@ -153,7 +153,8 @@ img {
   <img id="titleIcon" class="titleIcon">
   <span id="title"></span>
 </h2>
-  
+
+<p id="bossRateInfo" style="font-weight:bold;"></p>
 <p id="count"></p>
   <label>
   <input type="checkbox" id="showKanban" onchange="load()">
@@ -267,6 +268,16 @@ if (name) {
 
   if (bossOnly) {
   document.getElementById("title").textContent += "（ボスのみ）";
+}
+
+  const bossCount = params.get("bossCount");
+const appearCount = params.get("appearCount");
+
+if (bossOnly && bossCount && appearCount) {
+  document.getElementById("bossRateInfo").textContent =
+    `${bossCount}/${appearCount}`;
+} else {
+  document.getElementById("bossRateInfo").textContent = "";
 }
   
   const ul = document.getElementById("list");
