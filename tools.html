@@ -160,6 +160,12 @@ canvas {
     text-align: center !important;
   }
 
+  .stageLink {
+  color: #1976d2;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 </style>
 </head>
 
@@ -676,7 +682,11 @@ function redrawStageList() {
 
   tr.innerHTML = `
   <td class="chapterCell">${row.chapterName}</td>
-  <td class="stageCell">${row.stageName}</td>
+  <td class="stageCell">
+  <span class="stageLink" onclick="goStageDetail('${row.chapterId}', '${row.stageId}')">
+    ${row.stageName}
+  </span>
+  </td>
   <td class="numCell">${row.castleHP.toLocaleString()}</td>
   <td class="numCell">${row.bossPosition}</td>
   <td class="numCell">${row.castleDistance}</td>
@@ -716,6 +726,15 @@ trs.forEach((tr, i) => {
   }
 });
   }
+
+  function goStageDetail(chapterId, stageId) {
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("chapterId", chapterId);
+  url.searchParams.set("stageId", stageId);
+  url.searchParams.set("mode", "ALL");
+  url.searchParams.set("detail", "1");
+  location.href = url.toString();
+}
 
 function toggleDetailOrder() {
   detailDesc = !detailDesc;
