@@ -116,6 +116,50 @@ canvas {
   z-index: 5;
   background: #f0f0f0;
 }
+
+  #bossList .detailTable {
+  table-layout: fixed;
+}
+
+#bossList .detailTable th:nth-child(1),
+#bossList .detailTable td:nth-child(1) {
+  width: 65px;
+  text-align: center;
+}
+
+#bossList .detailTable th:nth-child(2),
+#bossList .detailTable td:nth-child(2) {
+  width: 200px;
+  text-align: left;
+}
+
+#bossList .detailTable th:nth-child(3),
+#bossList .detailTable td:nth-child(3) {
+  width: 70px;
+  text-align: center;
+}
+
+#bossList .detailTable th:nth-child(4),
+#bossList .detailTable td:nth-child(4) {
+  width: 70px;
+  text-align: center;
+}
+
+#bossList .detailTable th:nth-child(5),
+#bossList .detailTable td:nth-child(5) {
+  width: auto;
+  text-align: left;
+}
+
+  #bossList .detailTable img {
+  width: 50px;
+  margin-right: 0;
+}
+
+  #bossList .detailTable thead th {
+    text-align: center !important;
+  }
+
 </style>
 </head>
 
@@ -128,6 +172,7 @@ canvas {
 <div class="menu">
   <button class="funcBtn" onclick="openFunc('detailSort', this)">詳細並び替え</button>
   <button class="funcBtn active" onclick="openFunc('graph', this)">登場ステージグラフ</button>
+  <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
 </div>
   
 <!-- グラフ機能 -->
@@ -197,6 +242,41 @@ canvas {
 
 </div>
 
+  <div id="bossList" class="funcArea">
+  <h3>ボス一覧</h3>
+
+  <select id="bossMode" onchange="drawBossTable()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <select id="bossRateType" onchange="drawBossTable()">
+    <option value="fraction">分数</option>
+    <option value="decimal">%表示</option>
+  </select>
+
+  <select id="bossSort" onchange="drawBossTable()">
+    <option value="count">ボス回数順</option>
+    <option value="rate">ボス率順</option>
+    <option value="first">初ボス順</option>
+  </select>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>画像</th>
+        <th>敵名</th>
+        <th>ボス回数</th>
+        <th>ボス率</th>
+        <th>初ボスステージ</th>
+      </tr>
+    </thead>
+    <tbody id="bossTableBody"></tbody>
+  </table>
+</div>
+
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -244,6 +324,10 @@ function openFunc(id, btn) {
   if (id === "detailSort") {
     drawDetailTable();
   }
+
+  if (id === "bossList") {
+    drawBossTable();
+  }
 }
 
 async function init() {
@@ -270,7 +354,7 @@ async function init() {
 
   setupSuggest();
 
-  openFunc("detailSort", document.querySelectorAll(".funcBtn")[1]);
+  openFunc("detailSort", document.querySelectorAll(".funcBtn")[0]);
 }
   
 function setupSuggest() {
@@ -640,6 +724,154 @@ function toggleDetailOrder() {
     detailDesc ? "降順" : "昇順";
 
   drawDetailTable();
+}
+
+  // ボスリスト
+  function drawBossTable() {
+  const mode = document.getElementById("bossMode").value;
+  const rateType = document.getElementById("bossRateType").value;
+  const tbody = document.getElementById("bossTableBody");
+
+  tbody.innerHTML = "";
+
+  const appearMap = {};
+  const bossMap = {};
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      st.enemies.forEach(enemyName => {
+        const key = normalize(enemyName);
+
+        if (!appearMap[key]) {
+          appearMap[key] = {
+            name: enemyName,
+            count: 0
+          };
+        }
+
+        appearMap[key].count++;
+      });
+    });
+  });
+
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      if (!st.bosses || st.bosses === "なし") return;
+
+      const bosses = String(st.bosses)
+        .split(/[,\、]/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      bosses.forEach(bossName => {
+        const key = normalize(bossName);
+
+        if (!bossMap[key]) {
+          bossMap[key] = {
+            name: bossName,
+            bossCount: 0,
+            firstBoss: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+          };
+        }
+
+        bossMap[key].bossCount++;
+      });
+    });
+  });
+
+  let list = Object.values(bossMap).map(b => {
+    const appearCount = appearMap[normalize(b.name)]?.count || 0;
+
+    return {
+      ...b,
+      appearCount,
+      rate: appearCount ? b.bossCount / appearCount : 0,
+      firstNum: getFirstNum(b.firstBoss)
+    };
+  });
+
+  const sortType = document.getElementById("bossSort").value;
+
+list.sort((a, b) => {
+  if (sortType === "count") {
+    return b.bossCount - a.bossCount || a.firstNum - b.firstNum;
+  }
+
+  if (sortType === "rate") {
+    return b.rate - a.rate || b.bossCount - a.bossCount;
+  }
+
+  if (sortType === "first") {
+    return a.firstNum - b.firstNum;
+  }
+
+  return 0;
+});
+    
+  list.forEach(e => {
+    const tr = document.createElement("tr");
+
+    const img = document.createElement("img");
+
+    img.src = getEnemyImagePath(e.name);
+
+img.style.cursor = "pointer";
+
+img.addEventListener("click", () => {
+  const mode = document.getElementById("bossMode").value;
+
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("name", e.name);
+  url.searchParams.set("mode", mode);
+  url.searchParams.set("boss", "1");
+
+  // ★追加
+  url.searchParams.set("bossCount", e.bossCount);
+  url.searchParams.set("appearCount", e.appearCount);
+
+  location.href = url.toString();
+});
+    
+    img.onerror = () => img.src = "image/noimage.png";
+
+    const rateText =
+  rateType === "fraction"
+    ? `${e.bossCount}/${e.appearCount}`
+    : `${(e.rate * 100).toFixed(1).replace(/\.0$/, "")}%`;
+    
+    tr.innerHTML = `
+      <td></td>
+      <td class="stageCell">${e.name}</td>
+      <td class="numCell">${e.bossCount}</td>
+      <td class="numCell">${rateText}</td>
+      <td class="stageCell">${e.firstBoss}</td>
+    `;
+
+    tr.children[0].appendChild(img);
+    tbody.appendChild(tr);
+  });
+}
+
+  function getFirstNum(first) {
+  const match = first.match(/([A-Z]+)(\d+)-(\d+)/);
+
+  if (!match) return 999999;
+
+  const prefix = match[1];
+  const chap = parseInt(match[2]);
+  const stage = parseInt(match[3]);
+
+  const base =
+    prefix === "N"  ? 0 :
+    prefix === "NA" ? 100000 :
+    prefix === "ND" ? 200000 :
+    prefix === "E"  ? 300000 : 400000;
+
+  return base + chap * 100 + stage;
 }
   
 init();
