@@ -180,6 +180,7 @@ async function load() {
   const bossOnly = params.get("boss") === "1";
   const chapterIdParam = params.get("chapterId");
   const stageIdParam = params.get("stageId");
+  const stageNameParam = params.get("stageName");
 
   const name = params.get("name");
   const mode = params.get("mode") || "ALL";
@@ -336,10 +337,12 @@ const isBossStage =
 
 const matchedStage =
   chapterIdParam &&
-  stageIdParam !== null &&
   String(ch.chapterId).trim() === String(chapterIdParam).trim() &&
-  String(st.stageId).trim() === String(stageIdParam).trim();
-
+  (
+    String(st.stageId).trim() === String(stageIdParam).trim() ||
+    normalize(st.stageName) === normalize(stageNameParam)
+  );
+      
 if (
   matchedStage ||
   (
