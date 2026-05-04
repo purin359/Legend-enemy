@@ -781,7 +781,7 @@ list.sort((a, b) => {
 
 img.style.cursor = "pointer";
 
-img.onclick = () => {
+img.addEventListener("click", () => {
   const mode = document.getElementById("bossMode").value;
 
   const url = new URL("detail.html", location.href);
@@ -789,8 +789,12 @@ img.onclick = () => {
   url.searchParams.set("mode", mode);
   url.searchParams.set("boss", "1");
 
+  // ★追加
+  url.searchParams.set("bossCount", e.bossCount);
+  url.searchParams.set("appearCount", e.appearCount);
+
   location.href = url.toString();
-};
+});
     
     img.onerror = () => img.src = "image/noimage.png";
 
