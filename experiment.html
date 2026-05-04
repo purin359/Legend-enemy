@@ -116,6 +116,10 @@ canvas {
   z-index: 5;
   background: #f0f0f0;
 }
+
+  #bossTableBody td:first-child {
+  text-align: center;
+}
 </style>
 </head>
 
@@ -128,6 +132,7 @@ canvas {
 <div class="menu">
   <button class="funcBtn" onclick="openFunc('detailSort', this)">詳細並び替え</button>
   <button class="funcBtn active" onclick="openFunc('graph', this)">登場ステージグラフ</button>
+  <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
 </div>
   
 <!-- グラフ機能 -->
@@ -195,6 +200,35 @@ canvas {
     <tbody id="detailTableBody"></tbody>
   </table>
 
+</div>
+
+  <div id="bossList" class="funcArea">
+  <h3>ボス一覧</h3>
+
+  <select id="bossMode" onchange="drawBossTable()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <select id="bossRateType" onchange="drawBossTable()">
+    <option value="decimal">小数</option>
+    <option value="fraction">分数</option>
+  </select>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>画像</th>
+        <th>敵名</th>
+        <th>ボス回数</th>
+        <th>ボス率</th>
+        <th>初ボスステージ</th>
+      </tr>
+    </thead>
+    <tbody id="bossTableBody"></tbody>
+  </table>
 </div>
 
 <script>
@@ -270,7 +304,11 @@ async function init() {
 
   setupSuggest();
 
-  openFunc("detailSort", document.querySelectorAll(".funcBtn")[1]);
+  openFunc("detailSort", document.querySelectorAll(".funcBtn")[0]);
+
+  if (id === "bossList") {
+  drawBossTable();
+}
 }
   
 function setupSuggest() {
@@ -640,6 +678,101 @@ function toggleDetailOrder() {
     detailDesc ? "降順" : "昇順";
 
   drawDetailTable();
+}
+
+  // ボスリスト
+  function drawBossTable() {
+  const mode = document.getElementById("bossMode").value;
+  const rateType = document.getElementById("bossRateType").value;
+  const tbody = document.getElementById("bossTableBody");
+
+  tbody.innerHTML = "";
+
+  const appearMap = {};
+  const bossMap = {};
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      st.enemies.forEach(enemyName => {
+        const key = normalize(enemyName);
+
+        if (!appearMap[key]) {
+          appearMap[key] = {
+            name: enemyName,
+            count: 0
+          };
+        }
+
+        appearMap[key].count++;
+      });
+    });
+  });
+
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      if (!st.bosses || st.bosses === "なし") return;
+
+      const bosses = String(st.bosses)
+        .split(/[,\、]/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      bosses.forEach(bossName => {
+        const key = normalize(bossName);
+
+        if (!bossMap[key]) {
+          bossMap[key] = {
+            name: bossName,
+            bossCount: 0,
+            firstBoss: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
+          };
+        }
+
+        bossMap[key].bossCount++;
+      });
+    });
+  });
+
+  let list = Object.values(bossMap).map(b => {
+    const appearCount = appearMap[normalize(b.name)]?.count || 0;
+
+    return {
+      ...b,
+      appearCount,
+      rate: appearCount ? b.bossCount / appearCount : 0,
+      firstNum: getFirstNum(b.firstBoss)
+    };
+  });
+
+  list.sort((a, b) => b.bossCount - a.bossCount || a.firstNum - b.firstNum);
+
+  list.forEach(e => {
+    const tr = document.createElement("tr");
+
+    const img = document.createElement("img");
+    img.src = getEnemyImagePath(e.name);
+    img.onerror = () => img.src = "image/noimage.png";
+
+    const rateText =
+      rateType === "fraction"
+        ? `${e.bossCount}/${e.appearCount}`
+        : e.rate.toFixed(3);
+
+    tr.innerHTML = `
+      <td></td>
+      <td class="stageCell">${e.name}</td>
+      <td class="numCell">${e.bossCount}</td>
+      <td class="numCell">${rateText}</td>
+      <td class="stageCell">${e.firstBoss}</td>
+    `;
+
+    tr.children[0].appendChild(img);
+    tbody.appendChild(tr);
+  });
 }
   
 init();
