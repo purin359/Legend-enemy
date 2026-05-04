@@ -310,7 +310,7 @@ if (bossOnly && bossCount && appearCount) {
 
   (mode === "ND" && ch.chapterId.startsWith("ND"));
     
-    if (!isTarget) return;
+    if (!isTarget && !chapterIdParam) return;
 
     ch.stages.forEach(st => {
 
@@ -337,8 +337,8 @@ const isBossStage =
 const matchedStage =
   chapterIdParam &&
   stageIdParam !== null &&
-  ch.chapterId === chapterIdParam &&
-  String(st.stageId) === String(stageIdParam);
+  String(ch.chapterId).trim() === String(chapterIdParam).trim() &&
+  String(st.stageId).trim() === String(stageIdParam).trim();
 
 if (
   matchedStage ||
