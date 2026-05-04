@@ -2,232 +2,219 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵出現一覧</title>
+<title>その他の機能</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { font-family: sans-serif; padding:20px; }
-
-table { border-collapse: collapse; width:100%; }
-th, td { border:1px solid #ccc; padding:5px; }
-img { width:50px; cursor:pointer; }
-
-th { cursor:pointer; }
-
-.filterRow {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+body {
+  font-family: sans-serif;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
 }
 
-.attrSelect {
-  position: relative;
+.menu {
+  display: flex;          /* 横並び */
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.attrSelectBtn {
-  min-height: 38px;
-  min-width: 180px;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
+.funcBtn {
+  padding: 10px 16px;
   border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-#attrSelectedView {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-#attrSelectedView img {
-  width: 24px;
-  height: 24px;
-}
-
-.attrMenu {
-  display: none;
-  position: absolute;
-  top: 42px;
-  left: 0;
-  background: white;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 6px;
-  z-index: 20;
-  min-width: 220px;
-  max-height: 240px;
-  overflow-y: auto;
-}
-
-.attrMenu.open {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-}
-
-.attrOption {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f8f8f8;
+  background: #f5f5f5;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-.attrOption img {
-  width: 28px;
-  height: 28px;
+/* ホバー */
+.funcBtn:hover {
+  background: #e0e0e0;
 }
 
-.attrOption.active {
+/* 選択中（超重要） */
+.funcBtn.active {
+  background: #4CAF50;
+  color: white;
   border-color: #4CAF50;
-  background: #eaf7ea;
+  font-weight: bold;
 }
 
-  .bgImg {
-  width: 160px;
-  height: 90px;
-  object-fit: cover;
+.funcArea {
+  display: none;
+  margin-top: 20px;
 }
 
-  tbody td:first-child {
-    text-align: center;
-    vertical-align: middle;
-  }
-  
+.searchWrap {
+  position: relative;
+  margin-top: 10px;
+}
+
+#suggest {
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  position: absolute;
+  width: 250px;
+  z-index: 10;
+}
+
+.suggestItem {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.suggestItem:hover {
+  background: #eee;
+}
+
+  .suggestItem.active {
+  background: #cfe8ff;
+}
+
+canvas {
+  margin-top: 20px;
+}
+
+  .detailTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.detailTable th,
+.detailTable td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  vertical-align: middle;
+}
+
+.detailTable th {
+  background: #f0f0f0;
+  text-align: center;
+}
+
+.detailTable td {
+  text-align: center;
+}
+
+.detailTable td.chapterCell,
+.detailTable td.stageCell {
+  text-align: left;
+}
+
+.detailTable td.numCell {
+  text-align: center;
+}
+
+  .detailTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #f0f0f0;
+}
 </style>
 </head>
+
 <body>
 
-<h2>敵出現一覧</h2>
+<button onclick="history.back()">戻る</button>
 
-<div class="filterRow">
-  <input id="searchBox" placeholder="敵名で絞り込み" oninput="load()">
+<h2>その他</h2>
 
-  <div class="attrSelect" id="attrSelect">
-    <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
-      <span id="attrSelectedView">属性で絞り込み</span>
-    </button>
-    <div id="attrMenu" class="attrMenu">
-  <div class="attrOption" onclick="toggleAttr('赤')">
-    <img src="image_type/赤.png" alt="赤">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('浮き')">
-    <img src="image_type/浮き.png" alt="浮き">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('黒')">
-    <img src="image_type/黒.png" alt="黒">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('メタル')">
-    <img src="image_type/メタル.png" alt="メタル">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('天使')">
-    <img src="image_type/天使.png" alt="天使">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('エイリアン')">
-    <img src="image_type/エイリアン.png" alt="エイリアン">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('ゾンビ')">
-    <img src="image_type/ゾンビ.png" alt="ゾンビ">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('悪魔')">
-    <img src="image_type/悪魔.png" alt="悪魔">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('古代種')">
-    <img src="image_type/古代種.png" alt="古代種">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('無属性')">
-    <img src="image_type/無属性.png" alt="無属性">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('超生命体')">
-    <img src="image_type/超生命体.png" alt="超生命体">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('超獣')">
-    <img src="image_type/超獣.png" alt="超獣">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('超賢者')">
-    <img src="image_type/超賢者.png" alt="超賢者">
-  </div>
-  <div class="attrOption" onclick="toggleAttr('城')">
-    <span>城</span>
-  </div>
-</div>
-          
-  </div>
+<div class="menu">
+  <button class="funcBtn" onclick="openFunc('detailSort', this)">詳細並び替え</button>
+  <button class="funcBtn active" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
   
-<select id="mode" onchange="load()">
-  <option value="ALL">全て</option>
-  <option value="N">レジェンド</option>
-  <option value="NA">真レジェンド</option>
-  <option value="ND" selected>レジェンド0</option>
-</select>
+<!-- グラフ機能 -->
+<div id="graph" class="funcArea">
 
-<select id="listType" onchange="changeListType(this.value)">
-  <option value="enemy">敵</option>
-  <option value="castle">城</option>
-  <option value="background">背景</option>
-</select>
+  <h3>敵の登場ステージグラフ</h3>
 
-<select id="sort" onchange="changeSort()">
-  <option value="count">登場回数順</option>
-  <option value="first">初出ステージ順</option>
-  <option value="order">図鑑順</option>
-</select>
+  <select id="mode" onchange="drawGraph()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
 
-<button id="orderBtn" onclick="toggleOrder()">降順</button>
-  
-  <button onclick="goAllStages()">全ステージ一覧へ</button>
+  <div class="searchWrap">
+  <input id="enemyInput" placeholder="敵名を入力">
+  <button type="button" onclick="clearEnemyInput()">×</button>
+  <div id="suggest"></div>
+</div>
 
-  <button onclick="location.href='tools.html'">その他の機能</button>
+  <div id="info"></div>
 
-<table>
-<thead>
-<tr>
-  <th>画像</th>
-  <th>敵名</th>
-  <th>登場回数</th>
-  <th>初出ステージ</th>
-</tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
+  <canvas id="chart"></canvas>
+<label id="showStageEnemiesLabel" style="display:none;">
+  <input type="checkbox" id="showStageEnemies" onchange="redrawStageList()">
+  構成あり
+</label>
+<div id="stageList"></div>
+</div>
+
+  <!-- 詳細並び替え機能 -->
+<div id="detailSort" class="funcArea">
+
+  <h3>ステージ詳細並び替え</h3>
+
+  <select id="detailMode" onchange="drawDetailTable()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <select id="detailSortKey" onchange="drawDetailTable()">
+    <option value="castleHP">城体力</option>
+    <option value="bossPosition">ボス位置</option>
+    <option value="castleDistance">城距離</option>
+    <option value="energy">統率力</option>
+    <option value="unitLimit">出撃制限</option>
+  </select>
+
+  <button id="detailOrderBtn" onclick="toggleDetailOrder()">降順</button>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>章名</th>
+        <th>ステージ名</th>
+        <th>城体力</th>
+        <th>ボス位置</th>
+        <th>城距離</th>
+        <th>統率力</th>
+        <th>出撃制限</th>
+      </tr>
+    </thead>
+    <tbody id="detailTableBody"></tbody>
+  </table>
+
+</div>
 
 <script>
 let stagesData = [];
-let desc = true;
-let enemiesData = {};
-let sortMode = "count";
-let orderMap = {};
-let selectedAttrs = [];
-let listType = "enemy";
+let enemiesData = [];
+let enemyNames = [];
+let selectedEnemy = "";
+let chart;
+let graphStageMap = {};
+let maxStage = 0;
+let lastSelectedPos = null;
+let suggestIndex = -1;
+let currentSuggestList = [];
+let stageDetailsData = [];
+let detailDesc = true;
+let castlesData = [];
+let castleMap = {};
 
-async function init() {
-  enemiesData = await fetch("enemies.json").then(r=>r.json());
-  stagesData = await fetch("stages.json").then(r=>r.json());
-
-  // 順番記録
-  let i = 0;
-  for (let key in enemiesData) {
-    orderMap[enemiesData[key].name] = i++;
-  }
-
-  changeSort();
-  
-  load();
-}
-  
-// 比較専用（スペース無視）
 function normalize(str) {
-  return str
-    .toString()
+  return String(str)
     .replace(/\r?\n/g, "")
     .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
       String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
@@ -241,430 +228,309 @@ function normalize(str) {
     .trim();
 }
 
-  function getEnemyTypes(enemyName) {
-  const key = normalize(enemyName);
+function openFunc(id, btn) {
+  document.querySelectorAll(".funcArea").forEach(el => {
+    el.style.display = "none";
+  });
 
-  const found = Object.values(enemiesData).find(enemy =>
-    normalize(enemy.name) === key
-  );
+  document.getElementById(id).style.display = "block";
 
-  if (!found || !found.type) return [];
+  document.querySelectorAll(".funcBtn").forEach(b => {
+    b.classList.remove("active");
+  });
 
-  return String(found.type)
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
+  btn.classList.add("active");
+
+  if (id === "detailSort") {
+    drawDetailTable();
+  }
+}
+
+async function init() {
+  stagesData = await fetch("stages.json").then(r => r.json());
+  enemiesData = await fetch("enemies.json").then(r => r.json());
+
+  stageDetailsData = await fetch("stageDetails.json")
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => []);
+
+  castlesData = await fetch("castles.json")
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => []);
+
+  castleMap = {};
+  castlesData.forEach(c => {
+    castleMap[String(c.castleId)] = {
+      image: c.image,
+      bossPosition: c.bossPosition !== undefined ? Number(c.bossPosition) : ""
+    };
+  });
+
+  enemyNames = Object.values(enemiesData).map(e => e.name);
+
+  setupSuggest();
+
+  openFunc("detailSort", document.querySelectorAll(".funcBtn")[1]);
 }
   
-function load() {
-  const type = document.getElementById("listType").value;
-  listType = type;
+function setupSuggest() {
+  const input = document.getElementById("enemyInput");
+  const suggest = document.getElementById("suggest");
 
-  document.getElementById("searchBox").style.display =
-    type === "enemy" ? "" : "none";
+  input.addEventListener("input", () => {
+    const key = normalize(input.value);
+    suggest.innerHTML = "";
+    suggestIndex = -1;
+    currentSuggestList = [];
 
-  document.getElementById("attrSelect").style.display =
-    type === "enemy" ? "" : "none";
+    if (!key) return;
 
-  updateSortOptions(type);
+    currentSuggestList = enemyNames
+      .filter(n => normalize(n).includes(key))
+      .slice(0, 20);
 
-  if (type === "castle") {
-    loadCastleList();
-    return;
-  }
+    currentSuggestList.forEach((name, i) => {
+      const div = document.createElement("div");
+      div.className = "suggestItem";
+      div.textContent = name;
+      div.onclick = () => selectSuggest(name);
+      suggest.appendChild(div);
+    });
+  });
 
-  if (type === "background") {
-    loadBackgroundList();
-    return;
-  }
+  input.addEventListener("keydown", e => {
+    if (e.isComposing || e.keyCode === 229) return;
+    if (currentSuggestList.length === 0) return;
 
-  document.querySelector("thead tr").innerHTML = `
-    <th>画像</th>
-    <th>敵名</th>
-    <th>登場回数</th>
-    <th>初出ステージ</th>
-  `;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      suggestIndex = (suggestIndex + 1) % currentSuggestList.length;
+      updateSuggestSelection();
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      suggestIndex = (suggestIndex - 1 + currentSuggestList.length) % currentSuggestList.length;
+      updateSuggestSelection();
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (suggestIndex < 0) suggestIndex = 0;
+      selectSuggest(currentSuggestList[suggestIndex]);
+    }
+  });
+}
+
+function selectSuggest(name) {
+  selectedEnemy = name;
+  document.getElementById("enemyInput").value = name;
+  document.getElementById("suggest").innerHTML = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+  drawGraph();
+}
+
+function updateSuggestSelection() {
+  document.querySelectorAll(".suggestItem").forEach((item, i) => {
+    item.classList.toggle("active", i === suggestIndex);
+    if (i === suggestIndex) item.scrollIntoView({ block: "nearest" });
+  });
+}
+
+function drawGraph() {
+  if (!selectedEnemy) return;
 
   const mode = document.getElementById("mode").value;
-  const map = {};
+  const key = normalize(selectedEnemy);
+
+  const counts = {};
+  graphStageMap = {};
+  let total = 0;
+  let maxStage = 0;
 
   stagesData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
+    const ok =
+      mode === "ALL" ||
+      (mode === "N" && ch.chapterId.startsWith("N") && !ch.chapterId.startsWith("NA") && !ch.chapterId.startsWith("ND")) ||
+      (mode === "NA" && ch.chapterId.startsWith("NA")) ||
+      (mode === "ND" && ch.chapterId.startsWith("ND"));
 
-    ch.stages.forEach(st => {
-      st.enemies.forEach(enemyName => {
-        const key = normalize(enemyName);
+    if (!ok) return;
 
-        if (!map[key]) {
-          map[key] = {
-            name: enemyName,
-            count: 0,
-            first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
-          };
-        }
+    ch.stages.forEach((st, i) => {
+      const pos = i + 1;
+      if (pos > maxStage) maxStage = pos;
 
-        map[key].count++;
-      });
+      if (st.enemies.some(e => normalize(e) === key)) {
+        counts[pos] = (counts[pos] || 0) + 1;
+        total++;
+
+        if (!graphStageMap[pos]) graphStageMap[pos] = [];
+
+        graphStageMap[pos].push({
+          chapterName: ch.chapterName,
+          chapterId: ch.chapterId,
+          stageId: st.stageId,
+          stageName: st.stageName,
+          enemies: st.enemies
+        });
+      }
     });
   });
 
-  let list = Object.values(map);
+  let lastNonZero = 0;
 
-  const search = document.getElementById("searchBox").value.trim();
+for (let i = 1; i <= maxStage; i++) {
+  if ((counts[i] || 0) > 0) lastNonZero = i;
+}
 
-  if (search) {
-    const keyword = normalize(search);
-    list = list.filter(e => normalize(e.name).includes(keyword));
-  }
+const displayMax = Math.max(6, lastNonZero);
 
-  if (selectedAttrs.length > 0) {
-    list = list.filter(e => {
-      const types = getEnemyTypes(e.name);
-      return selectedAttrs.some(attr => types.includes(attr));
-    });
-  }
+const labels = [];
+const data = [];
 
-  list = list.map(e => {
-    return { ...e, firstNum: getFirstNum(e.first) };
-  });
+for (let i = 1; i <= displayMax; i++) {
+  labels.push(i);
+  data.push(counts[i] || 0);
+}
 
-  list.sort((a, b) => {
-    if (sortMode === "count") {
-      return desc ? b.count - a.count : a.count - b.count;
+  document.getElementById("info").textContent =
+    `${selectedEnemy} 出現数: ${total}`;
+
+  document.getElementById("stageList").innerHTML = "";
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+      labels: labels.map(n => `${n}ステージ目`),
+      datasets: [{ label: "回数", data }]
+    },
+    options: {
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1,
+        precision: 0,
+        maxTicksLimit: 5
+      },
+      grid: {
+        drawTicks: true
+      }
     }
+  },
+  onClick: (event, elements) => {
+    if (elements.length === 0) return;
 
-    if (sortMode === "first") {
-      return a.firstNum - b.firstNum;
-    }
+    const index = elements[0].index;
+    const pos = labels[index];
 
-    if (sortMode === "order") {
-      return (orderMap[a.name] ?? 99999) - (orderMap[b.name] ?? 99999);
-    }
-
-    return 0;
-  });
-
-  const tbody = document.getElementById("table");
-  tbody.innerHTML = "";
-
-  list.forEach(e => {
-    const baseName = e.name.replace(/\r?\n/g, "").trim();
-
-    const fileName = baseName
-      .replace(/[：:]/g, " ")
-      .replace(/[ 　]+/g, "");
-
-    const img = document.createElement("img");
-    img.src = "image/" + encodeURIComponent(fileName) + ".png";
-    img.onerror = () => img.src = "image/noimage.png";
-
-    img.addEventListener("click", () => {
-      const mode = document.getElementById("mode").value;
-
-      const url = new URL("detail.html", location.href);
-      url.searchParams.set("name", e.name);
-      url.searchParams.set("mode", mode);
-
-      location.href = url.toString();
-    });
-
-    const tr = document.createElement("tr");
-
-    const tdImg = document.createElement("td");
-    tdImg.appendChild(img);
-
-    const tdName = document.createElement("td");
-    tdName.textContent = e.name;
-
-    const tdCount = document.createElement("td");
-    tdCount.textContent = e.count;
-
-    const tdFirst = document.createElement("td");
-    tdFirst.textContent = e.first;
-
-    tr.appendChild(tdImg);
-    tr.appendChild(tdName);
-    tr.appendChild(tdCount);
-    tr.appendChild(tdFirst);
-
-    tbody.appendChild(tr);
-  });
-}
-
-function toggleSort() {
-  desc = !desc;
-  load();
-}
-
-function goDetail(name) {
-  const mode = document.getElementById("mode").value;
-
-  const url = new URL("detail.html", location.href);
-  url.searchParams.set("name", name);
-  url.searchParams.set("mode", mode);
-
-  location.href = url.toString();
-}
-
- function changeSort() {
-  sortMode = document.getElementById("sort").value;
-
-  const btn = document.getElementById("orderBtn");
-
-  btn.style.display =
-    (sortMode === "count") ? "inline-block" : "none";
-
-  load();
-}
-
-function changeOrder() {
-  const val = document.getElementById("order").value;
-  desc = (val === "desc");
-  load();
-}
-
-  function setAsc() {
-  desc = false;
-  load();
-}
-
-function setDesc() {
-  desc = true;
-  load();
-}
-
-  function goAllStages() {
-  const mode = document.getElementById("mode").value;
-
-  const url = new URL("allStages.html", location.href);
-  url.searchParams.set("mode", mode);
-
-  location.href = url.toString();
-}
-
-  function toggleOrder() {
-  desc = !desc;
-
-  const btn = document.getElementById("orderBtn");
-  btn.textContent = desc ? "降順" : "昇順";
-
-  load();
-}
-
-const attrImageMap = {
-  "赤": "image_type/赤.png",
-  "浮き": "image_type/浮き.png",
-  "黒": "image_type/黒.png",
-  "メタル": "image_type/メタル.png",
-  "天使": "image_type/天使.png",
-  "エイリアン": "image_type/エイリアン.png",
-  "ゾンビ": "image_type/ゾンビ.png",
-  "悪魔": "image_type/悪魔.png",
-  "古代種": "image_type/古代種.png",
-  "無属性": "image_type/無属性.png",
-  "超生命体": "image_type/超生命体.png",
-  "超獣": "image_type/超獣.png",
-  "超賢者": "image_type/超賢者.png"
-};
-
-function toggleAttrMenu() {
-  document.getElementById("attrMenu").classList.toggle("open");
-}
-
-function toggleAttr(attr) {
-  if (selectedAttrs.includes(attr)) {
-    selectedAttrs = selectedAttrs.filter(a => a !== attr);
-  } else {
-    selectedAttrs.push(attr);
+    showStageList(pos);
   }
-
-  updateAttrSelectedView();
-  updateAttrOptionState();
-  load();
+}
+  });
+  document.getElementById("stageList").innerHTML = "";
+document.getElementById("showStageEnemiesLabel").style.display = "none";
+lastSelectedPos = null;
 }
 
-function updateAttrSelectedView() {
-  const view = document.getElementById("attrSelectedView");
+function showStageList(pos) {
+  document.getElementById("showStageEnemiesLabel").style.display = "block";
+  lastSelectedPos = pos;
 
-  if (selectedAttrs.length === 0) {
-    view.textContent = "属性で絞り込み";
+  const area = document.getElementById("stageList");
+  const stages = graphStageMap[pos] || [];
+
+  if (stages.length === 0) {
+    area.innerHTML = `<h3>${pos}ステージ目の一覧</h3><p>該当なし</p>`;
     return;
   }
 
-  view.innerHTML = "";
+  const enemyName = selectedEnemy;
+  const fileName = enemyName
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
 
-  selectedAttrs.forEach(attr => {
-    if (attrImageMap[attr]) {
-      const img = document.createElement("img");
-      img.src = attrImageMap[attr];
-      img.alt = attr;
-      view.appendChild(img);
-    } else {
-      const span = document.createElement("span");
-      span.textContent = attr;
-      view.appendChild(span);
-    }
-  });
-}
+  const imgPath = "image/" + encodeURIComponent(fileName) + ".png";
+  const showEnemies = document.getElementById("showStageEnemies").checked;
 
-function updateAttrOptionState() {
-  document.querySelectorAll(".attrOption").forEach(option => {
-    const text = option.textContent.trim();
-    const img = option.querySelector("img");
-    const attr = img ? img.alt : text;
+  area.innerHTML = `
+    <h3>${pos}ステージ目の一覧</h3>
 
-    option.classList.toggle("active", selectedAttrs.includes(attr));
-  });
-}
+    <div style="margin-bottom:10px;">
+      <img src="${imgPath}" style="width:40px;" onerror="this.src='image/noimage.png'">
+      ${enemyName}
+    </div>
 
-window.addEventListener("click", e => {
-  const select = document.getElementById("attrSelect");
-  if (!select.contains(e.target)) {
-    document.getElementById("attrMenu").classList.remove("open");
-  }
-});
+    <ul style="${showEnemies ? 'padding-left:0;' : ''}">
+      ${stages.map(st => `
+        <li style="
+          margin-bottom:10px;
+          ${showEnemies ? 'border:1px solid #ccc; border-radius:8px; padding:8px; list-style:none;' : ''}
+        ">
+          <div>
+            ${st.chapterId}-${st.stageId}
+            ${st.chapterName} - ${st.stageName}
+          </div>
 
-  function changeListType(type) {
-  listType = type;
-
-  document.getElementById("listType").value = type;
-
-  load();
-}
-
-  async function loadCastleList() {
-  const mode = document.getElementById("mode").value;
-
-  const stageDetailsData = await fetch("stageDetails.json").then(r => r.json());
-  const castlesData = await fetch("castles.json").then(r => r.json());
-
-  const castleMap = {};
-  castlesData.forEach(c => {
-    castleMap[String(c.castleId)] = c.image;
-  });
-
-  const map = {};
-
-  stageDetailsData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
-    ch.stages.forEach(st => {
-      const id = String(st.castleId);
-
-      if (!map[id]) {
-        map[id] = {
-          id,
-          count: 0,
-          image: castleMap[id] || "",
-          first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
-        };
-      }
-
-      map[id].count++;
-    });
-  });
-
-  renderSpecialList(Object.values(map), "castle");
-}
-
-  async function loadBackgroundList() {
-  const mode = document.getElementById("mode").value;
-
-  const stageDetailsData = await fetch("stageDetails.json").then(r => r.json());
-  const backgroundsData = await fetch("backgrounds.json").then(r => r.json());
-
-  const backgroundMap = {};
-  backgroundsData.forEach(bg => {
-    backgroundMap[String(bg.background)] = bg.image;
-  });
-
-  const map = {};
-
-  stageDetailsData.forEach(ch => {
-    if (!isTargetChapter(ch, mode)) return;
-
-    ch.stages.forEach(st => {
-      const id = String(st.background);
-
-      if (!map[id]) {
-        map[id] = {
-          id,
-          count: 0,
-          image: backgroundMap[id] || "",
-          first: `${ch.chapterId}-${st.stageId} ${ch.chapterName}-${st.stageName}`
-        };
-      }
-
-      map[id].count++;
-    });
-  });
-
-  renderSpecialList(Object.values(map), "background");
-}
-
-  function renderSpecialList(list, type) {
-  const tbody = document.getElementById("table");
-  tbody.innerHTML = "";
-
-  document.querySelector("thead tr").innerHTML = `
-    <th>画像</th>
-    <th>使用回数</th>
-    <th>初出ステージ</th>
+          ${showEnemies ? `
+            <div style="margin-top:6px;">
+              ${st.enemies
+                .filter(e => e !== "カンバン娘")
+                .map(enemy => `
+                  <img src="${getEnemyImagePath(enemy)}"
+                       title="${enemy}"
+                       style="width:36px; margin-right:4px;"
+                       onerror="this.src='image/noimage.png'">
+                `).join("")}
+            </div>
+          ` : ""}
+        </li>
+      `).join("")}
+    </ul>
   `;
-
-  list = list.map(e => ({
-    ...e,
-    firstNum: getFirstNum(e.first)
-  }));
-
-  list.sort((a, b) => {
-    if (sortMode === "count") {
-      return desc ? b.count - a.count : a.count - b.count;
-    }
-
-    if (sortMode === "first") {
-      return a.firstNum - b.firstNum;
-    }
-
-    return 0;
-  });
-
-  list.forEach(e => {
-    const img = document.createElement("img");
-    img.src = e.image;
-    img.className = type === "background" ? "bgImg" : "";
-    img.onerror = () => img.src = "image/noimage.png";
-
-    img.addEventListener("click", () => {
-      const mode = document.getElementById("mode").value;
-
-      const url = new URL("detail.html", location.href);
-      url.searchParams.set(type, e.id);
-      url.searchParams.set("mode", mode);
-      url.searchParams.set("detail", "1");
-
-      location.href = url.toString();
-    });
-
-    const tr = document.createElement("tr");
-
-    const tdImg = document.createElement("td");
-    tdImg.appendChild(img);
-
-    const tdCount = document.createElement("td");
-    tdCount.textContent = e.count;
-
-    const tdFirst = document.createElement("td");
-    tdFirst.textContent = e.first;
-
-    tr.appendChild(tdImg);
-    tr.appendChild(tdCount);
-    tr.appendChild(tdFirst);
-
-    tbody.appendChild(tr);
-  });
 }
   
+  function getEnemyImagePath(enemyName) {
+  const fileName = enemyName
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+
+  return "image/" + encodeURIComponent(fileName) + ".png";
+}
+
+function redrawStageList() {
+  if (lastSelectedPos !== null) {
+    showStageList(lastSelectedPos);
+  }
+}
+
+  function clearEnemyInput() {
+  document.getElementById("enemyInput").value = "";
+  document.getElementById("suggest").innerHTML = "";
+  document.getElementById("info").textContent = "";
+  document.getElementById("stageList").innerHTML = "";
+  document.getElementById("showStageEnemiesLabel").style.display = "none";
+
+  selectedEnemy = "";
+  suggestIndex = -1;
+  currentSuggestList = [];
+  lastSelectedPos = null;
+
+  if (chart) {
+    chart.destroy();
+    chart = null;
+  }
+}
+
+  // 詳細一覧
   function isTargetChapter(ch, mode) {
   return (
     mode === "ALL" ||
@@ -686,49 +552,96 @@ window.addEventListener("click", e => {
   );
 }
 
-  function getFirstNum(first) {
-  const match = first.match(/([A-Z]+)(\d+)-(\d+)/);
+  function drawDetailTable() {
+  const mode = document.getElementById("detailMode").value;
+  const sortKey = document.getElementById("detailSortKey").value;
+  const tbody = document.getElementById("detailTableBody");
 
-  if (!match) return 999999;
+  tbody.innerHTML = "";
 
-  const prefix = match[1];
-  const chap = parseInt(match[2]);
-  const stage = parseInt(match[3]);
+  let rows = [];
 
-  const base =
-    prefix === "N"  ? 0 :
-    prefix === "NA" ? 100000 :
-    prefix === "ND" ? 200000 :
-    prefix === "E"  ? 300000 : 400000;
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
 
-  return base + chap * 100 + stage;
-}
+    ch.stages.forEach(st => {
+      const bossCastleId = st.bossCastleId ?? st.castleId;
+      const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
+      rows.push({
+        chapterId: ch.chapterId,
+        chapterName: ch.chapterName,
+        stageId: st.stageId,
+        stageName: st.stageName,
+        castleHP: Number(st.castleHP) || 0,
+        bossPosition: bossPosition,
+        castleDistance: Number(st.castleDistance) || 0,
+        energy: Number(st.energy) || 0,
+        unitLimit: Number(st.unitLimit) || 0
+      });
+    });
+  });
 
-function updateSortOptions(type) {
-  const sortSelect = document.getElementById("sort");
-  const current = sortSelect.value;
+  rows.sort((a, b) => {
+    return detailDesc
+      ? b[sortKey] - a[sortKey]
+      : a[sortKey] - b[sortKey];
+  });
 
-  if (type === "enemy") {
-    sortSelect.innerHTML = `
-      <option value="count">登場回数順</option>
-      <option value="first">初出ステージ順</option>
-      <option value="order">図鑑順</option>
-    `;
+  rows.forEach(row => {
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+  <td class="chapterCell">${row.chapterName}</td>
+  <td class="stageCell">${row.stageName}</td>
+  <td class="numCell">${row.castleHP.toLocaleString()}</td>
+  <td class="numCell">${row.bossPosition}</td>
+  <td class="numCell">${row.castleDistance}</td>
+  <td class="numCell">${row.energy}</td>
+  <td class="numCell">${row.unitLimit}</td>
+`;
+    
+  tbody.appendChild(tr);
+});
+
+    let prevChapter = null;
+let rowspanStart = null;
+let rowspanCount = 0;
+
+const trs = tbody.querySelectorAll("tr");
+
+trs.forEach((tr, i) => {
+  const chapterCell = tr.children[0];
+  const chapter = chapterCell.textContent;
+
+  if (chapter === prevChapter) {
+    rowspanCount++;
+    chapterCell.remove();
   } else {
-    sortSelect.innerHTML = `
-      <option value="count">使用回数順</option>
-      <option value="first">初出ステージ順</option>
-    `;
+    if (rowspanStart !== null && rowspanCount > 1) {
+      trs[rowspanStart].children[0].rowSpan = rowspanCount;
+    }
+
+    prevChapter = chapter;
+    rowspanStart = i;
+    rowspanCount = 1;
   }
 
-  if ([...sortSelect.options].some(o => o.value === current)) {
-    sortSelect.value = current;
-  } else {
-    sortSelect.value = "count";
-    sortMode = "count";
+  // 最後の処理
+  if (i === trs.length - 1 && rowspanCount > 1) {
+    trs[rowspanStart].children[0].rowSpan = rowspanCount;
   }
-}
+});
+  }
 
+function toggleDetailOrder() {
+  detailDesc = !detailDesc;
+
+  document.getElementById("detailOrderBtn").textContent =
+    detailDesc ? "降順" : "昇順";
+
+  drawDetailTable();
+}
+  
 init();
 </script>
 
