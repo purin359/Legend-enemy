@@ -206,6 +206,12 @@ async function load() {
   const sameEnemiesParam = params.get("sameEnemies");
   const sameOrderType = params.get("sameOrderType") || "same";
   const sameShowKanban = params.get("sameShowKanban") === "1";
+  const enemyTypeCountParam = params.get("enemyTypeCount");
+  const showKanbanParam = params.get("showKanban") === "1";
+
+  if (showKanbanParam) {
+  document.getElementById("showKanban").checked = true;
+}
 
   const name = params.get("name");
   const mode = params.get("mode") || "ALL";
@@ -304,6 +310,7 @@ if (name) {
   name ||
   (chapterIdParam ? "ステージ詳細" :
   sameEnemiesParam ? "同じ構成のステージ" :
+  enemyTypeCountParam ? `${enemyTypeCountParam}種類のみのステージ` :
   "");
 
   const bossCount = params.get("bossCount");
@@ -339,7 +346,7 @@ if (bossOnly && bossCount && appearCount) {
 
   (mode === "ND" && ch.chapterId.startsWith("ND"));
     
-    if (!isTarget && !chapterIdParam && !sameEnemiesParam) return;
+    if (!isTarget && !chapterIdParam && !sameEnemiesParam && !enemyTypeCountParam) return;
 
     ch.stages.forEach(st => {
 
@@ -373,13 +380,26 @@ const matchedStage =
     String(st.stageId).trim() === String(stageIdParam).trim()
   );
 
-      const matchedSameEnemies =
+  const matchedSameEnemies =
   sameEnemiesParam &&
   makeEnemyKey(st.enemies, sameOrderType, sameShowKanban) === sameEnemiesParam;
+
+const currentShowKanban = document.getElementById("showKanban").checked;
+
+let enemyListForCount = st.enemies.slice();
+
+if (!currentShowKanban) {
+  enemyListForCount = enemyListForCount.filter(e => normalize(e) !== normalize("カンバン娘"));
+}
+
+const matchedEnemyTypeCount =
+  enemyTypeCountParam &&
+  new Set(enemyListForCount.map(e => normalize(e))).size === Number(enemyTypeCountParam);
 
       if (
   matchedStage ||
   matchedSameEnemies ||
+  matchedEnemyTypeCount ||
   (
     (matchedEnemy || matchedCastle || matchedBackground) &&
     (!bossOnly || isBossStage)
