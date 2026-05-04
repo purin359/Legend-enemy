@@ -175,6 +175,7 @@ function normalize(str) {
 }
 
 async function load() {
+  const bossOnly = params.get("boss") === "1";
   const params = new URLSearchParams(location.search);
 
   const name = params.get("name");
@@ -263,6 +264,10 @@ if (name) {
 } else {
   titleIcon.style.display = "none";
 }
+
+  if (bossOnly) {
+  document.getElementById("title").textContent += "（ボスのみ）";
+}
   
   const ul = document.getElementById("list");
   ul.innerHTML = "";
@@ -308,7 +313,13 @@ const matchedCastle =
 const matchedBackground =
   backgroundParam && detail && String(detail.background) === String(backgroundParam);
 
-if (matchedEnemy || matchedCastle || matchedBackground) {
+const isBossStage =
+  bossList.includes(normalize(name));
+
+if (
+  (matchedEnemy || matchedCastle || matchedBackground) &&
+  (!bossOnly || isBossStage)
+) {
   
         total++;
 
