@@ -213,8 +213,8 @@ canvas {
   </select>
 
   <select id="bossRateType" onchange="drawBossTable()">
-    <option value="decimal">小数</option>
     <option value="fraction">分数</option>
+    <option value="decimal">小数</option>
   </select>
 
   <table class="detailTable">
@@ -758,10 +758,10 @@ function toggleDetailOrder() {
     img.onerror = () => img.src = "image/noimage.png";
 
     const rateText =
-      rateType === "fraction"
-        ? `${e.bossCount}/${e.appearCount}`
-        : e.rate.toFixed(3);
-
+  rateType === "fraction"
+    ? `${e.bossCount}/${e.appearCount}`
+    : `${(e.rate * 100).toFixed(1).replace(/\.0$/, "")}%`;
+    
     tr.innerHTML = `
       <td></td>
       <td class="stageCell">${e.name}</td>
