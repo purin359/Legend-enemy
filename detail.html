@@ -338,8 +338,13 @@ const isBossStage =
 const matchedStage =
   chapterIdParam &&
   String(ch.chapterId).trim() === String(chapterIdParam).trim() &&
-  stageNameParam &&
-  normalize(st.stageName) === normalize(stageNameParam);
+  (
+    String(st.stageId).trim() === String(stageIdParam).trim() ||
+    (
+      stageNameParam &&
+      normalize(st.stageName) === normalize(stageNameParam)
+    )
+  );
       
 if (
   matchedStage ||
