@@ -201,6 +201,7 @@ canvas {
   <button class="funcBtn active" onclick="openFunc('detailSort', this)">詳細並び替え</button>
   <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
   <button class="funcBtn" onclick="openFunc('sameEnemyList', this)">同じ構成</button>
+  <button class="funcBtn" onclick="openFunc('enemyTypeCount', this)">敵種類数</button>
   <button class="funcBtn" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
   
@@ -322,6 +323,33 @@ canvas {
   <div id="sameCountInfo" style="margin:10px 0; font-weight:bold;"></div>
 <div id="sameEnemyArea"></div>
 </div>
+
+  <div id="enemyTypeCount" class="funcArea">
+  <h3>敵種類数別ステージ数</h3>
+
+  <select id="typeCountMode" onchange="drawEnemyTypeCount()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <label>
+    <input type="checkbox" id="typeCountShowKanban" onchange="drawEnemyTypeCount()">
+    カンバン娘を含める
+  </label>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>種類数</th>
+        <th>数</th>
+        <th>一覧</th>
+      </tr>
+    </thead>
+    <tbody id="typeCountTableBody"></tbody>
+  </table>
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -376,6 +404,10 @@ function openFunc(id, btn) {
 
   if (id === "sameEnemyList") {
   drawSameEnemyList();
+}
+
+  if (id === "enemyTypeCount") {
+  drawEnemyTypeCount();
 }
 }
 
@@ -1022,6 +1054,71 @@ box.addEventListener("click", () => {
     box.appendChild(ul);
     area.appendChild(box);
   });
+}
+
+  // 種類数
+  function drawEnemyTypeCount() {
+  const mode = document.getElementById("typeCountMode").value;
+  const showKanban = document.getElementById("typeCountShowKanban").checked;
+  const tbody = document.getElementById("typeCountTableBody");
+
+  tbody.innerHTML = "";
+
+  const countMap = {};
+
+  for (let i = 1; i <= 10; i++) {
+    countMap[i] = 0;
+  }
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      let enemies = st.enemies.slice();
+
+      if (!showKanban) {
+        enemies = enemies.filter(e => normalize(e) !== normalize("カンバン娘"));
+      }
+
+      const uniqueCount = new Set(enemies.map(e => normalize(e))).size;
+
+      if (uniqueCount >= 1 && uniqueCount <= 10) {
+        countMap[uniqueCount]++;
+      }
+    });
+  });
+
+  for (let i = 1; i <= 10; i++) {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td class="numCell">${i}種類のみのステージ</td>
+      <td class="numCell">${countMap[i]}</td>
+      <td class="numCell">
+        <button onclick="goEnemyTypeCountDetail(${i})">一覧</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  }
+}
+
+  function goEnemyTypeCountDetail(count) {
+  const mode = document.getElementById("typeCountMode").value;
+  const showKanban = document.getElementById("typeCountShowKanban").checked;
+
+  const url = new URL("detail.html", location.href);
+
+  url.searchParams.set("enemyTypeCount", count);
+  url.searchParams.set("mode", mode);
+  url.searchParams.set("detail", "1");
+  url.searchParams.set("from", "tools");
+
+  if (showKanban) {
+    url.searchParams.set("showKanban", "1");
+  }
+
+  location.href = url.toString();
 }
   
   function getFirstNum(first) {
