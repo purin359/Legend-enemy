@@ -654,21 +654,22 @@ function redrawStageList() {
   stageDetailsData.forEach(ch => {
     if (!isTargetChapter(ch, mode)) return;
 
-    ch.stages.forEach(st => {
-      const bossCastleId = st.bossCastleId ?? st.castleId;
-      const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
-      rows.push({
-        chapterId: ch.chapterId,
-        chapterName: ch.chapterName,
-        stageId: st.stageId,
-        stageName: st.stageName,
-        castleHP: Number(st.castleHP) || 0,
-        bossPosition: bossPosition,
-        castleDistance: Number(st.castleDistance) || 0,
-        energy: Number(st.energy) || 0,
-        unitLimit: Number(st.unitLimit) || 0
-      });
-    });
+    ch.stages.forEach((st, i) => {
+  const bossCastleId = st.bossCastleId ?? st.castleId;
+  const bossPosition = castleMap[String(bossCastleId)]?.bossPosition ?? "";
+
+  rows.push({
+    chapterId: ch.chapterId,
+    chapterName: ch.chapterName,
+    stageId: i,
+    stageName: st.stageName,
+    castleHP: Number(st.castleHP) || 0,
+    bossPosition: bossPosition,
+    castleDistance: Number(st.castleDistance) || 0,
+    energy: Number(st.energy) || 0,
+    unitLimit: Number(st.unitLimit) || 0
+  });
+});
   });
 
   rows.sort((a, b) => {
