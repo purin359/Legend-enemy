@@ -166,6 +166,28 @@ canvas {
   cursor: pointer;
 }
 
+  .sameBox {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 12px;
+  background: #fafafa;
+}
+
+.sameEnemies {
+  margin-bottom: 8px;
+}
+
+.sameEnemies img {
+  width: 40px;
+  margin-right: 4px;
+}
+
+.sameStages {
+  margin: 0;
+  padding-left: 18px;
+}
+
 </style>
 </head>
 
@@ -178,6 +200,7 @@ canvas {
 <div class="menu">
   <button class="funcBtn active" onclick="openFunc('detailSort', this)">詳細並び替え</button>
   <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
+  <button class="funcBtn" onclick="openFunc('sameEnemyList', this)">同じ構成</button>
   <button class="funcBtn" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
   
@@ -281,8 +304,23 @@ canvas {
     </thead>
     <tbody id="bossTableBody"></tbody>
   </table>
-</div>
+  </div>
 
+    <div id="sameEnemyList" class="funcArea">
+  <h3>同じ構成のステージ一覧</h3>
+
+  <select id="sameOrderType" onchange="drawSameEnemyList()">
+    <option value="same">並びも一致</option>
+    <option value="ignore">順不同</option>
+  </select>
+
+  <label>
+    <input type="checkbox" id="sameShowKanban" onchange="drawSameEnemyList()">
+    カンバン娘を含める
+  </label>
+
+  <div id="sameEnemyArea"></div>
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -334,6 +372,10 @@ function openFunc(id, btn) {
   if (id === "bossList") {
     drawBossTable();
   }
+
+  if (id === "sameEnemyList") {
+  drawSameEnemyList();
+}
 }
 
 async function init() {
@@ -879,6 +921,88 @@ img.addEventListener("click", () => {
   });
 }
 
+  // 同じ構成のステージ
+  function drawSameEnemyList() {
+  const orderType = document.getElementById("sameOrderType").value;
+  const showKanban = document.getElementById("sameShowKanban").checked;
+  const area = document.getElementById("sameEnemyArea");
+
+  area.innerHTML = "";
+
+  const map = {};
+
+  stagesData.forEach(ch => {
+    ch.stages.forEach(st => {
+      let enemies = st.enemies.slice();
+
+      if (!showKanban) {
+        enemies = enemies.filter(e => normalize(e) !== normalize("カンバン娘"));
+      }
+
+      if (enemies.length === 0) return;
+
+      const keyEnemies = enemies.map(e => normalize(e));
+
+      const key =
+        orderType === "ignore"
+          ? keyEnemies.slice().sort().join("|")
+          : keyEnemies.join("|");
+
+      if (!map[key]) {
+        map[key] = {
+          enemies,
+          stages: []
+        };
+      }
+
+      map[key].stages.push({
+        chapterId: ch.chapterId,
+        stageId: st.stageId,
+        chapterName: ch.chapterName,
+        stageName: st.stageName
+      });
+    });
+  });
+
+  const list = Object.values(map)
+    .filter(g => g.stages.length >= 2)
+    .sort((a, b) => b.stages.length - a.stages.length);
+
+  if (list.length === 0) {
+    area.textContent = "同じ構成のステージは見つかりませんでした";
+    return;
+  }
+
+  list.forEach(group => {
+    const box = document.createElement("div");
+    box.className = "sameBox";
+
+    const enemiesDiv = document.createElement("div");
+    enemiesDiv.className = "sameEnemies";
+
+    group.enemies.forEach(enemyName => {
+      const img = document.createElement("img");
+      img.src = getEnemyImagePath(enemyName);
+      img.title = enemyName;
+      img.onerror = () => img.src = "image/noimage.png";
+      enemiesDiv.appendChild(img);
+    });
+
+    const ul = document.createElement("ul");
+    ul.className = "sameStages";
+
+    group.stages.forEach(st => {
+      const li = document.createElement("li");
+      li.textContent = `${st.chapterId}-${st.stageId} ${st.chapterName}-${st.stageName}`;
+      ul.appendChild(li);
+    });
+
+    box.appendChild(enemiesDiv);
+    box.appendChild(ul);
+    area.appendChild(box);
+  });
+}
+  
   function getFirstNum(first) {
   const match = first.match(/([A-Z]+)(\d+)-(\d+)/);
 
