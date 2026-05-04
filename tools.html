@@ -683,8 +683,8 @@ function redrawStageList() {
   tr.innerHTML = `
   <td class="chapterCell">${row.chapterName}</td>
   <td class="stageCell">
-  <span class="stageLink" onclick="goStageDetail('${row.chapterId}', '${row.stageId}')">
-    ${row.stageName}
+  <span class="stageLink" onclick="goStageDetail('${row.chapterId}', '${row.stageId}', '${row.stageName}')">
+  ${row.stageName}
   </span>
   </td>
   <td class="numCell">${row.castleHP.toLocaleString()}</td>
@@ -727,10 +727,11 @@ trs.forEach((tr, i) => {
 });
   }
 
-  function goStageDetail(chapterId, stageId) {
+  function goStageDetail(chapterId, stageId, stageName) {
   const url = new URL("detail.html", location.href);
   url.searchParams.set("chapterId", chapterId);
   url.searchParams.set("stageId", stageId);
+  url.searchParams.set("stageName", stageName);
   url.searchParams.set("mode", "ALL");
   url.searchParams.set("detail", "1");
   location.href = url.toString();
