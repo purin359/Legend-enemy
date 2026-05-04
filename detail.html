@@ -209,7 +209,7 @@ async function load() {
   const enemyTypeCountParam = params.get("enemyTypeCount");
   const showKanbanParam = params.get("showKanban") === "1";
 
-  if (showKanbanParam) {
+if (showKanbanParam) {
   document.getElementById("showKanban").checked = true;
 }
 
@@ -347,7 +347,7 @@ if (bossOnly && bossCount && appearCount) {
   (mode === "ND" && ch.chapterId.startsWith("ND"));
     
     if (!isTarget && !chapterIdParam && !sameEnemiesParam && !enemyTypeCountParam) return;
-
+    
     ch.stages.forEach(st => {
 
       const detailKey = `${ch.chapterId}-${st.stageId}`;
@@ -395,7 +395,7 @@ if (!currentShowKanban) {
 const matchedEnemyTypeCount =
   enemyTypeCountParam &&
   new Set(enemyListForCount.map(e => normalize(e))).size === Number(enemyTypeCountParam);
-
+      
       if (
   matchedStage ||
   matchedSameEnemies ||
