@@ -171,7 +171,15 @@ img {
 function normalize(str) {
   return String(str || "")
     .replace(/\r?\n/g, "")
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    )
+    .replace(/[ァ-ン]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)
+    )
+    .replace(/[：:]/g, "")
     .replace(/[ 　]+/g, "")
+    .toLowerCase()
     .trim();
 }
 
@@ -331,7 +339,7 @@ if (bossOnly && bossCount && appearCount) {
 
   (mode === "ND" && ch.chapterId.startsWith("ND"));
     
-    if (!isTarget && !chapterIdParam) return;
+    if (!isTarget && !chapterIdParam && !sameEnemiesParam) return;
 
     ch.stages.forEach(st => {
 
