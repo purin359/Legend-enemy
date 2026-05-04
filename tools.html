@@ -949,12 +949,11 @@ img.addEventListener("click", () => {
           ? keyEnemies.slice().sort().join("|")
           : keyEnemies.join("|");
 
-      if (!map[key]) {
-        map[key] = {
-          enemies,
-          stages: []
-        };
-      }
+      map[key] = {
+        key,
+        enemies,
+        stages: []
+      };
 
       map[key].stages.push({
         chapterId: ch.chapterId,
@@ -982,6 +981,20 @@ if (list.length === 0) {
   list.forEach(group => {
     const box = document.createElement("div");
     box.className = "sameBox";
+
+    box.style.cursor = "pointer";
+
+box.addEventListener("click", () => {
+  const url = new URL("detail.html", location.href);
+
+  url.searchParams.set("sameEnemies", group.key);
+  url.searchParams.set("sameOrderType", orderType);
+  url.searchParams.set("sameShowKanban", showKanban ? "1" : "0");
+  url.searchParams.set("detail", "1");
+  url.searchParams.set("from", "tools");
+
+  location.href = url.toString();
+});
 
     const enemiesDiv = document.createElement("div");
     enemiesDiv.className = "sameEnemies";
