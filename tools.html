@@ -735,9 +735,11 @@ trs.forEach((tr, i) => {
   url.searchParams.set("stageName", stageName);
   url.searchParams.set("mode", "ALL");
   url.searchParams.set("detail", "1");
+  url.searchParams.set("from", "tools");
+
   location.href = url.toString();
 }
-
+  
 function toggleDetailOrder() {
   detailDesc = !detailDesc;
 
