@@ -776,7 +776,22 @@ list.sort((a, b) => {
     const tr = document.createElement("tr");
 
     const img = document.createElement("img");
+
     img.src = getEnemyImagePath(e.name);
+
+img.style.cursor = "pointer";
+
+img.onclick = () => {
+  const mode = document.getElementById("bossMode").value;
+
+  const url = new URL("detail.html", location.href);
+  url.searchParams.set("name", e.name);
+  url.searchParams.set("mode", mode);
+  url.searchParams.set("boss", "1");
+
+  location.href = url.toString();
+};
+    
     img.onerror = () => img.src = "image/noimage.png";
 
     const rateText =
