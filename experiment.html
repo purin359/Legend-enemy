@@ -217,6 +217,12 @@ canvas {
     <option value="decimal">%表示</option>
   </select>
 
+  <select id="bossSort" onchange="drawBossTable()">
+    <option value="count">ボス回数順</option>
+    <option value="rate">ボス率順</option>
+    <option value="first">初ボス順</option>
+  </select>
+
   <table class="detailTable">
     <thead>
       <tr>
@@ -748,8 +754,24 @@ function toggleDetailOrder() {
     };
   });
 
-  list.sort((a, b) => b.bossCount - a.bossCount || a.firstNum - b.firstNum);
+  const sortType = document.getElementById("bossSort").value;
 
+list.sort((a, b) => {
+  if (sortType === "count") {
+    return b.bossCount - a.bossCount || a.firstNum - b.firstNum;
+  }
+
+  if (sortType === "rate") {
+    return b.rate - a.rate || b.bossCount - a.bossCount;
+  }
+
+  if (sortType === "first") {
+    return a.firstNum - b.firstNum;
+  }
+
+  return 0;
+});
+    
   list.forEach(e => {
     const tr = document.createElement("tr");
 
