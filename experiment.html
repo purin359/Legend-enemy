@@ -117,19 +117,26 @@ canvas {
   background: #f0f0f0;
 }
 
-  #bossTableBody td:first-child {
-  width: 60px;
+  #bossList .detailTable {
+  table-layout: fixed;
+}
+
+#bossList .detailTable th:nth-child(1),
+#bossList .detailTable td:nth-child(1) {
+  width: 55px;
   text-align: center;
   white-space: nowrap;
 }
 
-  #bossTableBody td:nth-child(2) {
+#bossList .detailTable th:nth-child(2),
+#bossList .detailTable td:nth-child(2) {
   width: auto;
   text-align: left;
 }
 
-  .detailTable {
-  table-layout: fixed;
+#bossList .detailTable img {
+  width: 40px;
+  margin-right: 0;
 }
 </style>
 </head>
