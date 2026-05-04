@@ -300,15 +300,15 @@ async function init() {
     };
   });
 
+  if (id === "bossList") {
+  drawBossTable();
+}
+
   enemyNames = Object.values(enemiesData).map(e => e.name);
 
   setupSuggest();
 
   openFunc("detailSort", document.querySelectorAll(".funcBtn")[0]);
-
-  if (id === "bossList") {
-  drawBossTable();
-}
 }
   
 function setupSuggest() {
