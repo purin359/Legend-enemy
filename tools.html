@@ -949,13 +949,13 @@ img.addEventListener("click", () => {
           ? keyEnemies.slice().sort().join("|")
           : keyEnemies.join("|");
 
-      if (!map[key]) = {
-        map[key] = {
-        key,
-        enemies,
-        stages: []
-      };
-    }
+      if (!map[key]) {
+  map[key] = {
+    key,
+    enemies,
+    stages: []
+  };
+}
 
       map[key].stages.push({
         chapterId: ch.chapterId,
