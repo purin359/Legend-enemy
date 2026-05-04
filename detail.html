@@ -175,12 +175,29 @@ function normalize(str) {
     .trim();
 }
 
+  function makeEnemyKey(enemies, orderType, showKanban) {
+  let list = enemies.slice();
+
+  if (!showKanban) {
+    list = list.filter(e => normalize(e) !== normalize("カンバン娘"));
+  }
+
+  const keyList = list.map(e => normalize(e));
+
+  return orderType === "ignore"
+    ? keyList.slice().sort().join("|")
+    : keyList.join("|");
+}
+
 async function load() {
   const params = new URLSearchParams(location.search);
   const bossOnly = params.get("boss") === "1";
   const chapterIdParam = params.get("chapterId");
   const stageIdParam = params.get("stageId");
   const stageNameParam = params.get("stageName");
+  const sameEnemiesParam = params.get("sameEnemies");
+  const sameOrderType = params.get("sameOrderType") || "same";
+  const sameShowKanban = params.get("sameShowKanban") === "1";
 
   const name = params.get("name");
   const mode = params.get("mode") || "ALL";
@@ -344,9 +361,10 @@ const matchedStage =
     normalize(st.stageName) === normalize(stageNameParam) ||
     String(st.stageId).trim() === String(stageIdParam).trim()
   );
-      
-if (
+
+      if (
   matchedStage ||
+  matchedSameEnemies ||
   (
     (matchedEnemy || matchedCastle || matchedBackground) &&
     (!bossOnly || isBossStage)
