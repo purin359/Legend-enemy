@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>敵詳細1</title>
+<title>敵詳細</title>
 
 <style>
 body { font-family: sans-serif; padding:20px; }
@@ -436,7 +436,7 @@ img.src = "image/" + encodeURIComponent(fileName) + ".png";
 img.onerror = () => img.src = "image/noimage.png";
 
 if (showDetail && bossList.includes(normalize(enemyName))) {
-  img.style.outline = "3px solid #ffE500"; // 薄い黄色
+  img.style.outline = "3px solid #F0566E"; // 薄い赤
 }
 
 td.appendChild(img);
