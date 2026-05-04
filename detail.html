@@ -178,6 +178,8 @@ function normalize(str) {
 async function load() {
   const params = new URLSearchParams(location.search);
   const bossOnly = params.get("boss") === "1";
+  const chapterIdParam = params.get("chapterId");
+  const stageIdParam = params.get("stageId");
 
   const name = params.get("name");
   const mode = params.get("mode") || "ALL";
@@ -327,9 +329,18 @@ const matchedBackground =
 const isBossStage =
   bossList.includes(normalize(name));
 
+const matchedStage =
+  chapterIdParam &&
+  stageIdParam !== null &&
+  ch.chapterId === chapterIdParam &&
+  String(st.stageId) === String(stageIdParam);
+
 if (
-  (matchedEnemy || matchedCastle || matchedBackground) &&
-  (!bossOnly || isBossStage)
+  matchedStage ||
+  (
+    (matchedEnemy || matchedCastle || matchedBackground) &&
+    (!bossOnly || isBossStage)
+  )
 ) {
   
         total++;
