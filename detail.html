@@ -293,7 +293,10 @@ if (name) {
 }
 
   document.getElementById("title").textContent =
-  name || (chapterIdParam ? "ステージ詳細" : "");
+  name ||
+  (chapterIdParam ? "ステージ詳細" :
+  sameEnemiesParam ? "同じ構成のステージ" :
+  "");
 
   const bossCount = params.get("bossCount");
 const appearCount = params.get("appearCount");
@@ -361,6 +364,10 @@ const matchedStage =
     normalize(st.stageName) === normalize(stageNameParam) ||
     String(st.stageId).trim() === String(stageIdParam).trim()
   );
+
+      const matchedSameEnemies =
+  sameEnemiesParam &&
+  makeEnemyKey(st.enemies, sameOrderType, sameShowKanban) === sameEnemiesParam;
 
       if (
   matchedStage ||
