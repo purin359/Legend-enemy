@@ -119,10 +119,13 @@ th { cursor:pointer; }
   <input id="searchBox" placeholder="敵名で絞り込み" oninput="load()">
 
   <div class="attrSelect" id="attrSelect">
+    <div style="display:flex; gap:6px; align-items:center;">
     <button type="button" id="attrSelectBtn" class="attrSelectBtn" onclick="toggleAttrMenu()">
       <span id="attrSelectedView">属性で絞り込み</span>
     </button>
+
     <button id="attrResetBtn" onclick="resetAttrs()">✕</button>
+  </div>
     <div id="attrMenu" class="attrMenu">
   <div class="attrOption" onclick="toggleAttr('赤')">
     <img src="image_type/赤.png" alt="赤">
