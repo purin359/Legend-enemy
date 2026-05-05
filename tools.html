@@ -245,13 +245,14 @@ canvas {
     <option value="ND">レジェンド0</option>
   </select>
 
-  <select id="detailSortKey" onchange="drawDetailTable()">
-    <option value="castleHP">城体力</option>
-    <option value="bossPosition">ボス位置</option>
-    <option value="castleDistance">城距離</option>
-    <option value="energy">統率力</option>
-    <option value="unitLimit">出撃制限</option>
-  </select>
+<select id="detailSortKey" onchange="drawDetailTable()">
+  <option value="stageOrder">ステージ順</option>
+  <option value="castleHP">城体力</option>
+  <option value="bossPosition">ボス位置</option>
+  <option value="castleDistance">城距離</option>
+  <option value="energy">統率力</option>
+  <option value="unitLimit">出撃制限</option>
+</select>
 
   <button id="detailOrderBtn" onclick="toggleDetailOrder()">降順</button>
 
@@ -737,6 +738,7 @@ function redrawStageList() {
     chapterId: ch.chapterId,
     chapterName: ch.chapterName,
     stageId: i,
+    stageOrder: getFirstNum(`${ch.chapterId}-${i}`),
     stageName: st.stageName,
     castleHP: Number(st.castleHP) || 0,
     bossPosition: bossPosition,
@@ -748,11 +750,17 @@ function redrawStageList() {
   });
 
   rows.sort((a, b) => {
+  if (sortKey === "stageOrder") {
     return detailDesc
-      ? b[sortKey] - a[sortKey]
-      : a[sortKey] - b[sortKey];
-  });
+      ? b.stageOrder - a.stageOrder
+      : a.stageOrder - b.stageOrder;
+  }
 
+  return detailDesc
+    ? b[sortKey] - a[sortKey]
+    : a[sortKey] - b[sortKey];
+});
+    
   rows.forEach(row => {
   const tr = document.createElement("tr");
 
