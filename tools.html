@@ -245,7 +245,7 @@ canvas {
     <option value="ND">レジェンド0</option>
   </select>
 
-<select id="detailSortKey" onchange="drawDetailTable()">
+<select id="detailSortKey" onchange="changeDetailSort()">
   <option value="stageOrder">ステージ順</option>
   <option value="castleHP">城体力</option>
   <option value="bossPosition">ボス位置</option>
@@ -751,9 +751,7 @@ function redrawStageList() {
 
   rows.sort((a, b) => {
   if (sortKey === "stageOrder") {
-    return detailDesc
-      ? b.stageOrder - a.stageOrder
-      : a.stageOrder - b.stageOrder;
+    return a.stageOrder - b.stageOrder;
   }
 
   return detailDesc
@@ -828,6 +826,15 @@ function toggleDetailOrder() {
 
   document.getElementById("detailOrderBtn").textContent =
     detailDesc ? "降順" : "昇順";
+
+  drawDetailTable();
+}
+
+  function changeDetailSort() {
+  const sortKey = document.getElementById("detailSortKey").value;
+  const btn = document.getElementById("detailOrderBtn");
+
+  btn.style.display = sortKey === "stageOrder" ? "none" : "inline-block";
 
   drawDetailTable();
 }
