@@ -158,6 +158,7 @@ th { cursor:pointer; }
   <div class="attrOption" onclick="toggleAttr('城')">
     <span>城</span>
   </div>
+<button id="attrResetBtn" onclick="resetAttrs()">属性リセット</button>
 </div>
           
   </div>
@@ -265,6 +266,9 @@ function load() {
 
   document.getElementById("attrSelect").style.display =
     type === "enemy" ? "" : "none";
+
+  document.getElementById("attrResetBtn").style.display =
+  type === "enemy" ? "" : "none";
 
   updateSortOptions(type);
 
@@ -477,6 +481,14 @@ function toggleAttr(attr) {
   } else {
     selectedAttrs.push(attr);
   }
+
+  updateAttrSelectedView();
+  updateAttrOptionState();
+  load();
+}
+
+  function resetAttrs() {
+  selectedAttrs = [];
 
   updateAttrSelectedView();
   updateAttrOptionState();
