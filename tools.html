@@ -1710,16 +1710,15 @@ box.innerHTML = `
       const enemies = JSON.parse(decodeURIComponent(area.dataset.enemies));
 
       area.innerHTML = enemies.map(enemy => `
-        area.innerHTML = enemies.map(enemy => `
-          <img
-            src="${getEnemyImagePath(enemy)}"
-            title="${enemy}"
-            loading="lazy"
-            decoding="async"
-            style="width:28px;margin-right:2px;"
-            onerror="this.src='image/noimage.png'"
-          >
-        `).join("");
+        <img
+          src="${getEnemyImagePath(enemy)}"
+          title="${enemy}"
+          loading="lazy"
+          decoding="async"
+          style="width:28px;margin-right:2px;"
+          onerror="this.src='image/noimage.png'"
+        >
+      `).join("");
       area.dataset.loaded = "1";
     }
 
