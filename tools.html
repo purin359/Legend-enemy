@@ -1469,8 +1469,13 @@ function getStageAttrs(enemies, showKanban) {
 function renderStageAttrIcons(attrs) {
   return attrs.map(attr => {
     if (stageAttrImageMap[attr]) {
-      return `<img src="${stageAttrImageMap[attr]}" title="${attr}" style="width:24px;margin-right:4px;">`;
+      return `<img src="${stageAttrImageMap[attr]}" title="${attr}" style="width:24px;margin-right:4px;vertical-align:middle;">`;
     }
+
+    if (attr === "城") {
+      return `<span style="display:inline-block; min-width:24px; text-align:center; margin-right:4px; vertical-align:middle;">城</span>`;
+    }
+
     return `<span>${attr}</span>`;
   }).join("");
 }
