@@ -1678,6 +1678,7 @@ box.innerHTML = `
 
         ${showEnemies ? `
           <div style="margin-top:4px;">
+          ${st.enemies
             .filter(enemy =>
               document.getElementById("stageAttrShowKanban").checked ||
               normalize(enemy) !== normalize("カンバン娘")
