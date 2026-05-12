@@ -467,6 +467,11 @@ canvas {
     <option value="ALL">属性数 全表示</option>
   </select>
 
+  <label id="stageAttrEnemyToggleWrap" style="display:none;">
+    <input type="checkbox" id="stageAttrShowEnemies" onchange="drawStageAttrList()">
+    敵構成表示
+  </label>
+
   <div id="stageAttrInfo" style="margin:10px 0;font-weight:bold;"></div>
   <div id="stageAttrArea"></div>
 </div>
@@ -1531,6 +1536,9 @@ function drawStageAttrList() {
   document.getElementById("stageAttrCountFilter").style.display =
     viewType === "group" ? "" : "none";
 
+  document.getElementById("stageAttrEnemyToggleWrap").style.display =
+    viewType === "group" ? "" : "none";
+
   document.getElementById("stageAttrSortKey").style.display =
     viewType === "list" ? "" : "none";
 
@@ -1623,6 +1631,9 @@ function mergeStageAttrChapterCells(tbody) {
 }
 
 function drawStageAttrGroup(rows) {
+  const showEnemies =
+    document.getElementById("stageAttrShowEnemies").checked;
+  
   const area = document.getElementById("stageAttrArea");
   const byCount = {};
 
@@ -1645,18 +1656,42 @@ function drawStageAttrGroup(rows) {
         const attrs = key ? key.split("|") : [];
 
         const box = document.createElement("div");
-        box.className = "sameBox";
-        box.innerHTML = `
-          <div style="font-weight:bold;">
-            ${renderStageAttrIcons(attrs)}
+box.className = "sameBox";
+
+box.innerHTML = `
+  <div style="font-weight:bold;">
+    ${renderStageAttrIcons(attrs)}
+  </div>
+
+  <div style="margin-top:6px;font-weight:bold;">
+    ${stages.length}ステージ
+  </div>
+
+  <ul>
+    ${stages.map(st => `
+      <li style="margin-bottom:8px;">
+        <div>
+          ${st.chapterId}-${st.stageId}
+          ${st.chapterName}-${st.stageName}
+        </div>
+
+        ${showEnemies ? `
+          <div style="margin-top:4px;">
+            ${st.enemies
+              .map(enemy => `
+                <img
+                  src="${getEnemyImagePath(enemy)}"
+                  title="${enemy}"
+                  style="width:32px;margin-right:3px;"
+                  onerror="this.src='image/noimage.png'"
+                >
+              `).join("")}
           </div>
-          <div style="margin-top:6px;font-weight:bold;">${stages.length}ステージ</div>
-          <ul>
-            ${stages.map(st =>
-              `<li>${st.chapterId}-${st.stageId} ${st.chapterName}-${st.stageName}</li>`
-            ).join("")}
-          </ul>
-        `;
+        ` : ""}
+      </li>
+    `).join("")}
+  </ul>
+`;
         area.appendChild(box);
       });
   });
