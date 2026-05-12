@@ -247,6 +247,7 @@ canvas {
   <button class="funcBtn" onclick="openFunc('sameEnemyList', this)">同じ構成</button>
   <button class="funcBtn" onclick="openFunc('enemyTypeCount', this)">敵種類数</button>
   <button class="funcBtn" onclick="openFunc('sameAttrStage', this)">単属性ステージ</button>
+  <button class="funcBtn" onclick="openFunc('stageAttrList', this)">ステージ別属性一覧</button>
   <button class="funcBtn" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
   
@@ -434,6 +435,41 @@ canvas {
   <div id="sameAttrInfo" style="margin:10px 0;font-weight:bold;"></div>
   <div id="sameAttrArea"></div>
 </div>
+
+  <div id="stageAttrList" class="funcArea">
+  <h3>ステージ別属性一覧</h3>
+
+  <select id="stageAttrMode" onchange="drawStageAttrList()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <label>
+    <input type="checkbox" id="stageAttrShowKanban" onchange="drawStageAttrList()">
+    カンバン娘を含める
+  </label>
+
+  <select id="stageAttrViewType" onchange="drawStageAttrList()">
+    <option value="list">リスト表示</option>
+    <option value="group">属性まとめ</option>
+  </select>
+
+  <select id="stageAttrSortKey" onchange="drawStageAttrList()">
+    <option value="stageOrder">ステージ順</option>
+    <option value="attrCount">属性数順</option>
+  </select>
+
+  <button id="stageAttrOrderBtn" onclick="toggleStageAttrOrder()">昇順</button>
+
+  <select id="stageAttrCountFilter" onchange="drawStageAttrList()" style="display:none;">
+    <option value="ALL">属性数 全表示</option>
+  </select>
+
+  <div id="stageAttrInfo" style="margin:10px 0;font-weight:bold;"></div>
+  <div id="stageAttrArea"></div>
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -496,6 +532,10 @@ function openFunc(id, btn) {
 
   if (id === "sameAttrStage") {
   drawSameAttrStage();
+}
+
+  if (id === "stageAttrList") {
+  drawStageAttrList();
 }
 }
 
@@ -1385,6 +1425,259 @@ info.textContent = `${attrLabel}：${results.length}件`;
   });
 
   area.appendChild(frag);
+}
+
+  // ステージ別属性一覧
+  const stageAttrOrder = [
+  "赤", "浮き", "黒", "メタル", "天使", "エイリアン",
+  "ゾンビ", "悪魔", "古代種", "無属性",
+  "超生命体", "超獣", "超賢者", "城"
+];
+
+const stageAttrImageMap = {
+  "赤": "image_type/赤.png",
+  "浮き": "image_type/浮き.png",
+  "黒": "image_type/黒.png",
+  "メタル": "image_type/メタル.png",
+  "天使": "image_type/天使.png",
+  "エイリアン": "image_type/エイリアン.png",
+  "ゾンビ": "image_type/ゾンビ.png",
+  "悪魔": "image_type/悪魔.png",
+  "古代種": "image_type/古代種.png",
+  "無属性": "image_type/無属性.png",
+  "超生命体": "image_type/超生命体.png",
+  "超獣": "image_type/超獣.png",
+  "超賢者": "image_type/超賢者.png"
+};
+
+let stageAttrDesc = false;
+
+function getStageAttrs(enemies, showKanban) {
+  const set = new Set();
+
+  enemies.forEach(enemyName => {
+    if (!showKanban && normalize(enemyName) === normalize("カンバン娘")) return;
+
+    getEnemyTypesCached(enemyName).forEach(t => {
+      if (stageAttrOrder.includes(t)) set.add(t);
+    });
+  });
+
+  return stageAttrOrder.filter(a => set.has(a));
+}
+
+function renderStageAttrIcons(attrs) {
+  return attrs.map(attr => {
+    if (stageAttrImageMap[attr]) {
+      return `<img src="${stageAttrImageMap[attr]}" title="${attr}" style="width:24px;margin-right:4px;">`;
+    }
+    return `<span>${attr}</span>`;
+  }).join("");
+}
+
+function getStageAttrRows() {
+  const mode = document.getElementById("stageAttrMode").value;
+  const showKanban = document.getElementById("stageAttrShowKanban").checked;
+  const rows = [];
+
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach((st, i) => {
+      const stageId = st.stageId ?? i;
+      const attrs = getStageAttrs(st.enemies, showKanban);
+
+      rows.push({
+        chapterId: ch.chapterId,
+        chapterName: ch.chapterName,
+        stageId,
+        stageName: st.stageName,
+        attrs,
+        attrCount: attrs.length,
+        attrKey: attrs.join("|"),
+        stageOrder: getFirstNum(`${ch.chapterId}-${stageId}`)
+      });
+    });
+  });
+
+  return rows;
+}
+
+function drawStageAttrList() {
+  const viewType = document.getElementById("stageAttrViewType").value;
+  const sortKey = document.getElementById("stageAttrSortKey").value;
+  const countFilter = document.getElementById("stageAttrCountFilter").value;
+  const area = document.getElementById("stageAttrArea");
+
+  area.innerHTML = "";
+
+  let rows = getStageAttrRows();
+
+  const maxCount = Math.max(0, ...rows.map(r => r.attrCount));
+  const countSelect = document.getElementById("stageAttrCountFilter");
+  const current = countSelect.value;
+
+  countSelect.innerHTML = `<option value="ALL">属性数 全表示</option>`;
+  for (let i = 1; i <= maxCount; i++) {
+    countSelect.innerHTML += `<option value="${i}">${i}属性のみ</option>`;
+  }
+  countSelect.value = [...countSelect.options].some(o => o.value === current) ? current : "ALL";
+
+  document.getElementById("stageAttrCountFilter").style.display =
+    viewType === "group" ? "" : "none";
+
+  document.getElementById("stageAttrSortKey").style.display =
+    viewType === "list" ? "" : "none";
+
+  document.getElementById("stageAttrOrderBtn").style.display =
+    viewType === "list" ? "" : "none";
+
+  if (countSelect.value !== "ALL") {
+    rows = rows.filter(r => r.attrCount === Number(countSelect.value));
+  }
+
+  document.getElementById("stageAttrInfo").textContent = `${rows.length}ステージ`;
+
+  if (viewType === "list") {
+    drawStageAttrTable(rows, sortKey);
+  } else {
+    drawStageAttrGroup(rows);
+  }
+}
+
+function drawStageAttrTable(rows, sortKey) {
+  const area = document.getElementById("stageAttrArea");
+
+  rows.sort((a, b) => {
+    let result = sortKey === "attrCount"
+      ? a.attrCount - b.attrCount || a.stageOrder - b.stageOrder
+      : a.stageOrder - b.stageOrder;
+
+    return stageAttrDesc ? -result : result;
+  });
+
+  const table = document.createElement("table");
+  table.className = "detailTable";
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>章名</th>
+        <th>ステージ名</th>
+        <th>属性数</th>
+        <th>属性一覧</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+  const tbody = table.querySelector("tbody");
+
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="chapterCell">${row.chapterName}</td>
+      <td class="stageCell">${row.stageName}</td>
+      <td class="numCell">${row.attrCount}</td>
+      <td>${renderStageAttrIcons(row.attrs)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  area.appendChild(table);
+  mergeStageAttrChapterCells(tbody);
+}
+
+function mergeStageAttrChapterCells(tbody) {
+  let prev = null;
+  let start = null;
+  let count = 0;
+
+  const trs = tbody.querySelectorAll("tr");
+
+  trs.forEach((tr, i) => {
+    const cell = tr.children[0];
+    const chapter = cell.textContent;
+
+    if (chapter === prev) {
+      count++;
+      cell.remove();
+    } else {
+      if (start !== null && count > 1) {
+        trs[start].children[0].rowSpan = count;
+      }
+      prev = chapter;
+      start = i;
+      count = 1;
+    }
+
+    if (i === trs.length - 1 && count > 1) {
+      trs[start].children[0].rowSpan = count;
+    }
+  });
+}
+
+function drawStageAttrGroup(rows) {
+  const area = document.getElementById("stageAttrArea");
+  const byCount = {};
+
+  rows.forEach(row => {
+    if (!byCount[row.attrCount]) byCount[row.attrCount] = {};
+    if (!byCount[row.attrCount][row.attrKey]) byCount[row.attrCount][row.attrKey] = [];
+    byCount[row.attrCount][row.attrKey].push(row);
+  });
+
+  Object.keys(byCount).map(Number).sort((a, b) => a - b).forEach(count => {
+    const total = Object.values(byCount[count]).reduce((sum, list) => sum + list.length, 0);
+
+    area.innerHTML += `<h3>${count}属性</h3><div style="font-weight:bold;">全${total}ステージ</div>`;
+
+    Object.entries(byCount[count])
+      .sort((a, b) => compareStageAttrKey(a[0], b[0]))
+      .forEach(([key, stages]) => {
+        stages.sort((a, b) => a.stageOrder - b.stageOrder);
+
+        const attrs = key ? key.split("|") : [];
+
+        const box = document.createElement("div");
+        box.className = "sameBox";
+        box.innerHTML = `
+          <div style="font-weight:bold;">
+            ${renderStageAttrIcons(attrs)}
+          </div>
+          <div style="margin-top:6px;font-weight:bold;">${stages.length}ステージ</div>
+          <ul>
+            ${stages.map(st =>
+              `<li>${st.chapterId}-${st.stageId} ${st.chapterName}-${st.stageName}</li>`
+            ).join("")}
+          </ul>
+        `;
+        area.appendChild(box);
+      });
+  });
+}
+
+function compareStageAttrKey(a, b) {
+  const aa = a.split("|");
+  const bb = b.split("|");
+
+  for (let i = 0; i < Math.max(aa.length, bb.length); i++) {
+    const ai = stageAttrOrder.indexOf(aa[i]);
+    const bi = stageAttrOrder.indexOf(bb[i]);
+
+    if (ai !== bi) return ai - bi;
+  }
+
+  return 0;
+}
+
+function toggleStageAttrOrder() {
+  stageAttrDesc = !stageAttrDesc;
+
+  document.getElementById("stageAttrOrderBtn").textContent =
+    stageAttrDesc ? "降順" : "昇順";
+
+  drawStageAttrList();
 }
   
 init();
