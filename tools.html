@@ -1257,7 +1257,18 @@ function updateSameAttrButtons() {
     if (!img) return;
 
     const src = decodeURIComponent(img.getAttribute("src"));
-    const attr = src.match(/image_type\/(.+)\.png/)?.[1];
+    let attr;
+
+if (img) {
+  const src = decodeURIComponent(img.getAttribute("src"));
+  attr = src.match(/image_type\/(.+)\.png/)?.[1];
+} else {
+  attr = btn.textContent.trim() === "全て"
+    ? "ALL"
+    : "";
+}
+
+btn.classList.toggle("active", attr === selectedSameAttr);
 
     btn.classList.toggle("active", attr === selectedSameAttr);
   });
