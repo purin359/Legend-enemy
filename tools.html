@@ -227,6 +227,11 @@ canvas {
   margin-right: 4px;
 }
 
+  .sameAttrIcons button {
+  min-width: 44px;
+  height: 44px;
+}
+
 </style>
 </head>
 
@@ -395,6 +400,13 @@ canvas {
   <div id="sameAttrStage" class="funcArea">
   <h3>全てが同じ属性のステージ</h3>
 
+  <select id="sameAttrMode" onchange="drawSameAttrStage()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
   <label>
     <input type="checkbox" id="sameAttrShowKanban" onchange="drawSameAttrStage()">
     カンバン娘を含める
@@ -406,16 +418,17 @@ canvas {
   </label>
 
   <div class="sameAttrIcons">
-    <button onclick="toggleSameAttr('赤')"><img src="image_type/赤.png"></button>
-    <button onclick="toggleSameAttr('浮き')"><img src="image_type/浮き.png"></button>
-    <button onclick="toggleSameAttr('黒')"><img src="image_type/黒.png"></button>
-    <button onclick="toggleSameAttr('メタル')"><img src="image_type/メタル.png"></button>
-    <button onclick="toggleSameAttr('天使')"><img src="image_type/天使.png"></button>
-    <button onclick="toggleSameAttr('エイリアン')"><img src="image_type/エイリアン.png"></button>
-    <button onclick="toggleSameAttr('ゾンビ')"><img src="image_type/ゾンビ.png"></button>
-    <button onclick="toggleSameAttr('悪魔')"><img src="image_type/悪魔.png"></button>
-    <button onclick="toggleSameAttr('古代種')"><img src="image_type/古代種.png"></button>
-    <button onclick="toggleSameAttr('無属性')"><img src="image_type/無属性.png"></button>
+    <button onclick="selectSameAttr('ALL')">全</button>
+    <button onclick="selectSameAttr('赤')"><img src="image_type/赤.png"></button>
+    <button onclick="selectSameAttr('浮き')"><img src="image_type/浮き.png"></button>
+    <button onclick="selectSameAttr('黒')"><img src="image_type/黒.png"></button>
+    <button onclick="selectSameAttr('メタル')"><img src="image_type/メタル.png"></button>
+    <button onclick="selectSameAttr('天使')"><img src="image_type/天使.png"></button>
+    <button onclick="selectSameAttr('エイリアン')"><img src="image_type/エイリアン.png"></button>
+    <button onclick="selectSameAttr('ゾンビ')"><img src="image_type/ゾンビ.png"></button>
+    <button onclick="selectSameAttr('悪魔')"><img src="image_type/悪魔.png"></button>
+    <button onclick="selectSameAttr('古代種')"><img src="image_type/古代種.png"></button>
+    <button onclick="selectSameAttr('無属性')"><img src="image_type/無属性.png"></button>
   </div>
 
   <div id="sameAttrInfo" style="margin:10px 0;font-weight:bold;"></div>
@@ -1229,15 +1242,11 @@ box.addEventListener("click", () => {
 }
 
   // 単属性ステージ
-  let selectedSameAttrs = ["赤", "浮き", "黒", "メタル", "天使", "エイリアン", "ゾンビ", "悪魔", "古代種", "無属性"];
+  let selectedSameAttr = "赤";
+let enemyTypeCache = {};
 
-function toggleSameAttr(attr) {
-  if (selectedSameAttrs.includes(attr)) {
-    selectedSameAttrs = selectedSameAttrs.filter(a => a !== attr);
-  } else {
-    selectedSameAttrs.push(attr);
-  }
-
+function selectSameAttr(attr) {
+  selectedSameAttr = attr;
   updateSameAttrButtons();
   drawSameAttrStage();
 }
@@ -1250,28 +1259,38 @@ function updateSameAttrButtons() {
     const src = decodeURIComponent(img.getAttribute("src"));
     const attr = src.match(/image_type\/(.+)\.png/)?.[1];
 
-    btn.classList.toggle("active", selectedSameAttrs.includes(attr));
+    btn.classList.toggle("active", attr === selectedSameAttr);
   });
 }
 
-function getEnemyTypes(enemyName) {
+function getEnemyTypesCached(enemyName) {
   const key = normalize(enemyName);
+
+  if (enemyTypeCache[key]) {
+    return enemyTypeCache[key];
+  }
 
   const found = Object.values(enemiesData).find(enemy =>
     normalize(enemy.name) === key
   );
 
-  if (!found || !found.type) return [];
+  if (!found || !found.type) {
+    enemyTypeCache[key] = [];
+    return [];
+  }
 
-  return String(found.type)
+  enemyTypeCache[key] = String(found.type)
     .split(",")
     .map(s => s.trim())
     .filter(Boolean);
+
+  return enemyTypeCache[key];
 }
 
 function drawSameAttrStage() {
   updateSameAttrButtons();
 
+  const mode = document.getElementById("sameAttrMode").value;
   const showKanban = document.getElementById("sameAttrShowKanban").checked;
   const ignoreCastle = document.getElementById("sameAttrIgnoreCastle").checked;
   const area = document.getElementById("sameAttrArea");
@@ -1279,84 +1298,88 @@ function drawSameAttrStage() {
 
   area.innerHTML = "";
 
-  const resultMap = {};
-  selectedSameAttrs.forEach(attr => {
-    resultMap[attr] = [];
-  });
+  const results = [];
 
   stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
     ch.stages.forEach(st => {
-      let judgeEnemies = st.enemies.slice();
+      let judgeEnemies = st.enemies;
 
       if (!showKanban) {
         judgeEnemies = judgeEnemies.filter(e => normalize(e) !== normalize("カンバン娘"));
       }
 
       if (ignoreCastle) {
-        judgeEnemies = judgeEnemies.filter(e => !getEnemyTypes(e).includes("城"));
+        judgeEnemies = judgeEnemies.filter(e => !getEnemyTypesCached(e).includes("城"));
       }
 
       if (judgeEnemies.length === 0) return;
 
-      selectedSameAttrs.forEach(attr => {
-        const ok = judgeEnemies.every(enemyName => {
-          const types = getEnemyTypes(enemyName);
-          return types.includes(attr);
-        });
+      const ok =
+      selectedSameAttr === "ALL"
+    ? judgeEnemies.every(enemyName => {
+        const types = getEnemyTypesCached(enemyName);
 
-        if (ok) {
-          resultMap[attr].push({
-            chapterId: ch.chapterId,
-            stageId: st.stageId,
-            chapterName: ch.chapterName,
-            stageName: st.stageName,
-            enemies: st.enemies
-          });
-        }
+        return judgeEnemies.every(otherEnemy => {
+          const otherTypes = getEnemyTypesCached(otherEnemy);
+
+          return types.some(t => otherTypes.includes(t));
+        });
+      })
+    : judgeEnemies.every(enemyName => {
+        const types = getEnemyTypesCached(enemyName);
+        return types.includes(selectedSameAttr);
       });
+
+      if (ok) {
+        results.push({
+          chapterId: ch.chapterId,
+          stageId: st.stageId,
+          chapterName: ch.chapterName,
+          stageName: st.stageName,
+          enemies: st.enemies
+        });
+      }
     });
   });
 
-  const total = Object.values(resultMap).reduce((sum, list) => sum + list.length, 0);
-  info.textContent = `合計 ${total}件`;
+  info.textContent = `${selectedSameAttr}のみ：${results.length}件`;
 
-  selectedSameAttrs.forEach(attr => {
-    const stages = resultMap[attr];
-    if (!stages || stages.length === 0) return;
+  if (results.length === 0) {
+    area.textContent = "該当ステージはありません";
+    return;
+  }
 
+  const frag = document.createDocumentFragment();
+
+  results.forEach(st => {
     const box = document.createElement("div");
     box.className = "sameAttrBox";
 
-    box.innerHTML = `
-      <h4>
-        <img src="image_type/${attr}.png" style="width:26px;vertical-align:middle;">
-        ${attr}のみ：${stages.length}件
-      </h4>
-    `;
+    const title = document.createElement("div");
+    title.textContent = `${st.chapterId}-${st.stageId} ${st.chapterName}-${st.stageName}`;
+    box.appendChild(title);
 
-    stages.forEach(st => {
-      const div = document.createElement("div");
-      div.style.borderTop = "1px solid #ddd";
-      div.style.padding = "8px 0";
+    const icons = document.createElement("div");
+    icons.className = "sameAttrEnemyIcons";
 
-      div.innerHTML = `
-        <div>${st.chapterId}-${st.stageId} ${st.chapterName}-${st.stageName}</div>
-        <div class="sameAttrEnemyIcons">
-          ${st.enemies
-            .filter(e => showKanban || normalize(e) !== normalize("カンバン娘"))
-            .map(e => `
-              <img src="${getEnemyImagePath(e)}"
-                   title="${e}"
-                   onerror="this.src='image/noimage.png'">
-            `).join("")}
-        </div>
-      `;
+    st.enemies.forEach(enemyName => {
+      if (!showKanban && normalize(enemyName) === normalize("カンバン娘")) return;
 
-      box.appendChild(div);
+      const img = document.createElement("img");
+      img.src = getEnemyImagePath(enemyName);
+      img.title = enemyName;
+      img.onerror = () => img.src = "image/noimage.png";
+
+      icons.appendChild(img);
     });
 
-    area.appendChild(box);
+    box.appendChild(icons);
+    frag.appendChild(box);
   });
+
+  area.appendChild(frag);
 }
   
 init();
