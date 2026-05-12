@@ -1260,7 +1260,7 @@ function updateSameAttrButtons() {
       const src = decodeURIComponent(img.getAttribute("src"));
       attr = src.match(/image_type\/(.+)\.png/)?.[1];
     } else {
-      attr = btn.textContent.trim() === "全て" ? "ALL" : "";
+      attr = btn.textContent.trim() === "全" ? "ALL" : "";
     }
 
     btn.classList.toggle("active", attr === selectedSameAttr);
