@@ -1677,20 +1677,24 @@ box.innerHTML = `
         </div>
 
         ${showEnemies ? `
-          <button type="button" onclick="toggleStageEnemies(this)" style="margin-top:4px;">
-            構成表示
-          </button>
-
-            <div class="stageEnemyIcons"
-              data-enemies="${encodeURIComponent(JSON.stringify(
-                st.enemies.filter(enemy =>
-                 document.getElementById("stageAttrShowKanban").checked ||
-                   normalize(enemy) !== normalize("カンバン娘")
-                 )
-               ))}"
-               style="display:none; margin-top:4px;">
-            </div>
-        ` : ""}
+  <div class="stageEnemyIcons" style="margin-top:4px;">
+    ${st.enemies
+      .filter(enemy =>
+        document.getElementById("stageAttrShowKanban").checked ||
+        normalize(enemy) !== normalize("カンバン娘")
+      )
+      .map(enemy => `
+        <img
+          src="${getEnemyImagePath(enemy)}"
+          title="${enemy}"
+          loading="lazy"
+          decoding="async"
+          style="width:28px;margin-right:2px;"
+          onerror="this.src='image/noimage.png'"
+        >
+      `).join("")}
+  </div>
+` : ""}
       </li>
     `).join("")}
   </ul>
