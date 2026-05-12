@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>その他の機能１</title>
+<title>その他の機能</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -1254,21 +1254,14 @@ function selectSameAttr(attr) {
 function updateSameAttrButtons() {
   document.querySelectorAll(".sameAttrIcons button").forEach(btn => {
     const img = btn.querySelector("img");
-    if (!img) return;
-
-    const src = decodeURIComponent(img.getAttribute("src"));
     let attr;
 
-if (img) {
-  const src = decodeURIComponent(img.getAttribute("src"));
-  attr = src.match(/image_type\/(.+)\.png/)?.[1];
-} else {
-  attr = btn.textContent.trim() === "全て"
-    ? "ALL"
-    : "";
-}
-
-btn.classList.toggle("active", attr === selectedSameAttr);
+    if (img) {
+      const src = decodeURIComponent(img.getAttribute("src"));
+      attr = src.match(/image_type\/(.+)\.png/)?.[1];
+    } else {
+      attr = btn.textContent.trim() === "全て" ? "ALL" : "";
+    }
 
     btn.classList.toggle("active", attr === selectedSameAttr);
   });
@@ -1355,7 +1348,8 @@ function drawSameAttrStage() {
     });
   });
 
-  info.textContent = `${selectedSameAttr}のみ：${results.length}件`;
+  const attrLabel = selectedSameAttr === "ALL" ? "全て" : selectedSameAttr;
+info.textContent = `${attrLabel}：${results.length}件`;
 
   if (results.length === 0) {
     area.textContent = "該当ステージはありません";
