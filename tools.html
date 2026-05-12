@@ -1683,7 +1683,7 @@ box.innerHTML = `
         document.getElementById("stageAttrShowKanban").checked ||
         normalize(enemy) !== normalize("カンバン娘")
       )
-      .map(enemy => `
+      .slice(0, 12).map(enemy => `
         <img
           src="${getEnemyImagePath(enemy)}"
           title="${enemy}"
@@ -1702,58 +1702,6 @@ box.innerHTML = `
         area.appendChild(box);
       });
   });
-}
-
-  function toggleStageEnemies(btn) {
-  const area = btn.nextElementSibling;
-
-  if (area.style.display === "none") {
-    area.style.display = "";
-
-    if (!area.dataset.loaded) {
-      const enemies = JSON.parse(decodeURIComponent(area.dataset.enemies));
-
-      area.innerHTML = enemies.map(enemy => `
-        <img
-          src="${getEnemyImagePath(enemy)}"
-          title="${enemy}"
-          loading="lazy"
-          decoding="async"
-          style="width:28px;margin-right:2px;"
-          onerror="this.src='image/noimage.png'"
-        >
-      `).join("");
-      area.dataset.loaded = "1";
-    }
-
-    btn.textContent = "構成非表示";
-  } else {
-    area.style.display = "none";
-    btn.textContent = "構成表示";
-  }
-}
-
-function compareStageAttrKey(a, b) {
-  const aa = a.split("|");
-  const bb = b.split("|");
-
-  for (let i = 0; i < Math.max(aa.length, bb.length); i++) {
-    const ai = stageAttrOrder.indexOf(aa[i]);
-    const bi = stageAttrOrder.indexOf(bb[i]);
-
-    if (ai !== bi) return ai - bi;
-  }
-
-  return 0;
-}
-
-function toggleStageAttrOrder() {
-  stageAttrDesc = !stageAttrDesc;
-
-  document.getElementById("stageAttrOrderBtn").textContent =
-    stageAttrDesc ? "降順" : "昇順";
-
-  drawStageAttrList();
 }
   
 init();
