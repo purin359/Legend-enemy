@@ -1677,21 +1677,19 @@ box.innerHTML = `
         </div>
 
         ${showEnemies ? `
-          <div style="margin-top:4px;">
-          ${st.enemies
-            .filter(enemy =>
-              document.getElementById("stageAttrShowKanban").checked ||
-              normalize(enemy) !== normalize("カンバン娘")
-            )
-              .map(enemy => `
-                <img
-                  src="${getEnemyImagePath(enemy)}"
-                  title="${enemy}"
-                  style="width:32px;margin-right:3px;"
-                  onerror="this.src='image/noimage.png'"
-                >
-              `).join("")}
-          </div>
+          <button type="button" onclick="toggleStageEnemies(this)" style="margin-top:4px;">
+            構成表示
+          </button>
+
+            <div class="stageEnemyIcons"
+              data-enemies="${encodeURIComponent(JSON.stringify(
+                st.enemies.filter(enemy =>
+                 document.getElementById("stageAttrShowKanban").checked ||
+                   normalize(enemy) !== normalize("カンバン娘")
+                 )
+               ))}"
+               style="display:none; margin-top:4px;">
+            </div>
         ` : ""}
       </li>
     `).join("")}
@@ -1700,6 +1698,35 @@ box.innerHTML = `
         area.appendChild(box);
       });
   });
+}
+
+  function toggleStageEnemies(btn) {
+  const area = btn.nextElementSibling;
+
+  if (area.style.display === "none") {
+    area.style.display = "";
+
+    if (!area.dataset.loaded) {
+      const enemies = JSON.parse(decodeURIComponent(area.dataset.enemies));
+
+      area.innerHTML = enemies.map(enemy => `
+        <img
+          src="${getEnemyImagePath(enemy)}"
+          title="${enemy}"
+          loading="lazy"
+          style="width:32px;margin-right:3px;"
+          onerror="this.src='image/noimage.png'"
+        >
+      `).join("");
+
+      area.dataset.loaded = "1";
+    }
+
+    btn.textContent = "構成非表示";
+  } else {
+    area.style.display = "none";
+    btn.textContent = "構成表示";
+  }
 }
 
 function compareStageAttrKey(a, b) {
