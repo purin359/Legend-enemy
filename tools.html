@@ -248,6 +248,7 @@ canvas {
   <button class="funcBtn" onclick="openFunc('enemyTypeCount', this)">敵種類数</button>
   <button class="funcBtn" onclick="openFunc('sameAttrStage', this)">単属性ステージ</button>
   <button class="funcBtn" onclick="openFunc('stageAttrList', this)">ステージ別属性一覧</button>
+  <button class="funcBtn" onclick="openFunc('energyTotal', this)">章別統率力</button>
   <button class="funcBtn" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
   
@@ -475,6 +476,28 @@ canvas {
   <div id="stageAttrInfo" style="margin:10px 0;font-weight:bold;"></div>
   <div id="stageAttrArea"></div>
 </div>
+
+  <div id="energyTotal" class="funcArea">
+  <h3>各章の合計統率力</h3>
+
+  <select id="energyMode" onchange="drawEnergyTotal()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>章名</th>
+        <th>ステージ数</th>
+        <th>合計統率力</th>
+      </tr>
+    </thead>
+    <tbody id="energyTotalBody"></tbody>
+  </table>
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -528,20 +551,24 @@ function openFunc(id, btn) {
   }
 
   if (id === "sameEnemyList") {
-  drawSameEnemyList();
-}
+    drawSameEnemyList();
+  }
 
   if (id === "enemyTypeCount") {
-  drawEnemyTypeCount();
-}
+    drawEnemyTypeCount();
+  }
 
   if (id === "sameAttrStage") {
-  drawSameAttrStage();
-}
+    drawSameAttrStage();
+  }
 
   if (id === "stageAttrList") {
-  drawStageAttrList();
-}
+    drawStageAttrList();
+  }
+
+  if (id === "energyTotal") {
+    drawEnergyTotal();
+  }
 }
 
 async function init() {
@@ -1754,6 +1781,49 @@ function toggleStageAttrOrder() {
     stageAttrDesc ? "降順" : "昇順";
 
   drawStageAttrList();
+}
+
+  // 章別統率力
+  function drawEnergyTotal() {
+  const mode = document.getElementById("energyMode").value;
+  const tbody = document.getElementById("energyTotalBody");
+
+  tbody.innerHTML = "";
+
+  let allEnergy = 0;
+  let allStages = 0;
+
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    let totalEnergy = 0;
+    let stageCount = 0;
+
+    ch.stages.forEach(st => {
+      totalEnergy += Number(st.energy) || 0;
+      stageCount++;
+    });
+
+    allEnergy += totalEnergy;
+    allStages += stageCount;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="stageCell">${ch.chapterName}</td>
+      <td class="numCell">${stageCount}</td>
+      <td class="numCell">${totalEnergy.toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const tr = document.createElement("tr");
+  tr.style.fontWeight = "bold";
+  tr.innerHTML = `
+    <td class="stageCell">合計</td>
+    <td class="numCell">${allStages}</td>
+    <td class="numCell">${allEnergy.toLocaleString()}</td>
+  `;
+  tbody.appendChild(tr);
 }
   
 init();
