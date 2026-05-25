@@ -9519,5 +9519,77 @@
         "bosses": "淘の賢者ダーヴィン"
       }
     ]
+  },
+  {
+    "chapterId": "ND031",
+    "chapterName": "ニューホライズン",
+    "stages": [
+      {
+        "stageId": 0,
+        "stageName": "遥かなる赤土の荒野",
+        "castleId": "1",
+        "background": "",
+        "castleHP": 1500000,
+        "castleDistance": 5000,
+        "energy": 160,
+        "unitLimit": 20,
+        "bosses": "ドヴェルダーク"
+      },
+      {
+        "stageId": 1,
+        "stageName": "跳躍する影の群れ",
+        "castleId": "10",
+        "background": "1058",
+        "castleHP": 1500000,
+        "castleDistance": 4500,
+        "energy": 180,
+        "unitLimit": 50,
+        "bosses": "ダ・チョー老"
+      },
+      {
+        "stageId": 2,
+        "stageName": "コアラ昼寝地帯",
+        "castleId": "12",
+        "background": "1035",
+        "castleHP": 1500000,
+        "castleDistance": 4400,
+        "energy": 200,
+        "unitLimit": 15,
+        "bosses": "デスコアラッキョ"
+      },
+      {
+        "stageId": 3,
+        "stageName": "巨大防壁岩礁",
+        "castleId": "8",
+        "background": "1042",
+        "castleHP": 2200000,
+        "castleDistance": 5200,
+        "energy": 220,
+        "unitLimit": 20,
+        "bosses": "レジェンドブンブンΩ"
+      },
+      {
+        "stageId": 4,
+        "stageName": "燃え萌えツリー",
+        "castleId": "3",
+        "background": "1036",
+        "castleHP": 2400000,
+        "castleDistance": 5800,
+        "energy": 250,
+        "unitLimit": 20,
+        "bosses": "クロサワ監督"
+      },
+      {
+        "stageId": 5,
+        "stageName": "ネコのおへそ",
+        "castleId": "16",
+        "background": "",
+        "castleHP": 2500000,
+        "castleDistance": 5500,
+        "energy": 250,
+        "unitLimit": 20,
+        "bosses": "チワワン伯爵"
+      }
+    ]
   }
 ]
