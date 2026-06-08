@@ -536,6 +536,8 @@ canvas {
     </thead>
     <tbody id="bossAttrTableBody"></tbody>
   </table>
+    <h4>属性内訳</h4>
+<div id="bossAttrDetail"></div>
 </div>
 <script>
 let stagesData = [];
@@ -1299,25 +1301,102 @@ function drawBossAttrTable() {
 
     const tr = document.createElement("tr");
 
-    const attrCell =
-  e.attr === "城"
-    ? "城"
-    : `<img
-         src="image_type/${e.attr}.png"
-         title="${e.attr}"
-         style="width:32px;height:32px;"
-       >`;
+    const tdAttr = document.createElement("td");
+      tdAttr.className = "numCell";
 
-tr.innerHTML = `
-  <td class="numCell">${attrCell}</td>
-  <td class="numCell">${e.bossCount}</td>
-  <td class="numCell">${e.appearCount}</td>
-  <td class="numCell">${rateText}</td>
-  <td class="numCell">${e.bossEnemyCount}</td>
-`;
+      if (e.attr === "城") {
+        tdAttr.textContent = "城";
+      } else {
+        tdAttr.innerHTML =
+          `<img src="image_type/${e.attr}.png"
+                style="width:32px;height:32px;">`;
+      }
+
+      tdAttr.style.cursor = "pointer";
+
+      tdAttr.onclick = () => {
+        showBossAttrDetail(e.attr, mode);
+      };
+
+      tr.appendChild(tdAttr);
+
+      tr.innerHTML = `
+        <td class="numCell">${attrCell}</td>
+        <td class="numCell">${e.bossCount}</td>
+        <td class="numCell">${e.appearCount}</td>
+        <td class="numCell">${rateText}</td>
+        <td class="numCell">${e.bossEnemyCount}</td>
+      `;
 
     tbody.appendChild(tr);
   });
+}
+
+  function showBossAttrDetail(attr, mode) {
+
+  const area =
+    document.getElementById("bossAttrDetail");
+
+  const enemyMap = {};
+
+  stageDetailsData.forEach(ch => {
+
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+
+      if (!st.bosses || st.bosses === "なし")
+        return;
+
+      const bosses = String(st.bosses)
+        .split(/[,\、]/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      bosses.forEach(name => {
+
+        const types =
+          getEnemyTypesForBossAttr(name);
+
+        if (!types.includes(attr)) return;
+
+        const key = normalize(name);
+
+        if (!enemyMap[key]) {
+          enemyMap[key] = {
+            name,
+            count: 0
+          };
+        }
+
+        enemyMap[key].count++;
+      });
+    });
+  });
+
+  const list = Object.values(enemyMap)
+    .sort((a,b)=>b.count-a.count);
+
+  area.innerHTML = `
+    <h4>${attr}</h4>
+
+    <table class="detailTable">
+      <thead>
+        <tr>
+          <th>敵名</th>
+          <th>ボス回数</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${list.map(e=>`
+          <tr>
+            <td class="stageCell">${e.name}</td>
+            <td class="numCell">${e.count}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
 }
 
   // 同じ構成のステージ
