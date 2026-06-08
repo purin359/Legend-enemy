@@ -1301,32 +1301,24 @@ function drawBossAttrTable() {
 
     const tr = document.createElement("tr");
 
-    const tdAttr = document.createElement("td");
-      tdAttr.className = "numCell";
-
-      if (e.attr === "城") {
-        tdAttr.textContent = "城";
-      } else {
-        tdAttr.innerHTML =
-          `<img src="image_type/${e.attr}.png"
+    const attrCell =
+      e.attr === "城"
+        ? "城"
+        : `<img src="image_type/${e.attr}.png"
+                title="${e.attr}"
                 style="width:32px;height:32px;">`;
-      }
 
-      tdAttr.style.cursor = "pointer";
+    tr.innerHTML = `
+      <td class="numCell" style="cursor:pointer;">${attrCell}</td>
+      <td class="numCell">${e.bossCount}</td>
+      <td class="numCell">${e.appearCount}</td>
+      <td class="numCell">${rateText}</td>
+      <td class="numCell">${e.bossEnemyCount}</td>
+    `;
 
-      tdAttr.onclick = () => {
-        showBossAttrDetail(e.attr, mode);
-      };
-
-      tr.appendChild(tdAttr);
-
-      tr.innerHTML = `
-        <td class="numCell">${attrCell}</td>
-        <td class="numCell">${e.bossCount}</td>
-        <td class="numCell">${e.appearCount}</td>
-        <td class="numCell">${rateText}</td>
-        <td class="numCell">${e.bossEnemyCount}</td>
-      `;
+    tr.children[0].onclick = () => {
+      showBossAttrDetail(e.attr, mode);
+    };
 
     tbody.appendChild(tr);
   });
