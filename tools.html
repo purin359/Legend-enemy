@@ -1366,35 +1366,52 @@ function drawBossAttrTable() {
     area.innerHTML = `<p>${attr}のボスはいません</p>`;
     return;
   }
+    
+    area.innerHTML = `
+      <h4 id="bossAttrDetailTitle">${attr}のボス内訳</h4>
 
-  area.innerHTML = `
-    <h4>${attr}のボス内訳</h4>
-
-    <table class="detailTable">
-      <thead>
-        <tr>
-          <th>敵</th>
-          <th>ボス回数</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${list.map(e => `
+      <table class="detailTable">
+        <thead>
           <tr>
-            <td class="numCell">
-              <img
-                src="${getEnemyImagePath(e.name)}"
-                title="${e.name}"
-                style="width:40px;"
-                onerror="this.src='image/noimage.png'"
-              >
-            </td>
-            <td class="numCell">${e.count}</td>
+            <th>画像</th>
+            <th>名前</th>
+            <th>ボス回数</th>
           </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
-}
+        </thead>
+        <tbody>
+          ${list.map(e => `
+            <tr>
+              <td class="numCell">
+                <img
+                  src="${getEnemyImagePath(e.name)}"
+                  title="${e.name}"
+                  style="width:40px;"
+                  onerror="this.src='image/noimage.png'"
+                >
+              </td>
+
+              <td class="stageCell">
+                ${e.name}
+              </td>
+
+              <td class="numCell">
+                ${e.count}
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+
+    setTimeout(() => {
+      document
+        .getElementById("bossAttrDetailTitle")
+        ?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+    }, 50);
+  }
 
   // 同じ構成のステージ
   function drawSameEnemyList() {
