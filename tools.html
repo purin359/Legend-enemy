@@ -245,6 +245,7 @@ canvas {
 <div class="menu">
   <button class="funcBtn active" onclick="openFunc('detailSort', this)">詳細並び替え</button>
   <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
+  <button class="funcBtn" onclick="openFunc('bossAttrList', this)">ボス属性</button>
   <button class="funcBtn" onclick="openFunc('sameEnemyList', this)">同じ構成</button>
   <button class="funcBtn" onclick="openFunc('enemyTypeCount', this)">敵種類数</button>
   <button class="funcBtn" onclick="openFunc('sameAttrStage', this)">単属性ステージ</button>
@@ -499,6 +500,37 @@ canvas {
     <tbody id="energyTotalBody"></tbody>
   </table>
 </div>
+
+  <div id="bossAttrList" class="funcArea">
+  <h3>ボスになりやすい属性</h3>
+
+  <select id="bossAttrMode" onchange="drawBossAttrTable()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <select id="bossAttrSort" onchange="drawBossAttrTable()">
+    <option value="rate">ボス率順</option>
+    <option value="bossCount">ボス回数順</option>
+    <option value="appearCount">出現回数順</option>
+    <option value="order">属性順</option>
+  </select>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>属性</th>
+        <th>ボス回数</th>
+        <th>出現回数</th>
+        <th>ボス率</th>
+        <th>ボス敵数</th>
+      </tr>
+    </thead>
+    <tbody id="bossAttrTableBody"></tbody>
+  </table>
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -569,6 +601,10 @@ function openFunc(id, btn) {
 
   if (id === "energyTotal") {
     drawEnergyTotal();
+  }
+
+  if (id === "bossAttrList") {
+    drawBossAttrTable();
   }
 }
 
@@ -1125,6 +1161,146 @@ img.addEventListener("click", () => {
     `;
 
     tr.children[0].appendChild(img);
+    tbody.appendChild(tr);
+  });
+}
+
+  // ボス属性
+  const attrOrder = [
+  "赤",
+  "浮き",
+  "黒",
+  "メタル",
+  "天使",
+  "エイリアン",
+  "ゾンビ",
+  "悪魔",
+  "古代種",
+  "無属性",
+  "超生命体",
+  "超獣",
+  "超賢者",
+  "城"
+];
+
+function getEnemyTypesForBossAttr(enemyName) {
+  const key = normalize(enemyName);
+
+  const found = Object.values(enemiesData).find(enemy =>
+    normalize(enemy.name) === key
+  );
+
+  if (!found || !found.type) return [];
+
+  return String(found.type)
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function drawBossAttrTable() {
+  const mode = document.getElementById("bossAttrMode").value;
+  const sortType = document.getElementById("bossAttrSort").value;
+  const tbody = document.getElementById("bossAttrTableBody");
+
+  tbody.innerHTML = "";
+
+  const attrMap = {};
+
+  attrOrder.forEach(attr => {
+    attrMap[attr] = {
+      attr,
+      bossCount: 0,
+      appearCount: 0,
+      bossEnemySet: new Set()
+    };
+  });
+
+  // 出現回数を属性ごとに集計
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      st.enemies.forEach(enemyName => {
+        const types = getEnemyTypesForBossAttr(enemyName);
+
+        types.forEach(attr => {
+          if (!attrMap[attr]) return;
+          attrMap[attr].appearCount++;
+        });
+      });
+    });
+  });
+
+  // ボス回数を属性ごとに集計
+  stageDetailsData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+      if (!st.bosses || st.bosses === "なし") return;
+
+      const bosses = String(st.bosses)
+        .split(/[,\、]/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      bosses.forEach(bossName => {
+        const types = getEnemyTypesForBossAttr(bossName);
+
+        types.forEach(attr => {
+          if (!attrMap[attr]) return;
+
+          attrMap[attr].bossCount++;
+          attrMap[attr].bossEnemySet.add(normalize(bossName));
+        });
+      });
+    });
+  });
+
+  let list = Object.values(attrMap).map(e => ({
+    attr: e.attr,
+    bossCount: e.bossCount,
+    appearCount: e.appearCount,
+    bossEnemyCount: e.bossEnemySet.size,
+    rate: e.appearCount ? e.bossCount / e.appearCount : 0
+  }));
+
+  list.sort((a, b) => {
+    if (sortType === "rate") {
+      return b.rate - a.rate || b.bossCount - a.bossCount;
+    }
+
+    if (sortType === "bossCount") {
+      return b.bossCount - a.bossCount;
+    }
+
+    if (sortType === "appearCount") {
+      return b.appearCount - a.appearCount;
+    }
+
+    if (sortType === "order") {
+      return attrOrder.indexOf(a.attr) - attrOrder.indexOf(b.attr);
+    }
+
+    return 0;
+  });
+
+  list.forEach(e => {
+    const rateText =
+      e.appearCount === 0
+        ? "0%"
+        : `${(e.rate * 100).toFixed(1).replace(/\.0$/, "")}%`;
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td class="stageCell">${e.attr}</td>
+      <td class="numCell">${e.bossCount}</td>
+      <td class="numCell">${e.appearCount}</td>
+      <td class="numCell">${rateText}</td>
+      <td class="numCell">${e.bossEnemyCount}</td>
+    `;
+
     tbody.appendChild(tr);
   });
 }
