@@ -1293,13 +1293,22 @@ function drawBossAttrTable() {
 
     const tr = document.createElement("tr");
 
-    tr.innerHTML = `
-      <td class="stageCell">${e.attr}</td>
-      <td class="numCell">${e.bossCount}</td>
-      <td class="numCell">${e.appearCount}</td>
-      <td class="numCell">${rateText}</td>
-      <td class="numCell">${e.bossEnemyCount}</td>
-    `;
+    const attrCell =
+  e.attr === "城"
+    ? "城"
+    : `<img
+         src="image_type/${e.attr}.png"
+         title="${e.attr}"
+         style="width:32px;height:32px;"
+       >`;
+
+tr.innerHTML = `
+  <td class="numCell">${attrCell}</td>
+  <td class="numCell">${e.bossCount}</td>
+  <td class="numCell">${e.appearCount}</td>
+  <td class="numCell">${rateText}</td>
+  <td class="numCell">${e.bossEnemyCount}</td>
+`;
 
     tbody.appendChild(tr);
   });
