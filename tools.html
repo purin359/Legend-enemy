@@ -1325,20 +1325,15 @@ function drawBossAttrTable() {
 }
 
   function showBossAttrDetail(attr, mode) {
-
-  const area =
-    document.getElementById("bossAttrDetail");
+  const area = document.getElementById("bossAttrDetail");
 
   const enemyMap = {};
 
   stageDetailsData.forEach(ch => {
-
     if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
-
-      if (!st.bosses || st.bosses === "なし")
-        return;
+      if (!st.bosses || st.bosses === "なし") return;
 
       const bosses = String(st.bosses)
         .split(/[,\、]/)
@@ -1346,9 +1341,7 @@ function drawBossAttrTable() {
         .filter(Boolean);
 
       bosses.forEach(name => {
-
-        const types =
-          getEnemyTypesForBossAttr(name);
+        const types = getEnemyTypesForBossAttr(name);
 
         if (!types.includes(attr)) return;
 
@@ -1367,22 +1360,34 @@ function drawBossAttrTable() {
   });
 
   const list = Object.values(enemyMap)
-    .sort((a,b)=>b.count-a.count);
+    .sort((a, b) => b.count - a.count);
+
+  if (list.length === 0) {
+    area.innerHTML = `<p>${attr}のボスはいません</p>`;
+    return;
+  }
 
   area.innerHTML = `
-    <h4>${attr}</h4>
+    <h4>${attr}のボス内訳</h4>
 
     <table class="detailTable">
       <thead>
         <tr>
-          <th>敵名</th>
+          <th>敵</th>
           <th>ボス回数</th>
         </tr>
       </thead>
       <tbody>
-        ${list.map(e=>`
+        ${list.map(e => `
           <tr>
-            <td class="stageCell">${e.name}</td>
+            <td class="numCell">
+              <img
+                src="${getEnemyImagePath(e.name)}"
+                title="${e.name}"
+                style="width:40px;"
+                onerror="this.src='image/noimage.png'"
+              >
+            </td>
             <td class="numCell">${e.count}</td>
           </tr>
         `).join("")}
