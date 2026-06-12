@@ -557,6 +557,11 @@ canvas {
     カンバン娘を含める
   </label>
 
+  <label>
+    <input type="checkbox" id="multiBossGroupByCount" onchange="drawMultiBossStage()">
+    ボス数で分類
+  </label>
+
   <div id="multiBossInfo"
        style="margin:10px 0;font-weight:bold;">
   </div>
@@ -2143,12 +2148,15 @@ function toggleStageAttrOrder() {
   // 複数種類ボス
   function drawMultiBossStage() {
   const mode = document.getElementById("multiBossMode").value;
+  const showKanban = document.getElementById("multiBossShowKanban").checked;
+  const groupByCount = document.getElementById("multiBossGroupByCount").checked;
+
   const area = document.getElementById("multiBossArea");
   const info = document.getElementById("multiBossInfo");
 
   area.innerHTML = "";
 
-  const list = [];
+  const groups = {};
 
   stageDetailsData.forEach(ch => {
     if (!isTargetChapter(ch, mode)) return;
@@ -2161,7 +2169,14 @@ function toggleStageAttrOrder() {
         .map(v => v.trim())
         .filter(Boolean);
 
-      if (bosses.length < 2) return;
+      const bossCount = bosses.length;
+      if (bossCount < 2) return;
+
+      const groupKey = String(Math.min(bossCount, 10));
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
 
       const stageDataChapter = stagesData.find(sch =>
         sch.chapterId === ch.chapterId
@@ -2172,71 +2187,106 @@ function toggleStageAttrOrder() {
         normalize(s.stageName) === normalize(st.stageName)
       );
 
-      list.push({
+      groups[groupKey].push({
         chapterId: ch.chapterId,
         stageId: st.stageId,
         chapterName: ch.chapterName,
         stageName: st.stageName,
         bosses,
+        bossCount,
         enemies: stageData ? stageData.enemies : bosses
       });
     });
   });
 
-  info.textContent = `複数ボスステージ ${list.length}件`;
+  const total = Object.values(groups)
+    .reduce((sum, list) => sum + list.length, 0);
 
-  if (list.length === 0) {
+  info.textContent = `複数ボスステージ ${total}件`;
+
+  if (total === 0) {
     area.textContent = "ありません";
     return;
   }
 
   const frag = document.createDocumentFragment();
 
-  list.forEach(st => {
-    const box = document.createElement("div");
-    box.className = "sameAttrBox";
-    box.style.cursor = "pointer";
+  if (!groupByCount) {
+    Object.values(groups)
+      .flat()
+      .sort((a, b) =>
+        getFirstNum(`${a.chapterId}-${a.stageId}`) -
+        getFirstNum(`${b.chapterId}-${b.stageId}`)
+      )
+      .forEach(st => {
+        createMultiBossBox(st, frag, showKanban);
+      });
 
-    box.onclick = () => {
-      goStageDetail(st.chapterId, st.stageId, st.stageName);
-    };
+  } else {
+    Object.keys(groups)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .forEach(count => {
+        if (!groups[count] || groups[count].length === 0) return;
 
-    const title = document.createElement("div");
-    title.textContent =
-      `${st.chapterId}-${st.stageId} ${st.chapterName} - ${st.stageName}`;
+        const title = document.createElement("h3");
+        title.textContent =
+          count === 10
+            ? `10体以上 (${groups[count].length}ステージ)`
+            : `${count}体 (${groups[count].length}ステージ)`;
 
-    const iconDiv = document.createElement("div");
-    iconDiv.className = "sameAttrEnemyIcons";
+        frag.appendChild(title);
 
-    const bossSet = new Set(st.bosses.map(b => normalize(b)));
-
-    st.enemies.forEach(enemyName => {
-  if (
-    !document.getElementById("multiBossShowKanban").checked &&
-    normalize(enemyName) === normalize("カンバン娘")
-  ) return;
-
-  const img = document.createElement("img");
-  img.src = getEnemyImagePath(enemyName);
-  img.title = enemyName;
-  img.onerror = () => img.src = "image/noimage.png";
-
-  if (bossSet.has(normalize(enemyName))) {
-    img.style.border = "3px solid #ff4444";
-    img.style.borderRadius = "6px";
-    img.style.boxSizing = "border-box";
-    img.style.background = "#ffeaea";
+        groups[count].forEach(st => {
+          createMultiBossBox(st, frag, showKanban);
+        });
+      });
   }
 
-  iconDiv.appendChild(img);
-});
+  area.appendChild(frag);
+}
 
-    box.appendChild(title);
-    box.appendChild(iconDiv);
-    frag.appendChild(box);
+  function createMultiBossBox(st, frag, showKanban) {
+  const box = document.createElement("div");
+  box.className = "sameAttrBox";
+  box.style.cursor = "pointer";
+
+  box.onclick = () => {
+    goStageDetail(st.chapterId, st.stageId, st.stageName);
+  };
+
+  const title = document.createElement("div");
+  title.textContent =
+    `${st.chapterId}-${st.stageId} ${st.chapterName} - ${st.stageName}`;
+
+  const iconDiv = document.createElement("div");
+  iconDiv.className = "sameAttrEnemyIcons";
+
+  const bossSet = new Set(st.bosses.map(b => normalize(b)));
+
+  st.enemies.forEach(enemyName => {
+    if (!showKanban && normalize(enemyName) === normalize("カンバン娘")) {
+      return;
+    }
+
+    const img = document.createElement("img");
+    img.src = getEnemyImagePath(enemyName);
+    img.title = enemyName;
+    img.onerror = () => img.src = "image/noimage.png";
+
+    if (bossSet.has(normalize(enemyName))) {
+      img.style.border = "3px solid #ff4444";
+      img.style.borderRadius = "6px";
+      img.style.boxSizing = "border-box";
+      img.style.background = "#ffeaea";
+    }
+
+    iconDiv.appendChild(img);
   });
 
-  area.appendChild(frag);
+  box.appendChild(title);
+  box.appendChild(iconDiv);
+  frag.appendChild(box);
 }
   
 init();
