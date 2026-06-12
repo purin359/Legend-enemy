@@ -552,6 +552,11 @@ canvas {
     <option value="ND">レジェンド0</option>
   </select>
 
+  <label>
+    <input type="checkbox" id="multiBossShowKanban" onchange="drawMultiBossStage()">
+    カンバン娘を含める
+  </label>
+
   <div id="multiBossInfo"
        style="margin:10px 0;font-weight:bold;">
   </div>
@@ -633,6 +638,10 @@ function openFunc(id, btn) {
 
   if (id === "bossAttrList") {
     drawBossAttrTable();
+  }
+
+  if (id === "multiBossStage") {
+    drawMultiBossStage();
   }
 }
 
@@ -2202,24 +2211,25 @@ function toggleStageAttrOrder() {
     const bossSet = new Set(st.bosses.map(b => normalize(b)));
 
     st.enemies.forEach(enemyName => {
-      const img = document.createElement("img");
+  if (
+    !document.getElementById("multiBossShowKanban").checked &&
+    normalize(enemyName) === normalize("カンバン娘")
+  ) return;
 
-      img.src = getEnemyImagePath(enemyName);
-      img.title = enemyName;
+  const img = document.createElement("img");
+  img.src = getEnemyImagePath(enemyName);
+  img.title = enemyName;
+  img.onerror = () => img.src = "image/noimage.png";
 
-      img.onerror = () => {
-        img.src = "image/noimage.png";
-      };
+  if (bossSet.has(normalize(enemyName))) {
+    img.style.border = "3px solid #ff4444";
+    img.style.borderRadius = "6px";
+    img.style.boxSizing = "border-box";
+    img.style.background = "#ffeaea";
+  }
 
-      if (bossSet.has(normalize(enemyName))) {
-        img.style.border = "3px solid #ff4444";
-        img.style.borderRadius = "6px";
-        img.style.boxSizing = "border-box";
-        img.style.background = "#ffeaea";
-      }
-
-      iconDiv.appendChild(img);
-    });
+  iconDiv.appendChild(img);
+});
 
     box.appendChild(title);
     box.appendChild(iconDiv);
