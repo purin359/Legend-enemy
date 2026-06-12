@@ -252,6 +252,7 @@ canvas {
   <button class="funcBtn active" onclick="openFunc('detailSort', this)">詳細並び替え</button>
   <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
   <button class="funcBtn" onclick="openFunc('bossAttrList', this)">ボス属性</button>
+  <button class="funcBtn" onclick="openFunc('multiBossStage', this)">複数種ボス</button>
   <button class="funcBtn" onclick="openFunc('sameEnemyList', this)">同じ構成</button>
   <button class="funcBtn" onclick="openFunc('enemyTypeCount', this)">敵種類数</button>
   <button class="funcBtn" onclick="openFunc('sameAttrStage', this)">単属性ステージ</button>
@@ -538,6 +539,25 @@ canvas {
   </table>
     <h4>属性内訳</h4>
 <div id="bossAttrDetail"></div>
+</div>
+
+  <div id="multiBossStage" class="funcArea">
+
+  <h3>複数種類ボスステージ一覧</h3>
+
+  <select id="multiBossMode" onchange="drawMultiBossStage()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <div id="multiBossInfo"
+       style="margin:10px 0;font-weight:bold;">
+  </div>
+
+  <div id="multiBossArea"></div>
+
 </div>
 <script>
 let stagesData = [];
@@ -2109,6 +2129,117 @@ function toggleStageAttrOrder() {
     <td class="numCell">${allEnergy.toLocaleString()}</td>
   `;
   tbody.appendChild(tr);
+}
+
+  // 複数種類ボス
+  function drawMultiBossStage() {
+
+  const mode =
+    document.getElementById("multiBossMode").value;
+
+  const area =
+    document.getElementById("multiBossArea");
+
+  const info =
+    document.getElementById("multiBossInfo");
+
+  area.innerHTML = "";
+
+  const list = [];
+
+  stageDetailsData.forEach(ch => {
+
+    if (!isTargetChapter(ch, mode)) return;
+
+    ch.stages.forEach(st => {
+
+      if (!st.bosses || st.bosses === "なし")
+        return;
+
+      const bosses = String(st.bosses)
+        .split(/[,\、]/)
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      if (bosses.length < 2)
+        return;
+
+      list.push({
+        chapterId: ch.chapterId,
+        stageId: st.stageId,
+        chapterName: ch.chapterName,
+        stageName: st.stageName,
+        bosses
+      });
+
+    });
+
+  });
+
+  info.textContent =
+    `複数ボスステージ ${list.length}件`;
+
+  if (list.length === 0) {
+    area.textContent = "ありません";
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+
+  list.forEach(st => {
+
+    const box = document.createElement("div");
+    box.className = "sameAttrBox";
+
+    box.style.cursor = "pointer";
+
+    box.onclick = () => {
+      goStageDetail(
+        st.chapterId,
+        st.stageId,
+        st.stageName
+      );
+    };
+
+    box.innerHTML = `
+      <div>
+        ${st.chapterId}-${st.stageId}
+        ${st.chapterName}
+        -
+        ${st.stageName}
+      </div>
+    `;
+
+    const iconDiv =
+      document.createElement("div");
+
+    iconDiv.className =
+      "sameAttrEnemyIcons";
+
+    st.bosses.forEach(name => {
+
+      const img =
+        document.createElement("img");
+
+      img.src =
+        getEnemyImagePath(name);
+
+      img.title = name;
+
+      img.onerror = () =>
+        img.src = "image/noimage.png";
+
+      iconDiv.appendChild(img);
+
+    });
+
+    box.appendChild(iconDiv);
+
+    frag.appendChild(box);
+
+  });
+
+  area.appendChild(frag);
 }
   
 init();
