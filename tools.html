@@ -2133,51 +2133,48 @@ function toggleStageAttrOrder() {
 
   // 複数種類ボス
   function drawMultiBossStage() {
-
-  const mode =
-    document.getElementById("multiBossMode").value;
-
-  const area =
-    document.getElementById("multiBossArea");
-
-  const info =
-    document.getElementById("multiBossInfo");
+  const mode = document.getElementById("multiBossMode").value;
+  const area = document.getElementById("multiBossArea");
+  const info = document.getElementById("multiBossInfo");
 
   area.innerHTML = "";
 
   const list = [];
 
   stageDetailsData.forEach(ch => {
-
     if (!isTargetChapter(ch, mode)) return;
 
     ch.stages.forEach(st => {
-
-      if (!st.bosses || st.bosses === "なし")
-        return;
+      if (!st.bosses || st.bosses === "なし") return;
 
       const bosses = String(st.bosses)
         .split(/[,\、]/)
         .map(v => v.trim())
         .filter(Boolean);
 
-      if (bosses.length < 2)
-        return;
+      if (bosses.length < 2) return;
+
+      const stageDataChapter = stagesData.find(sch =>
+        sch.chapterId === ch.chapterId
+      );
+
+      const stageData = stageDataChapter?.stages?.find(s =>
+        String(s.stageId) === String(st.stageId) ||
+        normalize(s.stageName) === normalize(st.stageName)
+      );
 
       list.push({
         chapterId: ch.chapterId,
         stageId: st.stageId,
         chapterName: ch.chapterName,
         stageName: st.stageName,
-        bosses
+        bosses,
+        enemies: stageData ? stageData.enemies : bosses
       });
-
     });
-
   });
 
-  info.textContent =
-    `複数ボスステージ ${list.length}件`;
+  info.textContent = `複数ボスステージ ${list.length}件`;
 
   if (list.length === 0) {
     area.textContent = "ありません";
@@ -2187,56 +2184,46 @@ function toggleStageAttrOrder() {
   const frag = document.createDocumentFragment();
 
   list.forEach(st => {
-
     const box = document.createElement("div");
     box.className = "sameAttrBox";
-
     box.style.cursor = "pointer";
 
     box.onclick = () => {
-      goStageDetail(
-        st.chapterId,
-        st.stageId,
-        st.stageName
-      );
+      goStageDetail(st.chapterId, st.stageId, st.stageName);
     };
 
-    box.innerHTML = `
-      <div>
-        ${st.chapterId}-${st.stageId}
-        ${st.chapterName}
-        -
-        ${st.stageName}
-      </div>
-    `;
+    const title = document.createElement("div");
+    title.textContent =
+      `${st.chapterId}-${st.stageId} ${st.chapterName} - ${st.stageName}`;
 
-    const iconDiv =
-      document.createElement("div");
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "sameAttrEnemyIcons";
 
-    iconDiv.className =
-      "sameAttrEnemyIcons";
+    const bossSet = new Set(st.bosses.map(b => normalize(b)));
 
-    st.bosses.forEach(name => {
+    st.enemies.forEach(enemyName => {
+      const img = document.createElement("img");
 
-      const img =
-        document.createElement("img");
+      img.src = getEnemyImagePath(enemyName);
+      img.title = enemyName;
 
-      img.src =
-        getEnemyImagePath(name);
-
-      img.title = name;
-
-      img.onerror = () =>
+      img.onerror = () => {
         img.src = "image/noimage.png";
+      };
+
+      if (bossSet.has(normalize(enemyName))) {
+        img.style.border = "3px solid #ff4444";
+        img.style.borderRadius = "6px";
+        img.style.boxSizing = "border-box";
+        img.style.background = "#ffeaea";
+      }
 
       iconDiv.appendChild(img);
-
     });
 
+    box.appendChild(title);
     box.appendChild(iconDiv);
-
     frag.appendChild(box);
-
   });
 
   area.appendChild(frag);
