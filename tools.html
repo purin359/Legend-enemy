@@ -559,7 +559,7 @@ canvas {
 
   <label>
     <input type="checkbox" id="multiBossGroupByCount" onchange="drawMultiBossStage()">
-    ボス数で分類
+    ボス種類数で分類
   </label>
 
   <div id="multiBossInfo"
@@ -2232,8 +2232,8 @@ function toggleStageAttrOrder() {
         const title = document.createElement("h3");
         title.textContent =
           count === 10
-            ? `10体 (${groups[count].length}ステージ)`
-            : `${count}体 (${groups[count].length}ステージ)`;
+            ? `10種類 (${groups[count].length}ステージ)`
+            : `${count}種類 (${groups[count].length}ステージ)`;
 
         frag.appendChild(title);
 
