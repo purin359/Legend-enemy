@@ -669,6 +669,7 @@ function normalizeName(str) {
     .replace(/\r?\n/g, "")
     .replace(/[：:]/g, "")
     .replace(/[ 　]/g, "")
+    .replace(/[～〜]/g, "〜")
     .trim();
 }
 
@@ -1330,6 +1331,7 @@ if (gameMode === "endless") {
     .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
       String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角→半角
     .replace(/[ 　]/g, "")
+    .replace(/[～〜]/g, "〜")
     .trim();
 }
   
