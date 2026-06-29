@@ -9591,5 +9591,149 @@
         "bosses": "チワワン伯爵"
       }
     ]
+  },
+  {
+    "chapterId": "ND032",
+    "chapterName": "ン・トーベ地方",
+    "stages": [
+      {
+        "stageId": 0,
+        "stageName": "バラバラバラン草原",
+        "castleId": "1",
+        "background": "1057",
+        "castleHP": 2000000,
+        "castleDistance": 4700,
+        "energy": 220,
+        "unitLimit": 20,
+        "bosses": "天使ブッタ"
+      },
+      {
+        "stageId": 1,
+        "stageName": "忘れられた橋",
+        "castleId": "8",
+        "background": "1042",
+        "castleHP": 1200000,
+        "castleDistance": 5000,
+        "energy": 240,
+        "unitLimit": 20,
+        "bosses": "アンドロメ・ダ長官"
+      },
+      {
+        "stageId": 2,
+        "stageName": "高密度おにぎり山脈",
+        "castleId": "0",
+        "background": "1056",
+        "castleHP": 1500000,
+        "castleDistance": 5000,
+        "energy": 100,
+        "unitLimit": 20,
+        "bosses": "カオル君"
+      },
+      {
+        "stageId": 3,
+        "stageName": "謎の汁湖",
+        "castleId": "3",
+        "background": "1041",
+        "castleHP": 1500000,
+        "castleDistance": 4500,
+        "energy": 220,
+        "unitLimit": 20,
+        "bosses": "ナマルケモルル"
+      },
+      {
+        "stageId": 4,
+        "stageName": "醤油さし魚群",
+        "castleId": "13",
+        "background": "1047",
+        "castleHP": 1500000,
+        "castleDistance": 5000,
+        "energy": 230,
+        "unitLimit": 50,
+        "bosses": "デビルサイクロン"
+      },
+      {
+        "stageId": 5,
+        "stageName": "夕飯の終着点",
+        "castleId": "12",
+        "background": "226",
+        "castleHP": 1200000,
+        "castleDistance": 4800,
+        "energy": 250,
+        "unitLimit": 20,
+        "bosses": "真レジェンドブンブン"
+      }
+    ]
+  },
+  {
+    "chapterId": "ND033",
+    "chapterName": "おしゃれクレイジー",
+    "stages": [
+      {
+        "stageId": 0,
+        "stageName": "全身たわしスーツ",
+        "castleId": "8",
+        "background": "1041",
+        "castleHP": 2200000,
+        "castleDistance": 5600,
+        "energy": 200,
+        "unitLimit": 20,
+        "bosses": "アカンゾウ"
+      },
+      {
+        "stageId": 1,
+        "stageName": "ダンベルイヤリング",
+        "castleId": "12",
+        "background": "1035",
+        "castleHP": 2300000,
+        "castleDistance": 4800,
+        "energy": 210,
+        "unitLimit": 50,
+        "bosses": "マンボーグ鈴木"
+      },
+      {
+        "stageId": 2,
+        "stageName": "異様な肩パッド",
+        "castleId": "7",
+        "background": "198",
+        "castleHP": 1600000,
+        "castleDistance": 4500,
+        "energy": 230,
+        "unitLimit": 20,
+        "bosses": "クロサワ監督"
+      },
+      {
+        "stageId": 3,
+        "stageName": "食べられるシャツ",
+        "castleId": "13",
+        "background": "1046",
+        "castleHP": 2000000,
+        "castleDistance": 5000,
+        "energy": 200,
+        "unitLimit": 20,
+        "bosses": "ヒカル"
+      },
+      {
+        "stageId": 4,
+        "stageName": "避雷針ハット",
+        "castleId": "9",
+        "background": "1041",
+        "castleHP": 1500000,
+        "castleDistance": 4500,
+        "energy": 200,
+        "unitLimit": 20,
+        "bosses": "ごん兵衛"
+      },
+      {
+        "stageId": 5,
+        "stageName": "刃物のような襟",
+        "castleId": "18",
+        "background": "204",
+        "castleHP": 2000000,
+        "castleDistance": 4700,
+        "energy": 220,
+        "unitLimit": 20,
+        "bosses": "古兵器マンボロス"
+      }
+    ]
   }
 ]
