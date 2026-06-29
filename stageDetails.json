@@ -9538,7 +9538,8 @@
       {
         "stageId": 1,
         "stageName": "跳躍する影の群れ",
-        "castleId": "10",
+        "castleId": "1001",
+        "bossCastleId": "10",
         "background": "1058",
         "castleHP": 1500000,
         "castleDistance": 4500,
@@ -9715,7 +9716,8 @@
       {
         "stageId": 4,
         "stageName": "避雷針ハット",
-        "castleId": "9",
+        "castleId": "1002",
+        "bossCastleId": "9",
         "background": "1041",
         "castleHP": 1500000,
         "castleDistance": 4500,
