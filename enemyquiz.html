@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>敵の登場ステージ全回答クイズ</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  max-width: 680px;
+  margin: auto;
+  padding: 16px;
+  color: #222;
+}
+
+h2 {
+  margin: 0 0 14px;
+  font-size: 22px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+select,
+input,
+button {
+  font-size: 16px;
+}
+
+select {
+  padding: 10px 12px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #4caf50;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.95);
+}
+
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.secondaryBtn {
+  background: #777;
+}
+
+.dangerBtn {
+  background: #e05252;
+}
+
+.scoreRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0 12px;
+  font-size: 15px;
+}
+
+.questionBox {
+  border-radius: 12px;
+  background: #eaf4ff;
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.questionBox img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+
+.enemyName {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.progressText {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.answerWrap {
+  position: relative;
+}
+
+.answerRow {
+  display: flex;
+  gap: 8px;
+}
+
+#answer {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+}
+
+.clearBtn {
+  min-width: 46px;
+  padding: 0;
+  background: #888;
+}
+
+#suggest {
+  position: absolute;
+  left: 0;
+  right: 54px;
+  top: 48px;
+  z-index: 20;
+  max-height: 190px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: none;
+}
+
+.suggestItem {
+  padding: 9px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.suggestItem:last-child {
+  border-bottom: none;
+}
+
+.suggestItem:hover,
+.suggestItem.active {
+  background: #dceeff;
+}
+
+.btnRow {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+#result {
+  min-height: 24px;
+  margin: 12px 0;
+  white-space: pre-line;
+  font-weight: bold;
+}
+
+.answerListBox {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 14px;
+}
+
+.answerListBox h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+#answeredList,
+#remainingList {
+  margin: 0;
+  padding-left: 22px;
+}
+
+#answeredList li {
+  color: #168139;
+  margin: 4px 0;
+}
+
+#remainingList li {
+  margin: 4px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 12px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .questionBox img {
+    width: 82px;
+    height: 82px;
+  }
+}
+</style>
+</head>
+<body>
+
+<h2>敵の登場ステージ全回答クイズ</h2>
+
+<div class="topRow">
+  <select id="mode" onchange="changeMode()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <button type="button" class="secondaryBtn" onclick="newQuestion()">
+    別の敵
+  </button>
+</div>
+
+<div class="scoreRow">
+  <div id="score">連続クリア: 0</div>
+  <div id="best">最高記録: 0</div>
+</div>
+
+<div id="loading" class="loading">データを読み込んでいます…</div>
+
+<div id="game" class="hidden">
+  <div class="questionBox">
+    <img id="enemyImage" src="image/noimage.png" alt="出題敵">
+    <div id="enemyName" class="enemyName"></div>
+    <div id="progress" class="progressText"></div>
+  </div>
+
+  <div class="answerWrap">
+    <div class="answerRow">
+      <input
+        id="answer"
+        type="text"
+        placeholder="ステージ名 または N001-0 の形式で入力"
+        autocomplete="off"
+      >
+      <button type="button" class="clearBtn" onclick="clearAnswer()">×</button>
+    </div>
+    <div id="suggest"></div>
+  </div>
+
+  <div class="btnRow">
+    <button id="checkBtn" type="button" onclick="checkAnswer()">回答</button>
+    <button id="hintBtn" type="button" class="secondaryBtn" onclick="showHint()">ヒント</button>
+    <button id="giveUpBtn" type="button" class="dangerBtn" onclick="giveUp()">ギブアップ</button>
+    <button id="nextBtn" type="button" onclick="newQuestion()" class="hidden">次の敵</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="answerListBox">
+    <h3>回答済み</h3>
+    <ul id="answeredList"></ul>
+  </div>
+
+  <div id="remainingBox" class="answerListBox hidden">
+    <h3>残りの正解</h3>
+    <ul id="remainingList"></ul>
+  </div>
+</div>
+
+<script>
+let stagesData = [];
+let quizPool = [];
+let allStageCandidates = [];
+let current = null;
+let answeredKeys = new Set();
+let score = 0;
+let bestScore = 0;
+let suggestIndex = -1;
+let currentSuggestList = [];
+let questionFinished = false;
+
+function normalize(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/\[EX\]/gi, "")
+    .replace(/\r?\n/g, "")
+    .replace(/[：:]/g, "")
+    .replace(/[～〜]/g, "〜")
+    .replace(/[ 　]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function normalizeSearch(value) {
+  return normalize(value)
+    .replace(/[ァ-ヶ]/g, char =>
+      String.fromCharCode(char.charCodeAt(0) - 0x60)
+    );
+}
+
+function getEnemyFileName(name) {
+  return String(name)
+    .replace(/\r?\n/g, "")
+    .trim()
+    .replace(/[：:]/g, " ")
+    .replace(/[ 　]+/g, "");
+}
+
+function getEnemyImagePath(name) {
+  return "image/" + encodeURIComponent(getEnemyFileName(name)) + ".png";
+}
+
+function isTargetChapter(chapter, mode) {
+  const id = String(chapter.chapterId || "");
+
+  return (
+    mode === "ALL" ||
+    (
+      mode === "N" &&
+      (
+        (id.startsWith("N") && !id.startsWith("NA") && !id.startsWith("ND")) ||
+        id === "E026"
+      )
+    ) ||
+    (
+      mode === "NA" &&
+      (id.startsWith("NA") || id === "E068" || id === "E069")
+    ) ||
+    (mode === "ND" && id.startsWith("ND"))
+  );
+}
+
+function makeStageKey(stage) {
+  return `${stage.chapterId}-${stage.stageId}`;
+}
+
+function getStageLabel(stage) {
+  return `${stage.chapterId}-${stage.stageId} ${stage.chapterName}-${stage.stageName}`;
+}
+
+function buildQuizPool() {
+  const mode = document.getElementById("mode").value;
+  const enemyMap = new Map();
+  const candidateMap = new Map();
+
+  stagesData.forEach(chapter => {
+    if (!isTargetChapter(chapter, mode)) return;
+
+    (chapter.stages || []).forEach(stage => {
+      const stageInfo = {
+        chapterId: String(chapter.chapterId),
+        chapterName: String(chapter.chapterName || ""),
+        stageId: String(stage.stageId),
+        stageName: String(stage.stageName || "")
+      };
+
+      candidateMap.set(makeStageKey(stageInfo), stageInfo);
+
+      const uniqueEnemies = new Set(
+        (stage.enemies || [])
+          .filter(name => normalize(name) !== normalize("カンバン娘"))
+          .map(name => String(name))
+      );
+
+      uniqueEnemies.forEach(enemyName => {
+        const enemyKey = normalize(enemyName);
+
+        if (!enemyMap.has(enemyKey)) {
+          enemyMap.set(enemyKey, {
+            enemyName,
+            stages: [],
+            stageKeySet: new Set()
+          });
+        }
+
+        const entry = enemyMap.get(enemyKey);
+        const stageKey = makeStageKey(stageInfo);
+
+        if (!entry.stageKeySet.has(stageKey)) {
+          entry.stageKeySet.add(stageKey);
+          entry.stages.push(stageInfo);
+        }
+      });
+    });
+  });
+
+  quizPool = [...enemyMap.values()]
+    .map(entry => ({
+      enemyName: entry.enemyName,
+      stages: entry.stages
+    }))
+    .filter(entry => entry.stages.length > 0);
+
+  allStageCandidates = [...candidateMap.values()];
+}
+
+function pickRandomQuestion() {
+  if (quizPool.length === 0) return null;
+
+  let candidates = quizPool;
+
+  if (current && quizPool.length > 1) {
+    candidates = quizPool.filter(
+      item => normalize(item.enemyName) !== normalize(current.enemyName)
+    );
+  }
+
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function newQuestion() {
+  current = pickRandomQuestion();
+  answeredKeys = new Set();
+  questionFinished = false;
+
+  document.getElementById("result").textContent = "";
+  document.getElementById("remainingBox").classList.add("hidden");
+  document.getElementById("remainingList").innerHTML = "";
+  document.getElementById("nextBtn").classList.add("hidden");
+  document.getElementById("checkBtn").disabled = false;
+  document.getElementById("hintBtn").disabled = false;
+  document.getElementById("giveUpBtn").disabled = false;
+  document.getElementById("answer").disabled = false;
+
+  clearAnswer();
+
+  if (!current) {
+    document.getElementById("enemyName").textContent = "出題できる敵がいません";
+    document.getElementById("enemyImage").src = "image/noimage.png";
+    document.getElementById("progress").textContent = "";
+    return;
+  }
+
+  const image = document.getElementById("enemyImage");
+  image.src = getEnemyImagePath(current.enemyName);
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = "image/noimage.png";
+  };
+
+  document.getElementById("enemyName").textContent = current.enemyName;
+  updateProgress();
+  renderAnsweredList();
+  document.getElementById("answer").focus();
+}
+
+function updateProgress() {
+  if (!current) return;
+
+  document.getElementById("progress").textContent =
+    `${answeredKeys.size} / ${current.stages.length} ステージ回答済み`;
+}
+
+function renderAnsweredList() {
+  const list = document.getElementById("answeredList");
+  list.innerHTML = "";
+
+  if (!current || answeredKeys.size === 0) {
+    const li = document.createElement("li");
+    li.textContent = "まだありません";
+    li.style.color = "#777";
+    list.appendChild(li);
+    return;
+  }
+
+  current.stages
+    .filter(stage => answeredKeys.has(makeStageKey(stage)))
+    .forEach(stage => {
+      const li = document.createElement("li");
+      li.textContent = getStageLabel(stage);
+      list.appendChild(li);
+    });
+}
+
+function findMatchedStages(input) {
+  if (!current) return [];
+
+  const inputKey = normalize(input);
+  if (!inputKey) return [];
+
+  return current.stages.filter(stage => {
+    const idText = `${stage.chapterId}-${stage.stageId}`;
+
+    return (
+      normalize(stage.stageName) === inputKey ||
+      normalize(idText) === inputKey ||
+      normalize(getStageLabel(stage)) === inputKey
+    );
+  });
+}
+
+function checkAnswer() {
+  if (!current || questionFinished) return;
+
+  hideSuggest();
+
+  const input = document.getElementById("answer").value;
+  const matched = findMatchedStages(input);
+  const result = document.getElementById("result");
+
+  if (matched.length === 0) {
+    result.textContent = "不正解です";
+    result.style.color = "#d32f2f";
+    return;
+  }
+
+  const newMatches = matched.filter(
+    stage => !answeredKeys.has(makeStageKey(stage))
+  );
+
+  if (newMatches.length === 0) {
+    result.textContent = "そのステージは回答済みです";
+    result.style.color = "#e38b00";
+    return;
+  }
+
+  newMatches.forEach(stage => answeredKeys.add(makeStageKey(stage)));
+
+  result.textContent =
+    newMatches.length === 1
+      ? `正解：${getStageLabel(newMatches[0])}`
+      : `正解：同名の${newMatches.length}ステージを回答済みにしました`;
+  result.style.color = "#168139";
+
+  clearAnswer();
+  updateProgress();
+  renderAnsweredList();
+
+  if (answeredKeys.size === current.stages.length) {
+    completeQuestion();
+  }
+}
+
+function completeQuestion() {
+  questionFinished = true;
+  score++;
+
+  if (score > bestScore) {
+    bestScore = score;
+    saveBest();
+  }
+
+  document.getElementById("result").textContent =
+    `全${current.stages.length}ステージ正解！ 🎉`;
+  document.getElementById("result").style.color = "#168139";
+
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("hintBtn").disabled = true;
+  document.getElementById("giveUpBtn").disabled = true;
+  document.getElementById("answer").disabled = true;
+  document.getElementById("nextBtn").classList.remove("hidden");
+
+  updateScoreView();
+}
+
+function showHint() {
+  if (!current || questionFinished) return;
+
+  const remaining = current.stages.filter(
+    stage => !answeredKeys.has(makeStageKey(stage))
+  );
+
+  if (remaining.length === 0) return;
+
+  const hint = remaining[Math.floor(Math.random() * remaining.length)];
+  const result = document.getElementById("result");
+
+  result.textContent = `ヒント：${hint.chapterName} / ${hint.stageName}`;
+  result.style.color = "#1565c0";
+}
+
+function giveUp() {
+  if (!current || questionFinished) return;
+  if (!confirm("残りの正解を表示しますか？\n連続クリア数は0に戻ります。")) return;
+
+  questionFinished = true;
+  score = 0;
+  updateScoreView();
+
+  const remaining = current.stages.filter(
+    stage => !answeredKeys.has(makeStageKey(stage))
+  );
+
+  const list = document.getElementById("remainingList");
+  list.innerHTML = "";
+
+  remaining.forEach(stage => {
+    const li = document.createElement("li");
+    li.textContent = getStageLabel(stage);
+    list.appendChild(li);
+  });
+
+  document.getElementById("remainingBox").classList.remove("hidden");
+  document.getElementById("result").textContent =
+    `ギブアップ：残り${remaining.length}ステージ`;
+  document.getElementById("result").style.color = "#d32f2f";
+
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("hintBtn").disabled = true;
+  document.getElementById("giveUpBtn").disabled = true;
+  document.getElementById("answer").disabled = true;
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+function clearAnswer() {
+  const input = document.getElementById("answer");
+  input.value = "";
+  hideSuggest();
+
+  if (!input.disabled) input.focus();
+}
+
+function buildSuggestions() {
+  if (!current || questionFinished) {
+    hideSuggest();
+    return;
+  }
+
+  const input = document.getElementById("answer").value;
+  const keyword = normalizeSearch(input);
+
+  if (!keyword) {
+    hideSuggest();
+    return;
+  }
+
+  const seen = new Set();
+  const results = [];
+
+  allStageCandidates.forEach(stage => {
+    const label = getStageLabel(stage);
+    const searchable = `${stage.stageName} ${stage.chapterId}-${stage.stageId} ${label}`;
+
+    if (!normalizeSearch(searchable).includes(keyword)) return;
+
+    const key = `${normalize(stage.stageName)}|${makeStageKey(stage)}`;
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    results.push(stage);
+  });
+
+  currentSuggestList = results.slice(0, 20);
+  suggestIndex = -1;
+
+  renderSuggestions();
+}
+
+function renderSuggestions() {
+  const suggest = document.getElementById("suggest");
+  suggest.innerHTML = "";
+
+  if (currentSuggestList.length === 0) {
+    suggest.style.display = "none";
+    return;
+  }
+
+  currentSuggestList.forEach((stage, index) => {
+    const div = document.createElement("div");
+    div.className = "suggestItem";
+    div.textContent = getStageLabel(stage);
+
+    if (index === suggestIndex) {
+      div.classList.add("active");
+    }
+
+    div.onclick = () => selectSuggestion(index);
+    suggest.appendChild(div);
+  });
+
+  suggest.style.display = "block";
+}
+
+function selectSuggestion(index) {
+  const stage = currentSuggestList[index];
+  if (!stage) return;
+
+  document.getElementById("answer").value = stage.stageName;
+  hideSuggest();
+  document.getElementById("answer").focus();
+}
+
+function hideSuggest() {
+  document.getElementById("suggest").innerHTML = "";
+  document.getElementById("suggest").style.display = "none";
+  currentSuggestList = [];
+  suggestIndex = -1;
+}
+
+function updateSuggestionSelection() {
+  document.querySelectorAll(".suggestItem").forEach((item, index) => {
+    item.classList.toggle("active", index === suggestIndex);
+
+    if (index === suggestIndex) {
+      item.scrollIntoView({ block: "nearest" });
+    }
+  });
+}
+
+function getBestKey() {
+  return `enemyAllStagesQuizBest_${document.getElementById("mode").value}`;
+}
+
+function loadBest() {
+  bestScore = Number(localStorage.getItem(getBestKey())) || 0;
+  updateScoreView();
+}
+
+function saveBest() {
+  localStorage.setItem(getBestKey(), String(bestScore));
+}
+
+function updateScoreView() {
+  document.getElementById("score").textContent = `連続クリア: ${score}`;
+  document.getElementById("best").textContent = `最高記録: ${bestScore}`;
+}
+
+function changeMode() {
+  score = 0;
+  buildQuizPool();
+  loadBest();
+  newQuestion();
+}
+
+async function init() {
+  try {
+    stagesData = await fetch("stages.json").then(response => {
+      if (!response.ok) {
+        throw new Error(`stages.jsonの読み込みに失敗しました: ${response.status}`);
+      }
+      return response.json();
+    });
+
+    buildQuizPool();
+    loadBest();
+
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+
+    const answer = document.getElementById("answer");
+    answer.addEventListener("input", buildSuggestions);
+
+    answer.addEventListener("keydown", event => {
+      if (event.isComposing || event.keyCode === 229) return;
+
+      if (event.key === "ArrowDown" && currentSuggestList.length > 0) {
+        event.preventDefault();
+        suggestIndex = (suggestIndex + 1) % currentSuggestList.length;
+        updateSuggestionSelection();
+        return;
+      }
+
+      if (event.key === "ArrowUp" && currentSuggestList.length > 0) {
+        event.preventDefault();
+        suggestIndex =
+          (suggestIndex - 1 + currentSuggestList.length) % currentSuggestList.length;
+        updateSuggestionSelection();
+        return;
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+
+        if (suggestIndex >= 0 && currentSuggestList[suggestIndex]) {
+          selectSuggestion(suggestIndex);
+          return;
+        }
+
+        checkAnswer();
+      }
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".answerWrap")) {
+        hideSuggest();
+      }
+    });
+
+    newQuestion();
+
+  } catch (error) {
+    console.error(error);
+    document.getElementById("loading").textContent =
+      "データの読み込みに失敗しました。stages.jsonの配置を確認してください。";
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
