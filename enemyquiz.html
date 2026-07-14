@@ -507,7 +507,7 @@ let questionStartTime = 0;
 let elapsedSeconds = 0;
 let hintUseCount = 0;
 let currentAttemptSaved = false;
-let currentHint = null;
+let currentHints = [];
 
 
 function getRecordStorageKey(mode, enemyName) {
@@ -906,8 +906,7 @@ function newQuestion() {
   questionFinished = false;
   currentAttemptSaved = false;
   hintUseCount = 0;
-  currentHint = null;
-
+  currentHints = [];
   document.getElementById("persistentHint").innerHTML = "";
 
   updateHintCountView();
@@ -1016,15 +1015,15 @@ function checkAnswer() {
 
   newMatches.forEach(stage => answeredKeys.add(makeStageKey(stage)));
 
-  if (
-    currentHint &&
-    newMatches.some(stage =>
-      makeStageKey(stage) === currentHint.stageKey
-    )
-  ) {
-    currentHint = null;
-    document.getElementById("persistentHint").innerHTML = "";
-  }
+  const answeredNowKeys = new Set(
+    newMatches.map(stage => makeStageKey(stage))
+  );
+
+  currentHints = currentHints.filter(hint =>
+    !answeredNowKeys.has(hint.stageKey)
+  );
+
+  renderPersistentHints();
 
   result.textContent =
     newMatches.length === 1
@@ -1070,13 +1069,21 @@ function showHint() {
 
   const hintArea = document.getElementById("persistentHint");
 
-  // すでにヒントがあり、その対象ステージがまだ未回答なら
-  // 同じヒントをそのまま残す
-  if (
-    currentHint &&
-    !answeredKeys.has(currentHint.stageKey)
-  ) {
-    renderPersistentHint();
+  // 回答済みになったヒントを整理
+  currentHints = currentHints.filter(hint =>
+    !answeredKeys.has(hint.stageKey)
+  );
+
+  // 最大3件まで
+  if (currentHints.length >= 3) {
+    renderPersistentHints();
+
+    const notice = document.createElement("div");
+    notice.textContent = "ヒントは最大3つまで保持できます";
+    notice.style.marginTop = "6px";
+    notice.style.color = "#e38b00";
+
+    hintArea.appendChild(notice);
     return;
   }
 
@@ -1091,6 +1098,13 @@ function showHint() {
   const kanbanKey = normalize("カンバン娘");
 
   remaining.forEach(stage => {
+    const stageKey = makeStageKey(stage);
+
+    // すでにヒント対象になっているステージは除外
+    if (currentHints.some(hint => hint.stageKey === stageKey)) {
+      return;
+    }
+
     (stage.enemies || []).forEach(enemyName => {
       const enemyKey = normalize(enemyName);
 
@@ -1098,68 +1112,91 @@ function showHint() {
       if (enemyKey === currentEnemyKey) return;
       if (enemyKey === kanbanKey) return;
 
+      // 同じ敵のヒント重複を避ける
+      if (
+        currentHints.some(hint =>
+          normalize(hint.enemyName) === enemyKey
+        )
+      ) {
+        return;
+      }
+
       candidates.push({
         enemyName: String(enemyName),
-        stageKey: makeStageKey(stage)
+        stageKey
       });
     });
   });
 
   if (candidates.length === 0) {
-    hintArea.textContent =
-      "ヒント：未回答ステージには、表示できる別の敵がいません";
+    renderPersistentHints();
+
+    const notice = document.createElement("div");
+    notice.textContent =
+      "これ以上、表示できる別のヒントはありません";
+    notice.style.marginTop = "6px";
+
+    hintArea.appendChild(notice);
     return;
   }
 
-  currentHint =
+  const selected =
     candidates[Math.floor(Math.random() * candidates.length)];
+
+  currentHints.push(selected);
 
   hintUseCount++;
   updateHintCountView();
 
-  renderPersistentHint();
+  renderPersistentHints();
 }
-
-  function renderPersistentHint() {
+  
+  function renderPersistentHints() {
   const hintArea = document.getElementById("persistentHint");
 
-  if (
-    !currentHint ||
-    answeredKeys.has(currentHint.stageKey)
-  ) {
-    hintArea.innerHTML = "";
-    currentHint = null;
-    return;
-  }
+  // 回答済みになったヒントを除外
+  currentHints = currentHints.filter(hint =>
+    !answeredKeys.has(hint.stageKey)
+  );
 
   hintArea.innerHTML = "";
 
+  if (currentHints.length === 0) {
+    return;
+  }
+
   const message = document.createElement("div");
   message.textContent =
-    "ヒント：まだ答えていないステージのどれかに、この敵が登場します";
-
-  const enemyBox = document.createElement("div");
-  enemyBox.className = "hintEnemy";
-
-  const image = document.createElement("img");
-  image.src = getEnemyImagePath(currentHint.enemyName);
-  image.alt = currentHint.enemyName;
-
-  image.onerror = () => {
-    image.onerror = null;
-    image.src = "image/noimage.png";
-  };
-
-  const name = document.createElement("span");
-  name.textContent = currentHint.enemyName;
-
-  enemyBox.appendChild(image);
-  enemyBox.appendChild(name);
+    `ヒント：未回答ステージに登場する別の敵（${currentHints.length}/3）`;
 
   hintArea.appendChild(message);
-  hintArea.appendChild(enemyBox);
-}
 
+  currentHints.forEach((hint, index) => {
+    const enemyBox = document.createElement("div");
+    enemyBox.className = "hintEnemy";
+
+    const number = document.createElement("strong");
+    number.textContent = `${index + 1}.`;
+
+    const image = document.createElement("img");
+    image.src = getEnemyImagePath(hint.enemyName);
+    image.alt = hint.enemyName;
+
+    image.onerror = () => {
+      image.onerror = null;
+      image.src = "image/noimage.png";
+    };
+
+    const name = document.createElement("span");
+    name.textContent = hint.enemyName;
+
+    enemyBox.appendChild(number);
+    enemyBox.appendChild(image);
+    enemyBox.appendChild(name);
+    hintArea.appendChild(enemyBox);
+  });
+}
+  
 function giveUp() {
   if (!current || questionFinished) return;
   if (!confirm("残りの正解を表示しますか？\n連続クリア数は0に戻ります。")) return;
