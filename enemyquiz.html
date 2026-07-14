@@ -804,7 +804,8 @@ function getEnemyRecord(mode, enemyName) {
       attempts: 0,
       clears: 0,
       bestTime: null,
-      bestHints: null
+      bestHints: null,
+      maxAnswered: 0
     };
   }
 
@@ -821,14 +822,16 @@ function getEnemyRecord(mode, enemyName) {
       bestHints:
         record.bestHints === null || record.bestHints === undefined
           ? null
-          : Number(record.bestHints)
+          : Number(record.bestHints),
+      maxAnswered: Number(record.maxAnswered) || 0
     };
   } catch {
     return {
       attempts: 0,
       clears: 0,
       bestTime: null,
-      bestHints: null
+      bestHints: null,
+      maxAnswered: 0
     };
   }
 }
@@ -849,6 +852,12 @@ function saveCurrentAttempt(cleared) {
   const record = getEnemyRecord(mode, current.enemyName);
 
   record.attempts++;
+
+  // これまでに答えたことのある最大ステージ数を保存
+  record.maxAnswered = Math.max(
+    Number(record.maxAnswered) || 0,
+    answeredKeys.size
+  );
 
   if (cleared) {
     record.clears++;
@@ -965,6 +974,12 @@ function showEnemyRecord(enemyName, stageCount) {
     status = "挑戦済み・未クリア";
   }
 
+  // 全問正解済みなら全体数だけ、未クリアなら最大回答数/全体数
+  const stageRecordText =
+    record.clears > 0
+      ? `${stageCount}`
+      : `${Math.min(record.maxAnswered || 0, stageCount)}/${stageCount}`;
+
   detail.innerHTML = `
     <div class="recordDetailTitle">
       <img
@@ -974,10 +989,11 @@ function showEnemyRecord(enemyName, stageCount) {
       >
       <span>${escapeRecordHTML(enemyName)}</span>
     </div>
+
     <div class="recordDetailRow">状態：${status}</div>
-    <div class="recordDetailRow">対象ステージ数：${stageCount}</div>
-    <div class="recordDetailRow">挑戦数：${record.attempts}</div>
+    <div class="recordDetailRow">ステージ数：${stageRecordText}</div>
     <div class="recordDetailRow">クリア数：${record.clears}</div>
+
     <div class="recordDetailRow">
       最高記録：
       ${
@@ -993,7 +1009,7 @@ function showEnemyRecord(enemyName, stageCount) {
     block: "start"
   });
 }
-  
+
 function escapeRecordHTML(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -1006,6 +1022,7 @@ function escapeRecordHTML(value) {
 function normalize(value) {
   return String(value ?? "")
     .normalize("NFKC")
+    .replace(/\[EX\]/gi, "")
     .replace(/\r?\n/g, "")
     .replace(/[：:]/g, "")
     .replace(/[～〜]/g, "〜")
