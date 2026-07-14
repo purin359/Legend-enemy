@@ -71,15 +71,40 @@ button:disabled {
   background: #e05252;
 }
 
-.scoreRow{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px 16px;
-  align-items:center;
+.scoreRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "score best"
+    "timer record"
+    ". hint";
+  gap: 8px 16px;
+  align-items: center;
+  margin: 8px 0 12px;
+  font-size: 15px;
 }
 
-.recordBtn{
-  width:100%;
+#score {
+  grid-area: score;
+}
+
+#best {
+  grid-area: best;
+}
+
+#timer {
+  grid-area: timer;
+}
+
+#hintCount {
+  grid-area: hint;
+}
+
+.recordBtn {
+  grid-area: record;
+  width: auto;
+  justify-self: start;
+  padding: 8px 14px;
 }
   
 .questionBox {
@@ -429,6 +454,8 @@ button:disabled {
 <div class="scoreRow">
   <div id="score">連続クリア: 0</div>
   <div id="best">最高記録: 0</div>
+  <div id="timer">タイム: 00:00</div>
+
   <button
     type="button"
     class="recordBtn"
@@ -436,7 +463,7 @@ button:disabled {
   >
     最高記録一覧
   </button>
-  <div id="timer">タイム: 00:00</div>
+
   <div id="hintCount">ヒント: 0回</div>
 </div>
 
