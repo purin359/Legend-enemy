@@ -996,9 +996,20 @@ function updateProgress() {
 
 function renderAnsweredList() {
   const list = document.getElementById("answeredList");
+
+  if (!list) return;
+
   list.innerHTML = "";
 
-  if (!current || answeredKeys.size === 0) {
+  if (!current) {
+    return;
+  }
+
+  const answeredStages = current.stages.filter(stage =>
+    answeredKeys.has(makeStageKey(stage))
+  );
+
+  if (answeredStages.length === 0) {
     const li = document.createElement("li");
     li.textContent = "まだありません";
     li.style.color = "#777";
@@ -1006,15 +1017,14 @@ function renderAnsweredList() {
     return;
   }
 
-  current.stages
-    .filter(stage => answeredKeys.has(makeStageKey(stage)))
-    .forEach(stage => {
-      const li = document.createElement("li");
-      li.textContent = getStageLabel(stage);
-      list.appendChild(li);
-    });
+  answeredStages.forEach(stage => {
+    const li = document.createElement("li");
+    li.textContent = getStageLabel(stage);
+    li.style.color = "#168139";
+    list.appendChild(li);
+  });
 }
-
+  
 function findMatchedStages(input) {
   if (!current) return [];
 
@@ -1047,18 +1057,26 @@ function checkAnswer() {
     return;
   }
 
-  const newMatches = matched.filter(
-    stage => !answeredKeys.has(makeStageKey(stage))
+  const newMatches = matched.filter(stage =>
+    !answeredKeys.has(makeStageKey(stage))
   );
 
+  // すでに回答済みの場合も、表示を現在の状態に更新する
   if (newMatches.length === 0) {
     result.textContent = "そのステージは回答済みです";
     result.style.color = "#e38b00";
+
+    updateProgress();
+    renderAnsweredList();
     return;
   }
 
-  newMatches.forEach(stage => answeredKeys.add(makeStageKey(stage)));
+  // 新しく正解したステージを登録
+  newMatches.forEach(stage => {
+    answeredKeys.add(makeStageKey(stage));
+  });
 
+  // 今回回答したステージに対応するヒントを削除
   const answeredNowKeys = new Set(
     newMatches.map(stage => makeStageKey(stage))
   );
@@ -1073,17 +1091,20 @@ function checkAnswer() {
     newMatches.length === 1
       ? `正解：${getStageLabel(newMatches[0])}`
       : `正解：同名の${newMatches.length}ステージを回答済みにしました`;
+
   result.style.color = "#168139";
 
-  clearAnswer();
+  // 回答済み一覧を確実に更新
   updateProgress();
   renderAnsweredList();
+
+  clearAnswer();
 
   if (answeredKeys.size === current.stages.length) {
     completeQuestion();
   }
 }
-
+  
 function completeQuestion() {
   questionFinished = true;
   saveCurrentAttempt(true);
