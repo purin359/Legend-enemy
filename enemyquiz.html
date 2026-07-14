@@ -417,6 +417,11 @@ button:disabled {
   margin: 5px 0;
 }
 
+
+#questionPickMode {
+  min-width: 150px;
+}
+
 .topRecordBtn{
   margin-left:auto;
   background:#5c6bc0;
@@ -600,6 +605,11 @@ body.darkMode .recordCell:not(.recordAttempted):not(.recordCleared):not(.recordN
     別の敵
   </button>
 
+  <select id="questionPickMode" onchange="changeQuestionPickMode()">
+    <option value="random">完全ランダム</option>
+    <option value="uncleared">未クリア優先</option>
+  </select>
+
   <button
     type="button"
     class="scoreRecordBtn"
@@ -705,6 +715,7 @@ let elapsedSeconds = 0;
 let hintUseCount = 0;
 let currentAttemptSaved = false;
 let currentHints = [];
+let questionPickMode = "random";
 
 
 
@@ -1151,15 +1162,91 @@ function buildQuizPool() {
   allStageCandidates = [...candidateMap.values()];
 }
 
+
+function getUnclearedQuestionPool() {
+  const mode = document.getElementById("mode").value;
+
+  return quizPool.filter(item => {
+    const record = getEnemyRecord(mode, item.enemyName);
+    return record.clears === 0;
+  });
+}
+
+function updateQuestionPickModeAvailability() {
+  const select = document.getElementById("questionPickMode");
+  if (!select) return;
+
+  const unclearedOption = [...select.options].find(
+    option => option.value === "uncleared"
+  );
+
+  const hasUncleared = getUnclearedQuestionPool().length > 0;
+
+  if (unclearedOption) {
+    unclearedOption.disabled = !hasUncleared;
+  }
+
+  // 全てクリア済みなら未クリア優先を選べないように戻す
+  if (!hasUncleared && select.value === "uncleared") {
+    select.value = "random";
+    questionPickMode = "random";
+  }
+}
+
+function changeQuestionPickMode() {
+  const select = document.getElementById("questionPickMode");
+  questionPickMode = select.value;
+
+  localStorage.setItem(
+    "enemyAllStagesQuizQuestionPickMode",
+    questionPickMode
+  );
+}
+
+function loadQuestionPickMode() {
+  const saved =
+    localStorage.getItem("enemyAllStagesQuizQuestionPickMode") || "random";
+
+  questionPickMode =
+    saved === "uncleared" ? "uncleared" : "random";
+
+  const select = document.getElementById("questionPickMode");
+  select.value = questionPickMode;
+
+  updateQuestionPickModeAvailability();
+}
+
 function pickRandomQuestion() {
   if (quizPool.length === 0) return null;
 
-  let candidates = quizPool;
+  updateQuestionPickModeAvailability();
 
-  if (current && quizPool.length > 1) {
-    candidates = quizPool.filter(
+  let candidates =
+    questionPickMode === "uncleared"
+      ? getUnclearedQuestionPool()
+      : [...quizPool];
+
+  // 念のため未クリア候補がなくなった場合は完全ランダムへ戻す
+  if (candidates.length === 0) {
+    questionPickMode = "random";
+
+    const select = document.getElementById("questionPickMode");
+    if (select) {
+      select.value = "random";
+    }
+
+    candidates = [...quizPool];
+  }
+
+  // 候補が複数いるときは直前と同じ敵を避ける
+  if (current && candidates.length > 1) {
+    const withoutCurrent = candidates.filter(
       item => normalize(item.enemyName) !== normalize(current.enemyName)
     );
+
+    if (withoutCurrent.length > 0) {
+      candidates = withoutCurrent;
+    }
   }
 
   return candidates[Math.floor(Math.random() * candidates.length)];
@@ -1370,6 +1457,7 @@ function completeQuestion() {
   document.getElementById("nextBtn").classList.remove("hidden");
 
   updateScoreView();
+  updateQuestionPickModeAvailability();
 }
 
 function showHint() {
@@ -1536,6 +1624,7 @@ function giveUp() {
   document.getElementById("giveUpBtn").disabled = true;
   document.getElementById("answer").disabled = true;
   document.getElementById("nextBtn").classList.remove("hidden");
+  updateQuestionPickModeAvailability();
 }
 
 function clearAnswer() {
@@ -1658,6 +1747,7 @@ function changeMode() {
   score = 0;
   buildQuizPool();
   loadBest();
+  updateQuestionPickModeAvailability();
 
   if (quizSettings.startOnModeChange) {
     showModeStartPanel();
@@ -1692,6 +1782,7 @@ async function init() {
     loadSettings();
     buildQuizPool();
     loadBest();
+    loadQuestionPickMode();
 
     document.getElementById("loading").classList.add("hidden");
     document.getElementById("game").classList.remove("hidden");
