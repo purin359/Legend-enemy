@@ -313,7 +313,7 @@ button:disabled {
 
 .recordGrid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 7px;
 }
 
@@ -381,7 +381,7 @@ button:disabled {
 
 @media (max-width: 520px) {
   .recordGrid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 4px;
   }
 
@@ -615,7 +615,18 @@ function renderRecordList() {
 
   const fragment = document.createDocumentFragment();
 
-  quizPool.forEach(entry => {
+  const orderMap = {};
+  Object.values(enemiesData).forEach((enemy, index) => {
+    orderMap[normalize(enemy.name)] = index;
+  });
+
+  const sortedPool = [...quizPool].sort((a, b) => {
+    const oa = orderMap[normalize(a.enemyName)] ?? 999999;
+    const ob = orderMap[normalize(b.enemyName)] ?? 999999;
+    return oa - ob;
+  });
+
+  sortedPool.forEach(entry => {
     const record = getEnemyRecord(mode, entry.enemyName);
     const cell = document.createElement("button");
 
