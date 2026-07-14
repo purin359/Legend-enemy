@@ -1408,11 +1408,8 @@ function showHint() {
   remaining.forEach(stage => {
     const stageKey = makeStageKey(stage);
 
-    // すでにヒント対象になっているステージは除外
-    if (currentHints.some(hint => hint.stageKey === stageKey)) {
-      return;
-    }
-
+    // 同じステージから複数のヒントを出せるようにする
+    // ステージ単位では除外せず、下で同じ敵だけ重複防止する
     (stage.enemies || []).forEach(enemyName => {
       const enemyKey = normalize(enemyName);
 
