@@ -434,11 +434,159 @@ button:disabled {
   }
 }
 
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.titleRow h2 {
+  margin: 0;
+}
+
+.settingsBtn {
+  background: #777;
+  padding: 8px 12px;
+}
+
+.settingsPanel {
+  position: fixed;
+  top: 62px;
+  right: max(16px, calc((100vw - 680px) / 2 + 16px));
+  z-index: 90;
+  display: none;
+  width: min(270px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.16);
+}
+
+.settingsPanel.open {
+  display: block;
+}
+
+.settingItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 2px;
+  line-height: 1.5;
+}
+
+.settingItem input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+.startPanel {
+  border-radius: 12px;
+  background: #eaf4ff;
+  padding: 34px 18px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.startPanel p {
+  margin: 0 0 14px;
+  font-weight: bold;
+}
+
+.startPanel button {
+  min-width: 140px;
+}
+
+/* ダークモード */
+body.darkMode {
+  background: #181818;
+  color: #eee;
+}
+
+body.darkMode select,
+body.darkMode input {
+  color: #eee;
+  background: #2a2a2a;
+  border-color: #666;
+}
+
+body.darkMode .questionBox,
+body.darkMode .startPanel {
+  background: #273747;
+}
+
+body.darkMode .answerListBox,
+body.darkMode .recordDialog,
+body.darkMode .recordDetail,
+body.darkMode .settingsPanel {
+  color: #eee;
+  background: #252525;
+  border-color: #666;
+}
+
+body.darkMode .hintEnemy {
+  color: #9bc7ff;
+  background: #243446;
+  border-color: #54769a;
+}
+
+body.darkMode .suggestItem,
+body.darkMode #suggest {
+  color: #eee;
+  background: #292929;
+  border-color: #666;
+}
+
+body.darkMode .suggestItem:hover,
+body.darkMode .suggestItem.active {
+  background: #3d5065;
+}
+
+body.darkMode .recordCell {
+  border-color: #666;
+}
+
+body.darkMode .recordCell:not(.recordAttempted):not(.recordCleared):not(.recordNoHint) {
+  background: #333;
+}
+
+@media (max-width: 520px) {
+  .settingsPanel {
+    top: 56px;
+    right: 12px;
+  }
+}
+
 </style>
 </head>
 <body>
 
-<h2>レジェンド敵クイズ</h2>
+<div class="titleRow">
+  <h2>レジェンド敵クイズ</h2>
+  <button type="button" class="settingsBtn" onclick="toggleSettings()">設定</button>
+</div>
+
+<div id="settingsPanel" class="settingsPanel">
+  <label class="settingItem">
+    <input type="checkbox" id="settingEnterAnswer" onchange="saveSettings()">
+    <span>Enterで回答</span>
+  </label>
+
+  <label class="settingItem">
+    <input type="checkbox" id="settingDarkMode" onchange="saveSettings()">
+    <span>ダークモード</span>
+  </label>
+
+  <label class="settingItem">
+    <input type="checkbox" id="settingStartOnModeChange" onchange="saveSettings()">
+    <span>モード切替時にスタート表示</span>
+  </label>
+</div>
 
 <div class="topRow">
   <select id="mode" onchange="changeMode()">
@@ -467,6 +615,11 @@ button:disabled {
   <div id="timer">タイム: 00:00</div>
 
   <div id="hintCount">ヒント: 0回</div>
+</div>
+
+<div id="startPanel" class="startPanel hidden">
+  <p>この範囲でクイズを開始します</p>
+  <button type="button" onclick="startQuizFromSetting()">スタート</button>
 </div>
 
 <div id="loading" class="loading">データを読み込んでいます…</div>
@@ -553,6 +706,80 @@ let hintUseCount = 0;
 let currentAttemptSaved = false;
 let currentHints = [];
 
+
+
+const SETTINGS_KEY = "enemyAllStagesQuizSettings";
+
+let quizSettings = {
+  enterAnswer: true,
+  darkMode: false,
+  startOnModeChange: false
+};
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+
+    quizSettings = {
+      enterAnswer:
+        saved.enterAnswer === undefined ? true : Boolean(saved.enterAnswer),
+      darkMode: Boolean(saved.darkMode),
+      startOnModeChange: Boolean(saved.startOnModeChange)
+    };
+  } catch {
+    quizSettings = {
+      enterAnswer: true,
+      darkMode: false,
+      startOnModeChange: false
+    };
+  }
+
+  document.getElementById("settingEnterAnswer").checked =
+    quizSettings.enterAnswer;
+  document.getElementById("settingDarkMode").checked =
+    quizSettings.darkMode;
+  document.getElementById("settingStartOnModeChange").checked =
+    quizSettings.startOnModeChange;
+
+  applySettings();
+}
+
+function saveSettings() {
+  quizSettings.enterAnswer =
+    document.getElementById("settingEnterAnswer").checked;
+  quizSettings.darkMode =
+    document.getElementById("settingDarkMode").checked;
+  quizSettings.startOnModeChange =
+    document.getElementById("settingStartOnModeChange").checked;
+
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(quizSettings));
+  applySettings();
+}
+
+function applySettings() {
+  document.body.classList.toggle("darkMode", quizSettings.darkMode);
+}
+
+function toggleSettings() {
+  document.getElementById("settingsPanel").classList.toggle("open");
+}
+
+function closeSettings() {
+  document.getElementById("settingsPanel").classList.remove("open");
+}
+
+function showModeStartPanel() {
+  stopQuestionTimer();
+
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("startPanel").classList.remove("hidden");
+}
+
+function startQuizFromSetting() {
+  document.getElementById("startPanel").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  newQuestion();
+}
 
 function getRecordStorageKey(mode, enemyName) {
   return `enemyAllStagesQuizRecord_${mode}_${encodeURIComponent(normalize(enemyName))}`;
@@ -1427,17 +1654,21 @@ function updateScoreView() {
 }
 
 function changeMode() {
-  // レジェンド範囲を切り替えただけでは未クリア記録にしない
+  // 範囲切替だけでは未クリア記録にしない
   stopQuestionTimer();
-
-  // 切り替え前の問題を保存済み扱いにして、
-  // newQuestion()で黄色記録が付かないようにする
   currentAttemptSaved = true;
 
   score = 0;
   buildQuizPool();
   loadBest();
-  newQuestion();
+
+  if (quizSettings.startOnModeChange) {
+    showModeStartPanel();
+  } else {
+    document.getElementById("startPanel").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+    newQuestion();
+  }
 }
 
 async function init() {
@@ -1461,6 +1692,7 @@ async function init() {
     stagesData = loadedStages;
     enemiesData = loadedEnemies;
 
+    loadSettings();
     buildQuizPool();
     loadBest();
 
@@ -1489,13 +1721,17 @@ async function init() {
       }
 
       if (event.key === "Enter") {
-        event.preventDefault();
-
         if (suggestIndex >= 0 && currentSuggestList[suggestIndex]) {
+          event.preventDefault();
           selectSuggestion(suggestIndex);
           return;
         }
 
+        if (!quizSettings.enterAnswer) {
+          return;
+        }
+
+        event.preventDefault();
         submitAnswer();
       }
     });
@@ -1503,6 +1739,13 @@ async function init() {
     document.addEventListener("click", event => {
       if (!event.target.closest(".answerWrap")) {
         hideSuggest();
+      }
+
+      if (
+        !event.target.closest(".settingsPanel") &&
+        !event.target.closest(".settingsBtn")
+      ) {
+        closeSettings();
       }
     });
 
