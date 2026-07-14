@@ -199,6 +199,27 @@ button:disabled {
   margin: 4px 0;
 }
 
+.hintEnemy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px auto 0;
+  padding: 8px 10px;
+  border: 1px solid #b9d7f5;
+  border-radius: 8px;
+  width: fit-content;
+  max-width: 100%;
+  background: #f4f9ff;
+  color: #1565c0;
+}
+
+.hintEnemy img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
 .hidden {
   display: none;
 }
@@ -227,7 +248,7 @@ button:disabled {
 </head>
 <body>
 
-<h2>敵の登場ステージ全回答クイズ</h2>
+<h2>レジェンド敵クイズ</h2>
 
 <div class="topRow">
   <select id="mode" onchange="changeMode()">
@@ -373,7 +394,8 @@ function buildQuizPool() {
         chapterId: String(chapter.chapterId),
         chapterName: String(chapter.chapterName || ""),
         stageId: String(stage.stageId),
-        stageName: String(stage.stageName || "")
+        stageName: String(stage.stageName || ""),
+        enemies: Array.isArray(stage.enemies) ? stage.enemies.map(String) : []
       };
 
       candidateMap.set(makeStageKey(stageInfo), stageInfo);
@@ -584,11 +606,60 @@ function showHint() {
 
   if (remaining.length === 0) return;
 
-  const hint = remaining[Math.floor(Math.random() * remaining.length)];
+  const candidates = [];
+  const currentEnemyKey = normalize(current.enemyName);
+  const kanbanKey = normalize("カンバン娘");
+
+  remaining.forEach(stage => {
+    (stage.enemies || []).forEach(enemyName => {
+      const enemyKey = normalize(enemyName);
+
+      if (!enemyKey) return;
+      if (enemyKey === currentEnemyKey) return;
+      if (enemyKey === kanbanKey) return;
+
+      candidates.push(String(enemyName));
+    });
+  });
+
   const result = document.getElementById("result");
 
-  result.textContent = `ヒント：${hint.chapterName} / ${hint.stageName}`;
+  if (candidates.length === 0) {
+    result.textContent =
+      "ヒント：未回答ステージには、表示できる別の敵がいません";
+    result.style.color = "#1565c0";
+    return;
+  }
+
+  const hintEnemy = candidates[
+    Math.floor(Math.random() * candidates.length)
+  ];
+
   result.style.color = "#1565c0";
+  result.innerHTML = "";
+
+  const message = document.createElement("div");
+  message.textContent =
+    "ヒント：まだ答えていないステージのどれかに、この敵が登場します";
+
+  const enemyBox = document.createElement("div");
+  enemyBox.className = "hintEnemy";
+
+  const image = document.createElement("img");
+  image.src = getEnemyImagePath(hintEnemy);
+  image.alt = hintEnemy;
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = "image/noimage.png";
+  };
+
+  const name = document.createElement("span");
+  name.textContent = hintEnemy;
+
+  enemyBox.appendChild(image);
+  enemyBox.appendChild(name);
+  result.appendChild(message);
+  result.appendChild(enemyBox);
 }
 
 function giveUp() {
@@ -650,13 +721,12 @@ function buildSuggestions() {
   const results = [];
 
   allStageCandidates.forEach(stage => {
-    const label = getStageLabel(stage);
-    const searchable = `${stage.stageName} ${stage.chapterId}-${stage.stageId} ${label}`;
+    const stageName = String(stage.stageName || "");
 
-    if (!normalizeSearch(searchable).includes(keyword)) return;
+    if (!normalizeSearch(stageName).includes(keyword)) return;
 
-    const key = `${normalize(stage.stageName)}|${makeStageKey(stage)}`;
-    if (seen.has(key)) return;
+    const key = normalize(stageName);
+    if (!key || seen.has(key)) return;
 
     seen.add(key);
     results.push(stage);
@@ -680,7 +750,7 @@ function renderSuggestions() {
   currentSuggestList.forEach((stage, index) => {
     const div = document.createElement("div");
     div.className = "suggestItem";
-    div.textContent = getStageLabel(stage);
+    div.textContent = stage.stageName;
 
     if (index === suggestIndex) {
       div.classList.add("active");
