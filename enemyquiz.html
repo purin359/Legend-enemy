@@ -483,6 +483,7 @@ button:disabled {
 
 <script>
 let stagesData = [];
+let enemiesData = {};
 let quizPool = [];
 let allStageCandidates = [];
 let current = null;
@@ -1267,12 +1268,24 @@ function changeMode() {
 
 async function init() {
   try {
-    stagesData = await fetch("stages.json").then(response => {
-      if (!response.ok) {
-        throw new Error(`stages.jsonの読み込みに失敗しました: ${response.status}`);
-      }
-      return response.json();
-    });
+    const [loadedStages, loadedEnemies] = await Promise.all([
+      fetch("stages.json").then(response => {
+        if (!response.ok) {
+          throw new Error(`stages.jsonの読み込みに失敗しました: ${response.status}`);
+        }
+        return response.json();
+      }),
+
+      fetch("enemies.json").then(response => {
+        if (!response.ok) {
+          throw new Error(`enemies.jsonの読み込みに失敗しました: ${response.status}`);
+        }
+        return response.json();
+      })
+    ]);
+
+    stagesData = loadedStages;
+    enemiesData = loadedEnemies;
 
     buildQuizPool();
     loadBest();
