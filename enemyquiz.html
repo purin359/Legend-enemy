@@ -1018,7 +1018,7 @@ body {
 <body>
 
 <div class="titleRow">
-  <h2>レジェンド敵クイズ　Ver.15.5.0対応</h2>
+  <h2>レジェンド敵クイズ</h2>
   <button type="button" class="settingsBtn" onclick="toggleSettings()">設定</button>
 </div>
 
@@ -1634,24 +1634,66 @@ function getUnclearedQuestionPool() {
   });
 }
 
+function getHintClearedQuestionPool() {
+  const mode = document.getElementById("mode").value;
+
+  return quizPool.filter(item => {
+    const record = getEnemyRecord(mode, item.enemyName);
+
+    // クリア済みだが、最高記録でヒントを1回以上使っている敵
+    return record.clears > 0 && Number(record.bestHints) > 0;
+  });
+}
+
+function getPriorityQuestionPool() {
+  const uncleared = getUnclearedQuestionPool();
+
+  // 未クリアが残っている間は未クリア優先
+  if (uncleared.length > 0) {
+    return {
+      type: "uncleared",
+      list: uncleared
+    };
+  }
+
+  // 全てクリア後は、ヒントなし未達成の敵を優先
+  const hintCleared = getHintClearedQuestionPool();
+
+  return {
+    type: "hint",
+    list: hintCleared
+  };
+}
+
 function updateQuestionPickModeAvailability() {
   const select = document.getElementById("questionPickMode");
   if (!select) return;
 
-  const unclearedOption = [...select.options].find(
+  const priorityOption = [...select.options].find(
     option => option.value === "uncleared"
   );
 
-  const hasUncleared = getUnclearedQuestionPool().length > 0;
+  const priority = getPriorityQuestionPool();
+  const hasPriorityTargets = priority.list.length > 0;
 
-  if (unclearedOption) {
-    unclearedOption.disabled = !hasUncleared;
+  if (priorityOption) {
+    priorityOption.textContent =
+      priority.type === "uncleared"
+        ? "未クリア優先"
+        : "ヒントあり優先";
+
+    priorityOption.disabled = !hasPriorityTargets;
   }
 
-  // 全てクリア済みなら未クリア優先を選べないように戻す
-  if (!hasUncleared && select.value === "uncleared") {
+  // 全員ヒントなしクリア済みなら優先モードを選べないようにする
+  if (!hasPriorityTargets && select.value === "uncleared") {
     select.value = "random";
     questionPickMode = "random";
+
+    localStorage.setItem(
+      "enemyAllStagesQuizQuestionPickMode",
+      questionPickMode
+    );
   }
 }
 
@@ -1683,12 +1725,15 @@ function pickRandomQuestion() {
 
   updateQuestionPickModeAvailability();
 
-  let candidates =
-    questionPickMode === "uncleared"
-      ? getUnclearedQuestionPool()
-      : [...quizPool];
+  let candidates;
 
-  // 念のため未クリア候補がなくなった場合は完全ランダムへ戻す
+  if (questionPickMode === "uncleared") {
+    candidates = getPriorityQuestionPool().list;
+  } else {
+    candidates = [...quizPool];
+  }
+
+  // 優先対象がなくなった場合は完全ランダムへ戻す
   if (candidates.length === 0) {
     questionPickMode = "random";
 
@@ -1696,6 +1741,11 @@ function pickRandomQuestion() {
     if (select) {
       select.value = "random";
     }
+
+    localStorage.setItem(
+      "enemyAllStagesQuizQuestionPickMode",
+      questionPickMode
+    );
 
     candidates = [...quizPool];
   }
