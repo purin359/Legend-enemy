@@ -172,6 +172,13 @@ button:disabled {
   font-weight: bold;
 }
 
+#persistentHint {
+  min-height: 0;
+  margin: 10px 0;
+  color: #1565c0;
+  font-weight: bold;
+}
+
 .answerListBox {
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -447,6 +454,7 @@ button:disabled {
     <button id="nextBtn" type="button" onclick="newQuestion()" class="hidden">次の敵</button>
   </div>
 
+  <div id="persistentHint"></div>
   <div id="result"></div>
 
   <div class="answerListBox">
@@ -499,6 +507,7 @@ let questionStartTime = 0;
 let elapsedSeconds = 0;
 let hintUseCount = 0;
 let currentAttemptSaved = false;
+let currentHint = null;
 
 
 function getRecordStorageKey(mode, enemyName) {
@@ -897,6 +906,10 @@ function newQuestion() {
   questionFinished = false;
   currentAttemptSaved = false;
   hintUseCount = 0;
+  currentHint = null;
+
+  document.getElementById("persistentHint").innerHTML = "";
+
   updateHintCountView();
 
   document.getElementById("result").textContent = "";
@@ -1003,6 +1016,16 @@ function checkAnswer() {
 
   newMatches.forEach(stage => answeredKeys.add(makeStageKey(stage)));
 
+  if (
+    currentHint &&
+    newMatches.some(stage =>
+      makeStageKey(stage) === currentHint.stageKey
+    )
+  ) {
+    currentHint = null;
+    document.getElementById("persistentHint").innerHTML = "";
+  }
+
   result.textContent =
     newMatches.length === 1
       ? `正解：${getStageLabel(newMatches[0])}`
@@ -1045,6 +1068,18 @@ function completeQuestion() {
 function showHint() {
   if (!current || questionFinished) return;
 
+  const hintArea = document.getElementById("persistentHint");
+
+  // すでにヒントがあり、その対象ステージがまだ未回答なら
+  // 同じヒントをそのまま残す
+  if (
+    currentHint &&
+    !answeredKeys.has(currentHint.stageKey)
+  ) {
+    renderPersistentHint();
+    return;
+  }
+
   const remaining = current.stages.filter(
     stage => !answeredKeys.has(makeStageKey(stage))
   );
@@ -1063,28 +1098,41 @@ function showHint() {
       if (enemyKey === currentEnemyKey) return;
       if (enemyKey === kanbanKey) return;
 
-      candidates.push(String(enemyName));
+      candidates.push({
+        enemyName: String(enemyName),
+        stageKey: makeStageKey(stage)
+      });
     });
   });
 
-  const result = document.getElementById("result");
-
   if (candidates.length === 0) {
-    result.textContent =
+    hintArea.textContent =
       "ヒント：未回答ステージには、表示できる別の敵がいません";
-    result.style.color = "#1565c0";
     return;
   }
 
-  const hintEnemy = candidates[
-    Math.floor(Math.random() * candidates.length)
-  ];
+  currentHint =
+    candidates[Math.floor(Math.random() * candidates.length)];
 
   hintUseCount++;
   updateHintCountView();
 
-  result.style.color = "#1565c0";
-  result.innerHTML = "";
+  renderPersistentHint();
+}
+
+  function renderPersistentHint() {
+  const hintArea = document.getElementById("persistentHint");
+
+  if (
+    !currentHint ||
+    answeredKeys.has(currentHint.stageKey)
+  ) {
+    hintArea.innerHTML = "";
+    currentHint = null;
+    return;
+  }
+
+  hintArea.innerHTML = "";
 
   const message = document.createElement("div");
   message.textContent =
@@ -1094,20 +1142,22 @@ function showHint() {
   enemyBox.className = "hintEnemy";
 
   const image = document.createElement("img");
-  image.src = getEnemyImagePath(hintEnemy);
-  image.alt = hintEnemy;
+  image.src = getEnemyImagePath(currentHint.enemyName);
+  image.alt = currentHint.enemyName;
+
   image.onerror = () => {
     image.onerror = null;
     image.src = "image/noimage.png";
   };
 
   const name = document.createElement("span");
-  name.textContent = hintEnemy;
+  name.textContent = currentHint.enemyName;
 
   enemyBox.appendChild(image);
   enemyBox.appendChild(name);
-  result.appendChild(message);
-  result.appendChild(enemyBox);
+
+  hintArea.appendChild(message);
+  hintArea.appendChild(enemyBox);
 }
 
 function giveUp() {
