@@ -417,6 +417,11 @@ button:disabled {
   margin: 5px 0;
 }
 
+.topRecordBtn{
+  margin-left:auto;
+  background:#5c6bc0;
+}
+
 @media (max-width: 520px) {
   .recordGrid {
     grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -446,12 +451,6 @@ button:disabled {
   <button type="button" class="secondaryBtn" onclick="newQuestion()">
     別の敵
   </button>
-</div>
-
-<div class="scoreRow">
-  <div id="score">連続クリア: 0</div>
-  <div id="best">最高記録: 0</div>
-  <div id="timer">タイム: 00:00</div>
 
   <button
     type="button"
@@ -460,6 +459,12 @@ button:disabled {
   >
     最高記録一覧
   </button>
+</div>
+
+<div class="scoreRow">
+  <div id="score">連続クリア: 0</div>
+  <div id="best">最高記録: 0</div>
+  <div id="timer">タイム: 00:00</div>
 
   <div id="hintCount">ヒント: 0回</div>
 </div>
