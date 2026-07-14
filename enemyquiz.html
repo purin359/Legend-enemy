@@ -492,7 +492,7 @@ button:disabled {
   </div>
 
   <div class="btnRow">
-    <button id="checkBtn" type="button" onclick="checkAnswer()">回答</button>
+    <button id="checkBtn" type="button" onclick="submitAnswer()">回答</button>
     <button id="hintBtn" type="button" class="secondaryBtn" onclick="showHint()">ヒント</button>
     <button id="giveUpBtn" type="button" class="dangerBtn" onclick="giveUp()">ギブアップ</button>
     <button id="nextBtn" type="button" onclick="newQuestion()" class="hidden">次の敵</button>
@@ -1042,6 +1042,22 @@ function findMatchedStages(input) {
   });
 }
 
+
+function submitAnswer() {
+  const input = document.getElementById("answer");
+
+  // 日本語入力の変換中でも、ボタン1回で確定後の文字を判定する
+  input.blur();
+
+  requestAnimationFrame(() => {
+    checkAnswer();
+
+    if (!input.disabled) {
+      input.focus();
+    }
+  });
+}
+
 function checkAnswer() {
   if (!current || questionFinished) return;
 
@@ -1217,11 +1233,7 @@ function showHint() {
 }
   
   function renderPersistentHints() {
-  hintArea.innerHTML = `
-    <div class="hintTitle">
-      ヒント（${currentHints.length}/3）
-    </div>
-  `;
+  const hintArea = document.getElementById("persistentHint");
 
   // 回答済みになったヒントを除外
   currentHints = currentHints.filter(hint =>
@@ -1234,11 +1246,12 @@ function showHint() {
     return;
   }
 
-  const message = document.createElement("div");
-  message.textContent =
+  const title = document.createElement("div");
+  title.className = "hintTitle";
+  title.textContent =
     `ヒント：未回答ステージに登場する別の敵（${currentHints.length}/3）`;
 
-  hintArea.appendChild(message);
+  hintArea.appendChild(title);
 
   currentHints.forEach((hint, index) => {
     const enemyBox = document.createElement("div");
@@ -1265,7 +1278,7 @@ function showHint() {
     hintArea.appendChild(enemyBox);
   });
 }
-  
+
 function giveUp() {
   if (!current || questionFinished) return;
   if (!confirm("残りの正解を表示しますか？\n連続クリア数は0に戻ります。")) return;
@@ -1483,7 +1496,7 @@ async function init() {
           return;
         }
 
-        checkAnswer();
+        submitAnswer();
       }
     });
 
