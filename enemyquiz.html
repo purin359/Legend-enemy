@@ -696,8 +696,13 @@ function showEnemyRecord(enemyName, stageCount) {
       }
     </div>
   `;
-}
 
+  detail.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+  
 function escapeRecordHTML(value) {
   return String(value)
     .replace(/&/g, "&amp;")
