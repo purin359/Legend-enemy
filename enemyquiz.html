@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>レジェンド敵クイズ</title>
+<title>敵から全ステージ当てクイズ</title>
 
 <style>
 * {
@@ -11,24 +11,35 @@
 }
 
 body {
-  font-family: sans-serif;
-  max-width: 680px;
-  margin: auto;
+  margin: 0;
   padding: 16px;
+  font-family: sans-serif;
+  background: #f5f6fa;
   color: #222;
 }
 
-h2 {
-  margin: 0 0 14px;
-  font-size: 22px;
+.container {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
 }
 
-.topRow {
+h1 {
+  font-size: 24px;
+  margin: 0 0 16px;
+}
+
+.topRow,
+.statusRow,
+.answerRow,
+.buttonRow {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
 }
 
 select,
@@ -37,119 +48,132 @@ button {
   font-size: 16px;
 }
 
-select {
-  padding: 10px 12px;
+select,
+input {
+  min-height: 44px;
+  padding: 8px 12px;
   border: 1px solid #bbb;
-  border-radius: 8px;
-  background: #fff;
+  border-radius: 9px;
+  background: white;
 }
 
-button {
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 8px;
-  background: #4caf50;
-  color: #fff;
-  cursor: pointer;
+select {
+  min-width: 180px;
 }
 
-button:hover {
-  filter: brightness(0.95);
-}
-
-button:disabled {
-  background: #999;
-  cursor: not-allowed;
-  filter: none;
-}
-
-.secondaryBtn {
-  background: #777;
-}
-
-.dangerBtn {
-  background: #e05252;
-}
-
-.scoreRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 8px 0 12px;
-  font-size: 15px;
-}
-
-.questionBox {
-  border-radius: 12px;
-  background: #eaf4ff;
-  padding: 18px;
-  text-align: center;
-  margin-bottom: 14px;
-}
-
-.questionBox img {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-}
-
-.enemyName {
-  margin-top: 8px;
-  font-size: 20px;
+.statusRow {
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: 9px;
+  background: #f3f5f8;
   font-weight: bold;
 }
 
-.progressText {
+.statusItem {
+  min-width: 130px;
+}
+
+.question {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  text-align: center;
+  background: #fafafa;
+}
+
+#enemyImage {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+#enemyName {
+  margin-top: 8px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+#progress {
   margin-top: 8px;
   font-weight: bold;
 }
 
 .answerWrap {
   position: relative;
-}
-
-.answerRow {
-  display: flex;
-  gap: 8px;
+  flex: 1 1 360px;
 }
 
 #answer {
   width: 100%;
-  min-width: 0;
-  padding: 12px;
-  border: 1px solid #bbb;
-  border-radius: 8px;
+  padding-right: 44px;
 }
 
 .clearBtn {
-  min-width: 46px;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 34px;
+  height: 34px;
   padding: 0;
-  background: #888;
+  border: 0;
+  border-radius: 7px;
+  background: #eee;
+  cursor: pointer;
+}
+
+.answerRow {
+  margin-top: 16px;
+}
+
+button {
+  min-height: 42px;
+  padding: 8px 15px;
+  border: 1px solid #bbb;
+  border-radius: 9px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #e8e8e8;
+}
+
+.primary {
+  border-color: #4CAF50;
+  background: #4CAF50;
+  color: white;
+}
+
+.primary:hover {
+  background: #409344;
+}
+
+.danger {
+  border-color: #d9534f;
+  background: white;
+  color: #c9302c;
 }
 
 #suggest {
   position: absolute;
   left: 0;
-  right: 54px;
-  top: 48px;
+  right: 0;
+  top: 46px;
   z-index: 20;
-  max-height: 190px;
+  max-height: 220px;
   overflow-y: auto;
-  background: #fff;
-  border: 1px solid #ccc;
+  background: white;
+  border: 1px solid #bbb;
   border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,.12);
   display: none;
 }
 
 .suggestItem {
-  padding: 9px;
+  padding: 9px 11px;
   cursor: pointer;
-  border-bottom: 1px solid #eee;
-}
-
-.suggestItem:last-child {
-  border-bottom: none;
+  text-align: left;
 }
 
 .suggestItem:hover,
@@ -157,61 +181,44 @@ button:disabled {
   background: #dceeff;
 }
 
-.btnRow {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
 #result {
-  min-height: 24px;
-  margin: 12px 0;
-  white-space: pre-line;
+  min-height: 28px;
+  margin-top: 12px;
   font-weight: bold;
 }
 
-.answerListBox {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 12px;
-  margin-top: 14px;
+.ok {
+  color: #16803c;
 }
 
-.answerListBox h3 {
+.ng {
+  color: #c62828;
+}
+
+.panel {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.panel h2 {
   margin: 0 0 8px;
-  font-size: 17px;
+  font-size: 18px;
 }
 
 #answeredList,
-#remainingList {
-  margin: 0;
-  padding-left: 22px;
-}
-
-#answeredList li {
-  color: #168139;
-  margin: 4px 0;
-}
-
-#remainingList li {
-  margin: 4px 0;
+#hintArea,
+#answerList {
+  line-height: 1.7;
 }
 
 .hintEnemy {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin: 8px auto 0;
-  padding: 8px 10px;
-  border: 1px solid #b9d7f5;
-  border-radius: 8px;
-  width: fit-content;
-  max-width: 100%;
-  background: #f4f9ff;
-  color: #1565c0;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .hintEnemy img {
@@ -220,566 +227,444 @@ button:disabled {
   object-fit: contain;
 }
 
+.stageItem {
+  padding: 4px 0;
+  border-bottom: 1px dashed #ddd;
+}
+
+.stageItem:last-child {
+  border-bottom: 0;
+}
+
 .hidden {
   display: none;
 }
 
-.loading {
-  padding: 20px;
-  text-align: center;
-  color: #666;
-}
-
-@media (max-width: 520px) {
+@media (max-width: 560px) {
   body {
-    padding: 12px;
+    padding: 8px;
   }
 
-  h2 {
-    font-size: 20px;
+  .container {
+    padding: 13px;
   }
 
-  .questionBox img {
-    width: 82px;
-    height: 82px;
+  h1 {
+    font-size: 21px;
+  }
+
+  select {
+    width: 100%;
+  }
+
+  .statusItem {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .answerRow > button {
+    flex: 1;
   }
 }
 </style>
 </head>
+
 <body>
+<div class="container">
+  <h1>敵から全ステージ当てクイズ</h1>
 
-<h2>レジェンド敵クイズ</h2>
+  <div class="topRow">
+    <select id="mode" onchange="changeMode()">
+      <option value="ALL">全て</option>
+      <option value="N">レジェンド</option>
+      <option value="NA">真レジェンド</option>
+      <option value="ND">レジェンド0</option>
+    </select>
 
-<div class="topRow">
-  <select id="mode" onchange="changeMode()">
-    <option value="ALL">全て</option>
-    <option value="N">レジェンド</option>
-    <option value="NA">真レジェンド</option>
-    <option value="ND">レジェンド0</option>
-  </select>
-
-  <button type="button" class="secondaryBtn" onclick="newQuestion()">
-    別の敵
-  </button>
-</div>
-
-<div class="scoreRow">
-  <div id="score">連続クリア: 0</div>
-  <div id="best">最高記録: 0</div>
-</div>
-
-<div id="loading" class="loading">データを読み込んでいます…</div>
-
-<div id="game" class="hidden">
-  <div class="questionBox">
-    <img id="enemyImage" src="image/noimage.png" alt="出題敵">
-    <div id="enemyName" class="enemyName"></div>
-    <div id="progress" class="progressText"></div>
+    <button type="button" onclick="newQuestion()">別の敵を出題</button>
   </div>
 
-  <div class="answerWrap">
-    <div class="answerRow">
+  <div class="statusRow">
+    <div class="statusItem" id="timer">タイム：00:00</div>
+    <div class="statusItem" id="hintCount">ヒント：0回</div>
+    <div class="statusItem" id="remainingCount">残り：0</div>
+  </div>
+
+  <div class="question">
+    <img id="enemyImage" src="image/noimage.png" alt="">
+    <div id="enemyName">読み込み中...</div>
+    <div id="progress"></div>
+  </div>
+
+  <div class="answerRow">
+    <div class="answerWrap">
       <input
         id="answer"
         type="text"
-        placeholder="ステージ名 または N001-0 の形式で入力"
+        placeholder="ステージ名を入力"
         autocomplete="off"
       >
       <button type="button" class="clearBtn" onclick="clearAnswer()">×</button>
+      <div id="suggest"></div>
     </div>
-    <div id="suggest"></div>
+
+    <button type="button" class="primary" onclick="checkAnswer()">回答</button>
   </div>
 
-  <div class="btnRow">
-    <button id="checkBtn" type="button" onclick="checkAnswer()">回答</button>
-    <button id="hintBtn" type="button" class="secondaryBtn" onclick="showHint()">ヒント</button>
-    <button id="giveUpBtn" type="button" class="dangerBtn" onclick="giveUp()">ギブアップ</button>
-    <button id="nextBtn" type="button" onclick="newQuestion()" class="hidden">次の敵</button>
+  <div class="buttonRow" style="margin-top:10px;">
+    <button type="button" onclick="showHint()">ヒント</button>
+    <button type="button" class="danger" onclick="giveUp()">ギブアップ</button>
   </div>
 
   <div id="result"></div>
 
-  <div class="answerListBox">
-    <h3>回答済み</h3>
-    <ul id="answeredList"></ul>
+  <div class="panel">
+    <h2>回答済みステージ</h2>
+    <div id="answeredList">まだありません</div>
   </div>
 
-  <div id="remainingBox" class="answerListBox hidden">
-    <h3>残りの正解</h3>
-    <ul id="remainingList"></ul>
+  <div class="panel hidden" id="hintPanel">
+    <h2>ヒント</h2>
+    <div id="hintArea"></div>
+  </div>
+
+  <div class="panel hidden" id="answerPanel">
+    <h2>正解一覧</h2>
+    <div id="answerList"></div>
   </div>
 </div>
 
 <script>
 let stagesData = [];
 let quizPool = [];
-let allStageCandidates = [];
-let current = null;
-let answeredKeys = new Set();
-let score = 0;
-let bestScore = 0;
-let suggestIndex = -1;
+let currentQuestion = null;
+
+let answeredStageKeys = new Set();
+let stageSuggestionNames = [];
 let currentSuggestList = [];
+let suggestIndex = -1;
+
+let timerId = null;
+let questionStartTime = 0;
+let elapsedSeconds = 0;
+let hintUseCount = 0;
+let usedHintEnemies = new Set();
 let questionFinished = false;
 
-function normalize(value) {
-  return String(value ?? "")
-    .normalize("NFKC")
+function normalize(str) {
+  return String(str ?? "")
     .replace(/\[EX\]/gi, "")
     .replace(/\r?\n/g, "")
-    .replace(/[：:]/g, "")
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    )
     .replace(/[～〜]/g, "〜")
-    .replace(/[ 　]/g, "")
-    .trim()
-    .toLowerCase();
+    .replace(/[：:]/g, "")
+    .replace(/[ 　]+/g, "")
+    .toLowerCase()
+    .trim();
 }
 
-function normalizeSearch(value) {
-  return normalize(value)
-    .replace(/[ァ-ヶ]/g, char =>
-      String.fromCharCode(char.charCodeAt(0) - 0x60)
+function normalizeSearch(str) {
+  return normalize(str)
+    .replace(/[ァ-ヶ]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)
     );
 }
 
-function getEnemyFileName(name) {
-  return String(name)
+function isTargetChapter(ch, mode) {
+  return (
+    mode === "ALL" ||
+
+    (mode === "N" && (
+      (
+        ch.chapterId.startsWith("N") &&
+        !ch.chapterId.startsWith("NA") &&
+        !ch.chapterId.startsWith("ND")
+      ) ||
+      ch.chapterId === "E026"
+    )) ||
+
+    (mode === "NA" && (
+      ch.chapterId.startsWith("NA") ||
+      ch.chapterId === "E068" ||
+      ch.chapterId === "E069"
+    )) ||
+
+    (mode === "ND" && ch.chapterId.startsWith("ND"))
+  );
+}
+
+function getStageKey(stage) {
+  return `${stage.chapterId}-${stage.stageId}`;
+}
+
+function getEnemyImagePath(enemyName) {
+  const fileName = String(enemyName)
     .replace(/\r?\n/g, "")
     .trim()
     .replace(/[：:]/g, " ")
     .replace(/[ 　]+/g, "");
+
+  return "image/" + encodeURIComponent(fileName) + ".png";
 }
 
-function getEnemyImagePath(name) {
-  return "image/" + encodeURIComponent(getEnemyFileName(name)) + ".png";
-}
+async function init() {
+  try {
+    stagesData = await fetch("stages.json").then(r => {
+      if (!r.ok) throw new Error("stages.jsonを読み込めませんでした");
+      return r.json();
+    });
 
-function isTargetChapter(chapter, mode) {
-  const id = String(chapter.chapterId || "");
-
-  return (
-    mode === "ALL" ||
-    (
-      mode === "N" &&
-      (
-        (id.startsWith("N") && !id.startsWith("NA") && !id.startsWith("ND")) ||
-        id === "E026"
-      )
-    ) ||
-    (
-      mode === "NA" &&
-      (id.startsWith("NA") || id === "E068" || id === "E069")
-    ) ||
-    (mode === "ND" && id.startsWith("ND"))
-  );
-}
-
-function makeStageKey(stage) {
-  return `${stage.chapterId}-${stage.stageId}`;
-}
-
-function getStageLabel(stage) {
-  return `${stage.chapterId}-${stage.stageId} ${stage.chapterName}-${stage.stageName}`;
+    setupInputEvents();
+    buildQuizPool();
+    newQuestion();
+  } catch (error) {
+    console.error(error);
+    document.getElementById("enemyName").textContent =
+      "stages.jsonの読み込みに失敗しました";
+    setResult(error.message, false);
+  }
 }
 
 function buildQuizPool() {
   const mode = document.getElementById("mode").value;
   const enemyMap = new Map();
-  const candidateMap = new Map();
+  const suggestionMap = new Map();
 
-  stagesData.forEach(chapter => {
-    if (!isTargetChapter(chapter, mode)) return;
+  stagesData.forEach(ch => {
+    if (!isTargetChapter(ch, mode)) return;
 
-    (chapter.stages || []).forEach(stage => {
-      const stageInfo = {
-        chapterId: String(chapter.chapterId),
-        chapterName: String(chapter.chapterName || ""),
-        stageId: String(stage.stageId),
-        stageName: String(stage.stageName || ""),
-        enemies: Array.isArray(stage.enemies) ? stage.enemies.map(String) : []
+    ch.stages.forEach(st => {
+      const stageData = {
+        chapterId: ch.chapterId,
+        chapterName: ch.chapterName,
+        stageId: st.stageId,
+        stageName: st.stageName,
+        enemies: Array.isArray(st.enemies) ? st.enemies : []
       };
 
-      candidateMap.set(makeStageKey(stageInfo), stageInfo);
+      const suggestionKey = normalize(stageData.stageName);
+      if (!suggestionMap.has(suggestionKey)) {
+        suggestionMap.set(suggestionKey, stageData.stageName);
+      }
 
-      const uniqueEnemies = new Set(
-        (stage.enemies || [])
-          .filter(name => normalize(name) !== normalize("カンバン娘"))
-          .map(name => String(name))
-      );
+      stageData.enemies.forEach(enemyName => {
+        if (normalize(enemyName) === normalize("カンバン娘")) return;
 
-      uniqueEnemies.forEach(enemyName => {
         const enemyKey = normalize(enemyName);
+        if (!enemyKey) return;
 
         if (!enemyMap.has(enemyKey)) {
           enemyMap.set(enemyKey, {
             enemyName,
-            stages: [],
-            stageKeySet: new Set()
+            stages: []
           });
         }
 
-        const entry = enemyMap.get(enemyKey);
-        const stageKey = makeStageKey(stageInfo);
+        const question = enemyMap.get(enemyKey);
+        const duplicate = question.stages.some(stage =>
+          getStageKey(stage) === getStageKey(stageData)
+        );
 
-        if (!entry.stageKeySet.has(stageKey)) {
-          entry.stageKeySet.add(stageKey);
-          entry.stages.push(stageInfo);
+        if (!duplicate) {
+          question.stages.push(stageData);
         }
       });
     });
   });
 
   quizPool = [...enemyMap.values()]
-    .map(entry => ({
-      enemyName: entry.enemyName,
-      stages: entry.stages
-    }))
-    .filter(entry => entry.stages.length > 0);
+    .filter(question => question.stages.length > 0);
 
-  allStageCandidates = [...candidateMap.values()];
+  stageSuggestionNames = [...suggestionMap.values()];
 }
 
-function pickRandomQuestion() {
-  if (quizPool.length === 0) return null;
-
-  let candidates = quizPool;
-
-  if (current && quizPool.length > 1) {
-    candidates = quizPool.filter(
-      item => normalize(item.enemyName) !== normalize(current.enemyName)
-    );
-  }
-
-  return candidates[Math.floor(Math.random() * candidates.length)];
+function changeMode() {
+  buildQuizPool();
+  newQuestion();
 }
 
 function newQuestion() {
-  current = pickRandomQuestion();
-  answeredKeys = new Set();
-  questionFinished = false;
+  stopTimer();
 
-  document.getElementById("result").textContent = "";
-  document.getElementById("remainingBox").classList.add("hidden");
-  document.getElementById("remainingList").innerHTML = "";
-  document.getElementById("nextBtn").classList.add("hidden");
-  document.getElementById("checkBtn").disabled = false;
-  document.getElementById("hintBtn").disabled = false;
-  document.getElementById("giveUpBtn").disabled = false;
-  document.getElementById("answer").disabled = false;
-
-  clearAnswer();
-
-  if (!current) {
+  if (quizPool.length === 0) {
+    currentQuestion = null;
     document.getElementById("enemyName").textContent = "出題できる敵がいません";
     document.getElementById("enemyImage").src = "image/noimage.png";
-    document.getElementById("progress").textContent = "";
     return;
   }
 
-  const image = document.getElementById("enemyImage");
-  image.src = getEnemyImagePath(current.enemyName);
-  image.onerror = () => {
-    image.onerror = null;
-    image.src = "image/noimage.png";
+  let next = quizPool[Math.floor(Math.random() * quizPool.length)];
+
+  if (quizPool.length >= 2 && currentQuestion) {
+    let guard = 0;
+    while (
+      normalize(next.enemyName) === normalize(currentQuestion.enemyName) &&
+      guard < 30
+    ) {
+      next = quizPool[Math.floor(Math.random() * quizPool.length)];
+      guard++;
+    }
+  }
+
+  currentQuestion = next;
+  answeredStageKeys = new Set();
+  usedHintEnemies = new Set();
+  hintUseCount = 0;
+  questionFinished = false;
+
+  document.getElementById("enemyName").textContent = currentQuestion.enemyName;
+
+  const enemyImage = document.getElementById("enemyImage");
+  enemyImage.src = getEnemyImagePath(currentQuestion.enemyName);
+  enemyImage.alt = currentQuestion.enemyName;
+  enemyImage.onerror = () => {
+    enemyImage.src = "image/noimage.png";
   };
 
-  document.getElementById("enemyName").textContent = current.enemyName;
-  updateProgress();
-  renderAnsweredList();
+  document.getElementById("hintPanel").classList.add("hidden");
+  document.getElementById("answerPanel").classList.add("hidden");
+  document.getElementById("hintArea").innerHTML = "";
+  document.getElementById("answerList").innerHTML = "";
+  document.getElementById("answeredList").textContent = "まだありません";
+  document.getElementById("result").textContent = "";
+
+  clearAnswer();
+  updateStatus();
+  startTimer();
+
   document.getElementById("answer").focus();
 }
 
-function updateProgress() {
-  if (!current) return;
+function startTimer() {
+  elapsedSeconds = 0;
+  questionStartTime = Date.now();
+  renderTimer();
+
+  timerId = setInterval(() => {
+    elapsedSeconds = Math.floor((Date.now() - questionStartTime) / 1000);
+    renderTimer();
+  }, 250);
+}
+
+function stopTimer() {
+  if (timerId !== null) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  if (questionStartTime) {
+    elapsedSeconds = Math.floor((Date.now() - questionStartTime) / 1000);
+    renderTimer();
+  }
+}
+
+function renderTimer() {
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = elapsedSeconds % 60;
+
+  document.getElementById("timer").textContent =
+    `タイム：${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function updateStatus() {
+  const total = currentQuestion ? currentQuestion.stages.length : 0;
+  const answered = answeredStageKeys.size;
+  const remaining = Math.max(0, total - answered);
+
+  document.getElementById("hintCount").textContent =
+    `ヒント：${hintUseCount}回`;
+
+  document.getElementById("remainingCount").textContent =
+    `残り：${remaining}`;
 
   document.getElementById("progress").textContent =
-    `${answeredKeys.size} / ${current.stages.length} ステージ回答済み`;
+    `${answered} / ${total} ステージ回答済み`;
 }
 
-function renderAnsweredList() {
-  const list = document.getElementById("answeredList");
-  list.innerHTML = "";
-
-  if (!current || answeredKeys.size === 0) {
-    const li = document.createElement("li");
-    li.textContent = "まだありません";
-    li.style.color = "#777";
-    list.appendChild(li);
-    return;
-  }
-
-  current.stages
-    .filter(stage => answeredKeys.has(makeStageKey(stage)))
-    .forEach(stage => {
-      const li = document.createElement("li");
-      li.textContent = getStageLabel(stage);
-      list.appendChild(li);
-    });
-}
-
-function findMatchedStages(input) {
-  if (!current) return [];
-
-  const inputKey = normalize(input);
-  if (!inputKey) return [];
-
-  return current.stages.filter(stage => {
-    const idText = `${stage.chapterId}-${stage.stageId}`;
-
-    return (
-      normalize(stage.stageName) === inputKey ||
-      normalize(idText) === inputKey ||
-      normalize(getStageLabel(stage)) === inputKey
-    );
-  });
-}
-
-function checkAnswer() {
-  if (!current || questionFinished) return;
-
-  hideSuggest();
-
-  const input = document.getElementById("answer").value;
-  const matched = findMatchedStages(input);
-  const result = document.getElementById("result");
-
-  if (matched.length === 0) {
-    result.textContent = "不正解です";
-    result.style.color = "#d32f2f";
-    return;
-  }
-
-  const newMatches = matched.filter(
-    stage => !answeredKeys.has(makeStageKey(stage))
-  );
-
-  if (newMatches.length === 0) {
-    result.textContent = "そのステージは回答済みです";
-    result.style.color = "#e38b00";
-    return;
-  }
-
-  newMatches.forEach(stage => answeredKeys.add(makeStageKey(stage)));
-
-  result.textContent =
-    newMatches.length === 1
-      ? `正解：${getStageLabel(newMatches[0])}`
-      : `正解：同名の${newMatches.length}ステージを回答済みにしました`;
-  result.style.color = "#168139";
-
-  clearAnswer();
-  updateProgress();
-  renderAnsweredList();
-
-  if (answeredKeys.size === current.stages.length) {
-    completeQuestion();
-  }
-}
-
-function completeQuestion() {
-  questionFinished = true;
-  score++;
-
-  if (score > bestScore) {
-    bestScore = score;
-    saveBest();
-  }
-
-  document.getElementById("result").textContent =
-    `全${current.stages.length}ステージ正解！ 🎉`;
-  document.getElementById("result").style.color = "#168139";
-
-  document.getElementById("checkBtn").disabled = true;
-  document.getElementById("hintBtn").disabled = true;
-  document.getElementById("giveUpBtn").disabled = true;
-  document.getElementById("answer").disabled = true;
-  document.getElementById("nextBtn").classList.remove("hidden");
-
-  updateScoreView();
-}
-
-function showHint() {
-  if (!current || questionFinished) return;
-
-  const remaining = current.stages.filter(
-    stage => !answeredKeys.has(makeStageKey(stage))
-  );
-
-  if (remaining.length === 0) return;
-
-  const candidates = [];
-  const currentEnemyKey = normalize(current.enemyName);
-  const kanbanKey = normalize("カンバン娘");
-
-  remaining.forEach(stage => {
-    (stage.enemies || []).forEach(enemyName => {
-      const enemyKey = normalize(enemyName);
-
-      if (!enemyKey) return;
-      if (enemyKey === currentEnemyKey) return;
-      if (enemyKey === kanbanKey) return;
-
-      candidates.push(String(enemyName));
-    });
-  });
-
-  const result = document.getElementById("result");
-
-  if (candidates.length === 0) {
-    result.textContent =
-      "ヒント：未回答ステージには、表示できる別の敵がいません";
-    result.style.color = "#1565c0";
-    return;
-  }
-
-  const hintEnemy = candidates[
-    Math.floor(Math.random() * candidates.length)
-  ];
-
-  result.style.color = "#1565c0";
-  result.innerHTML = "";
-
-  const message = document.createElement("div");
-  message.textContent =
-    "ヒント：まだ答えていないステージのどれかに、この敵が登場します";
-
-  const enemyBox = document.createElement("div");
-  enemyBox.className = "hintEnemy";
-
-  const image = document.createElement("img");
-  image.src = getEnemyImagePath(hintEnemy);
-  image.alt = hintEnemy;
-  image.onerror = () => {
-    image.onerror = null;
-    image.src = "image/noimage.png";
-  };
-
-  const name = document.createElement("span");
-  name.textContent = hintEnemy;
-
-  enemyBox.appendChild(image);
-  enemyBox.appendChild(name);
-  result.appendChild(message);
-  result.appendChild(enemyBox);
-}
-
-function giveUp() {
-  if (!current || questionFinished) return;
-  if (!confirm("残りの正解を表示しますか？\n連続クリア数は0に戻ります。")) return;
-
-  questionFinished = true;
-  score = 0;
-  updateScoreView();
-
-  const remaining = current.stages.filter(
-    stage => !answeredKeys.has(makeStageKey(stage))
-  );
-
-  const list = document.getElementById("remainingList");
-  list.innerHTML = "";
-
-  remaining.forEach(stage => {
-    const li = document.createElement("li");
-    li.textContent = getStageLabel(stage);
-    list.appendChild(li);
-  });
-
-  document.getElementById("remainingBox").classList.remove("hidden");
-  document.getElementById("result").textContent =
-    `ギブアップ：残り${remaining.length}ステージ`;
-  document.getElementById("result").style.color = "#d32f2f";
-
-  document.getElementById("checkBtn").disabled = true;
-  document.getElementById("hintBtn").disabled = true;
-  document.getElementById("giveUpBtn").disabled = true;
-  document.getElementById("answer").disabled = true;
-  document.getElementById("nextBtn").classList.remove("hidden");
-}
-
-function clearAnswer() {
+function setupInputEvents() {
   const input = document.getElementById("answer");
-  input.value = "";
-  hideSuggest();
 
-  if (!input.disabled) input.focus();
-}
+  input.addEventListener("input", updateSuggestions);
 
-function buildSuggestions() {
-  if (!current || questionFinished) {
-    hideSuggest();
-    return;
-  }
+  input.addEventListener("keydown", event => {
+    if (event.isComposing || event.keyCode === 229) return;
 
-  const input = document.getElementById("answer").value;
-  const keyword = normalizeSearch(input);
+    if (event.key === "ArrowDown") {
+      if (currentSuggestList.length === 0) return;
+      event.preventDefault();
+      suggestIndex = (suggestIndex + 1) % currentSuggestList.length;
+      updateSuggestionActive();
+      return;
+    }
 
-  if (!keyword) {
-    hideSuggest();
-    return;
-  }
+    if (event.key === "ArrowUp") {
+      if (currentSuggestList.length === 0) return;
+      event.preventDefault();
+      suggestIndex =
+        (suggestIndex - 1 + currentSuggestList.length) %
+        currentSuggestList.length;
+      updateSuggestionActive();
+      return;
+    }
 
-  const seen = new Set();
-  const results = [];
+    if (event.key === "Enter") {
+      event.preventDefault();
 
-  allStageCandidates.forEach(stage => {
-    const stageName = String(stage.stageName || "");
-
-    if (!normalizeSearch(stageName).includes(keyword)) return;
-
-    const key = normalize(stageName);
-    if (!key || seen.has(key)) return;
-
-    seen.add(key);
-    results.push(stage);
+      if (suggestIndex >= 0 && currentSuggestList[suggestIndex]) {
+        selectSuggestion(currentSuggestList[suggestIndex]);
+      } else {
+        checkAnswer();
+      }
+    }
   });
 
-  currentSuggestList = results.slice(0, 20);
+  document.addEventListener("click", event => {
+    const wrap = document.querySelector(".answerWrap");
+    if (!wrap.contains(event.target)) {
+      closeSuggestions();
+    }
+  });
+}
+
+function updateSuggestions() {
+  const input = document.getElementById("answer");
+  const keyword = normalizeSearch(input.value);
+  const suggest = document.getElementById("suggest");
+
+  suggest.innerHTML = "";
+  currentSuggestList = [];
   suggestIndex = -1;
 
-  renderSuggestions();
-}
+  if (!keyword || questionFinished) {
+    suggest.style.display = "none";
+    return;
+  }
 
-function renderSuggestions() {
-  const suggest = document.getElementById("suggest");
-  suggest.innerHTML = "";
+  currentSuggestList = stageSuggestionNames
+    .filter(stageName =>
+      normalizeSearch(stageName).includes(keyword)
+    )
+    .slice(0, 20);
 
   if (currentSuggestList.length === 0) {
     suggest.style.display = "none";
     return;
   }
 
-  currentSuggestList.forEach((stage, index) => {
-    const div = document.createElement("div");
-    div.className = "suggestItem";
-    div.textContent = stage.stageName;
-
-    if (index === suggestIndex) {
-      div.classList.add("active");
-    }
-
-    div.onclick = () => selectSuggestion(index);
-    suggest.appendChild(div);
+  currentSuggestList.forEach(stageName => {
+    const item = document.createElement("div");
+    item.className = "suggestItem";
+    item.textContent = stageName;
+    item.onclick = () => selectSuggestion(stageName);
+    suggest.appendChild(item);
   });
 
   suggest.style.display = "block";
 }
 
-function selectSuggestion(index) {
-  const stage = currentSuggestList[index];
-  if (!stage) return;
-
-  document.getElementById("answer").value = stage.stageName;
-  hideSuggest();
-  document.getElementById("answer").focus();
-}
-
-function hideSuggest() {
-  document.getElementById("suggest").innerHTML = "";
-  document.getElementById("suggest").style.display = "none";
-  currentSuggestList = [];
-  suggestIndex = -1;
-}
-
-function updateSuggestionSelection() {
+function updateSuggestionActive() {
   document.querySelectorAll(".suggestItem").forEach((item, index) => {
     item.classList.toggle("active", index === suggestIndex);
 
@@ -789,96 +674,236 @@ function updateSuggestionSelection() {
   });
 }
 
-function getBestKey() {
-  return `enemyAllStagesQuizBest_${document.getElementById("mode").value}`;
+function selectSuggestion(stageName) {
+  document.getElementById("answer").value = stageName;
+  closeSuggestions();
+  document.getElementById("answer").focus();
 }
 
-function loadBest() {
-  bestScore = Number(localStorage.getItem(getBestKey())) || 0;
-  updateScoreView();
+function closeSuggestions() {
+  document.getElementById("suggest").style.display = "none";
+  document.getElementById("suggest").innerHTML = "";
+  currentSuggestList = [];
+  suggestIndex = -1;
 }
 
-function saveBest() {
-  localStorage.setItem(getBestKey(), String(bestScore));
+function clearAnswer() {
+  const input = document.getElementById("answer");
+  input.value = "";
+  closeSuggestions();
+  input.focus();
 }
 
-function updateScoreView() {
-  document.getElementById("score").textContent = `連続クリア: ${score}`;
-  document.getElementById("best").textContent = `最高記録: ${bestScore}`;
-}
+function checkAnswer() {
+  if (!currentQuestion || questionFinished) return;
 
-function changeMode() {
-  score = 0;
-  buildQuizPool();
-  loadBest();
-  newQuestion();
-}
+  const input = document.getElementById("answer");
+  const value = input.value.trim();
 
-async function init() {
-  try {
-    stagesData = await fetch("stages.json").then(response => {
-      if (!response.ok) {
-        throw new Error(`stages.jsonの読み込みに失敗しました: ${response.status}`);
-      }
-      return response.json();
-    });
-
-    buildQuizPool();
-    loadBest();
-
-    document.getElementById("loading").classList.add("hidden");
-    document.getElementById("game").classList.remove("hidden");
-
-    const answer = document.getElementById("answer");
-    answer.addEventListener("input", buildSuggestions);
-
-    answer.addEventListener("keydown", event => {
-      if (event.isComposing || event.keyCode === 229) return;
-
-      if (event.key === "ArrowDown" && currentSuggestList.length > 0) {
-        event.preventDefault();
-        suggestIndex = (suggestIndex + 1) % currentSuggestList.length;
-        updateSuggestionSelection();
-        return;
-      }
-
-      if (event.key === "ArrowUp" && currentSuggestList.length > 0) {
-        event.preventDefault();
-        suggestIndex =
-          (suggestIndex - 1 + currentSuggestList.length) % currentSuggestList.length;
-        updateSuggestionSelection();
-        return;
-      }
-
-      if (event.key === "Enter") {
-        event.preventDefault();
-
-        if (suggestIndex >= 0 && currentSuggestList[suggestIndex]) {
-          selectSuggestion(suggestIndex);
-          return;
-        }
-
-        checkAnswer();
-      }
-    });
-
-    document.addEventListener("click", event => {
-      if (!event.target.closest(".answerWrap")) {
-        hideSuggest();
-      }
-    });
-
-    newQuestion();
-
-  } catch (error) {
-    console.error(error);
-    document.getElementById("loading").textContent =
-      "データの読み込みに失敗しました。stages.jsonの配置を確認してください。";
+  if (!value) {
+    setResult("ステージ名を入力してください", false);
+    return;
   }
+
+  const normalizedInput = normalize(value);
+
+  const matchedStage = currentQuestion.stages.find(stage => {
+    const stageKey = getStageKey(stage);
+
+    return (
+      !answeredStageKeys.has(stageKey) &&
+      (
+        normalize(stage.stageName) === normalizedInput ||
+        normalize(stageKey) === normalizedInput
+      )
+    );
+  });
+
+  if (!matchedStage) {
+    const alreadyAnswered = currentQuestion.stages.some(stage => {
+      const stageKey = getStageKey(stage);
+
+      return (
+        answeredStageKeys.has(stageKey) &&
+        (
+          normalize(stage.stageName) === normalizedInput ||
+          normalize(stageKey) === normalizedInput
+        )
+      );
+    });
+
+    setResult(
+      alreadyAnswered
+        ? "そのステージは回答済みです"
+        : "不正解です",
+      false
+    );
+
+    input.select();
+    return;
+  }
+
+  answeredStageKeys.add(getStageKey(matchedStage));
+  renderAnsweredStages();
+  updateStatus();
+  clearAnswer();
+
+  if (answeredStageKeys.size === currentQuestion.stages.length) {
+    completeQuestion();
+  } else {
+    setResult("正解です", true);
+  }
+}
+
+function renderAnsweredStages() {
+  if (!currentQuestion || answeredStageKeys.size === 0) {
+    document.getElementById("answeredList").textContent = "まだありません";
+    return;
+  }
+
+  const answered = currentQuestion.stages
+    .filter(stage => answeredStageKeys.has(getStageKey(stage)));
+
+  document.getElementById("answeredList").innerHTML =
+    answered.map(stage => `
+      <div class="stageItem">
+        ${escapeHTML(stage.chapterName)}－${escapeHTML(stage.stageName)}
+      </div>
+    `).join("");
+}
+
+function completeQuestion() {
+  questionFinished = true;
+  stopTimer();
+  closeSuggestions();
+
+  const timeText = formatTime(elapsedSeconds);
+
+  setResult(
+    `全ステージ正解！ タイム ${timeText}／ヒント ${hintUseCount}回`,
+    true
+  );
+
+  document.getElementById("answerPanel").classList.remove("hidden");
+  renderCorrectAnswerList();
+
+  updateStatus();
+}
+
+function showHint() {
+  if (!currentQuestion || questionFinished) return;
+
+  const unansweredStages = currentQuestion.stages.filter(stage =>
+    !answeredStageKeys.has(getStageKey(stage))
+  );
+
+  const candidates = [];
+
+  unansweredStages.forEach(stage => {
+    stage.enemies.forEach(enemyName => {
+      const enemyKey = normalize(enemyName);
+
+      if (
+        enemyKey === normalize(currentQuestion.enemyName) ||
+        enemyKey === normalize("カンバン娘") ||
+        usedHintEnemies.has(enemyKey)
+      ) {
+        return;
+      }
+
+      candidates.push({
+        enemyName,
+        stageKey: getStageKey(stage)
+      });
+    });
+  });
+
+  if (candidates.length === 0) {
+    document.getElementById("hintPanel").classList.remove("hidden");
+    document.getElementById("hintArea").textContent =
+      "これ以上、別の敵によるヒントはありません";
+    return;
+  }
+
+  const selected =
+    candidates[Math.floor(Math.random() * candidates.length)];
+
+  usedHintEnemies.add(normalize(selected.enemyName));
+  hintUseCount++;
+  updateStatus();
+
+  const panel = document.getElementById("hintPanel");
+  const area = document.getElementById("hintArea");
+
+  panel.classList.remove("hidden");
+
+  area.innerHTML = `
+    <div>未回答ステージのどれかに、この敵が登場します。</div>
+    <div class="hintEnemy">
+      <img
+        src="${getEnemyImagePath(selected.enemyName)}"
+        alt="${escapeHTML(selected.enemyName)}"
+        onerror="this.src='image/noimage.png'"
+      >
+      <strong>${escapeHTML(selected.enemyName)}</strong>
+    </div>
+  `;
+}
+
+function giveUp() {
+  if (!currentQuestion || questionFinished) return;
+
+  const ok = confirm("ギブアップして正解一覧を表示しますか？");
+  if (!ok) return;
+
+  questionFinished = true;
+  stopTimer();
+  closeSuggestions();
+
+  setResult(
+    `ギブアップしました。タイム ${formatTime(elapsedSeconds)}／ヒント ${hintUseCount}回`,
+    false
+  );
+
+  document.getElementById("answerPanel").classList.remove("hidden");
+  renderCorrectAnswerList();
+}
+
+function renderCorrectAnswerList() {
+  if (!currentQuestion) return;
+
+  document.getElementById("answerList").innerHTML =
+    currentQuestion.stages.map(stage => `
+      <div class="stageItem">
+        ${escapeHTML(stage.chapterId)}-${escapeHTML(stage.stageId)}
+       　${escapeHTML(stage.chapterName)}－${escapeHTML(stage.stageName)}
+      </div>
+    `).join("");
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remain = seconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(remain).padStart(2, "0")}`;
+}
+
+function setResult(message, isCorrect) {
+  const result = document.getElementById("result");
+  result.textContent = message;
+  result.className = isCorrect ? "ok" : "ng";
+}
+
+function escapeHTML(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 init();
 </script>
-
 </body>
 </html>
