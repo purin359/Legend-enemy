@@ -1006,7 +1006,6 @@ function escapeRecordHTML(value) {
 function normalize(value) {
   return String(value ?? "")
     .normalize("NFKC")
-    .replace(/\[EX\]/gi, "")
     .replace(/\r?\n/g, "")
     .replace(/[：:]/g, "")
     .replace(/[～〜]/g, "〜")
