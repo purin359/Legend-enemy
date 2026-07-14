@@ -1241,11 +1241,12 @@ function updateScoreView() {
 }
 
 function changeMode() {
-  if (current && !questionFinished && !currentAttemptSaved) {
-    saveCurrentAttempt(false);
-  } else {
-    stopQuestionTimer();
-  }
+  // レジェンド範囲を切り替えただけでは未クリア記録にしない
+  stopQuestionTimer();
+
+  // 切り替え前の問題を保存済み扱いにして、
+  // newQuestion()で黄色記録が付かないようにする
+  currentAttemptSaved = true;
 
   score = 0;
   buildQuizPool();
