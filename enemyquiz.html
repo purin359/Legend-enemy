@@ -244,6 +244,153 @@ button:disabled {
     height: 82px;
   }
 }
+
+.recordBtn {
+  background: #5c6bc0;
+}
+
+.recordOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  background: rgba(0, 0, 0, 0.48);
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.recordOverlay.open {
+  display: block;
+}
+
+.recordDialog {
+  width: min(680px, 100%);
+  margin: 20px auto;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.recordHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.recordHeader h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.recordCloseBtn {
+  min-width: 42px;
+  padding: 8px 10px;
+  background: #777;
+}
+
+.recordLegend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.recordLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.recordColor {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+.recordGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.recordCell {
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f8f8f8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recordCell:hover {
+  outline: 2px solid #777;
+}
+
+.recordCell img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.recordAttempted {
+  background: #fff3a6;
+}
+
+.recordCleared {
+  background: #c8f3a6;
+}
+
+.recordNoHint {
+  background: #aee8ff;
+}
+
+.recordDetail {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.recordDetailTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.recordDetailTitle img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.recordDetailRow {
+  margin: 5px 0;
+}
+
+@media (max-width: 520px) {
+  .recordGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .recordCell {
+    padding: 2px;
+    border-radius: 5px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -294,6 +441,7 @@ button:disabled {
 
   <div class="btnRow">
     <button id="checkBtn" type="button" onclick="checkAnswer()">回答</button>
+    <button type="button" class="recordBtn" onclick="openRecordList()">最高記録一覧</button>
     <button id="hintBtn" type="button" class="secondaryBtn" onclick="showHint()">ヒント</button>
     <button id="giveUpBtn" type="button" class="dangerBtn" onclick="giveUp()">ギブアップ</button>
     <button id="nextBtn" type="button" onclick="newQuestion()" class="hidden">次の敵</button>
@@ -309,6 +457,27 @@ button:disabled {
   <div id="remainingBox" class="answerListBox hidden">
     <h3>残りの正解</h3>
     <ul id="remainingList"></ul>
+  </div>
+</div>
+
+
+<div id="recordOverlay" class="recordOverlay" onclick="closeRecordListByOutside(event)">
+  <div class="recordDialog">
+    <div class="recordHeader">
+      <h3 id="recordTitle">最高記録一覧</h3>
+      <button type="button" class="recordCloseBtn" onclick="closeRecordList()">×</button>
+    </div>
+
+    <div class="recordLegend">
+      <span><i class="recordColor recordNoHint"></i>ヒントなしクリア</span>
+      <span><i class="recordColor recordCleared"></i>クリア済み</span>
+      <span><i class="recordColor recordAttempted"></i>挑戦済み・未クリア</span>
+    </div>
+
+    <div id="recordGrid" class="recordGrid"></div>
+    <div id="recordDetail" class="recordDetail">
+      敵アイコンを押すと記録を表示します
+    </div>
   </div>
 </div>
 
@@ -328,6 +497,203 @@ let timerId = null;
 let questionStartTime = 0;
 let elapsedSeconds = 0;
 let hintUseCount = 0;
+let currentAttemptSaved = false;
+
+
+function getRecordStorageKey(mode, enemyName) {
+  return `enemyAllStagesQuizRecord_${mode}_${encodeURIComponent(normalize(enemyName))}`;
+}
+
+function getEnemyRecord(mode, enemyName) {
+  const raw = localStorage.getItem(getRecordStorageKey(mode, enemyName));
+
+  if (!raw) {
+    return {
+      attempts: 0,
+      clears: 0,
+      bestTime: null,
+      bestHints: null
+    };
+  }
+
+  try {
+    const record = JSON.parse(raw);
+
+    return {
+      attempts: Number(record.attempts) || 0,
+      clears: Number(record.clears) || 0,
+      bestTime:
+        record.bestTime === null || record.bestTime === undefined
+          ? null
+          : Number(record.bestTime),
+      bestHints:
+        record.bestHints === null || record.bestHints === undefined
+          ? null
+          : Number(record.bestHints)
+    };
+  } catch {
+    return {
+      attempts: 0,
+      clears: 0,
+      bestTime: null,
+      bestHints: null
+    };
+  }
+}
+
+function saveEnemyRecord(mode, enemyName, record) {
+  localStorage.setItem(
+    getRecordStorageKey(mode, enemyName),
+    JSON.stringify(record)
+  );
+}
+
+function saveCurrentAttempt(cleared) {
+  if (!current || currentAttemptSaved) return;
+
+  stopQuestionTimer();
+
+  const mode = document.getElementById("mode").value;
+  const record = getEnemyRecord(mode, current.enemyName);
+
+  record.attempts++;
+
+  if (cleared) {
+    record.clears++;
+
+    const isFirstClear =
+      record.bestHints === null ||
+      record.bestTime === null;
+
+    const isBetter =
+      isFirstClear ||
+      hintUseCount < record.bestHints ||
+      (
+        hintUseCount === record.bestHints &&
+        elapsedSeconds < record.bestTime
+      );
+
+    if (isBetter) {
+      record.bestHints = hintUseCount;
+      record.bestTime = elapsedSeconds;
+    }
+  }
+
+  saveEnemyRecord(mode, current.enemyName, record);
+  currentAttemptSaved = true;
+}
+
+function openRecordList() {
+  const overlay = document.getElementById("recordOverlay");
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderRecordList();
+}
+
+function closeRecordList() {
+  document.getElementById("recordOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function closeRecordListByOutside(event) {
+  if (event.target.id === "recordOverlay") {
+    closeRecordList();
+  }
+}
+
+function renderRecordList() {
+  const mode = document.getElementById("mode").value;
+  const modeLabel = document.getElementById("mode").selectedOptions[0]?.textContent || mode;
+  const grid = document.getElementById("recordGrid");
+  const detail = document.getElementById("recordDetail");
+
+  document.getElementById("recordTitle").textContent =
+    `${modeLabel}・最高記録一覧`;
+
+  grid.innerHTML = "";
+  detail.textContent = "敵アイコンを押すと記録を表示します";
+
+  const fragment = document.createDocumentFragment();
+
+  quizPool.forEach(entry => {
+    const record = getEnemyRecord(mode, entry.enemyName);
+    const cell = document.createElement("button");
+
+    cell.type = "button";
+    cell.className = "recordCell";
+    cell.title = entry.enemyName;
+
+    if (record.clears > 0 && record.bestHints === 0) {
+      cell.classList.add("recordNoHint");
+    } else if (record.clears > 0) {
+      cell.classList.add("recordCleared");
+    } else if (record.attempts > 0) {
+      cell.classList.add("recordAttempted");
+    }
+
+    const image = document.createElement("img");
+    image.src = getEnemyImagePath(entry.enemyName);
+    image.alt = entry.enemyName;
+    image.onerror = () => {
+      image.onerror = null;
+      image.src = "image/noimage.png";
+    };
+
+    cell.appendChild(image);
+    cell.onclick = () => showEnemyRecord(entry.enemyName, entry.stages.length);
+    fragment.appendChild(cell);
+  });
+
+  grid.appendChild(fragment);
+}
+
+function showEnemyRecord(enemyName, stageCount) {
+  const mode = document.getElementById("mode").value;
+  const record = getEnemyRecord(mode, enemyName);
+  const detail = document.getElementById("recordDetail");
+
+  let status = "未挑戦";
+
+  if (record.clears > 0 && record.bestHints === 0) {
+    status = "ヒントなしクリア";
+  } else if (record.clears > 0) {
+    status = "クリア済み";
+  } else if (record.attempts > 0) {
+    status = "挑戦済み・未クリア";
+  }
+
+  detail.innerHTML = `
+    <div class="recordDetailTitle">
+      <img
+        src="${getEnemyImagePath(enemyName)}"
+        alt="${escapeRecordHTML(enemyName)}"
+        onerror="this.src='image/noimage.png'"
+      >
+      <span>${escapeRecordHTML(enemyName)}</span>
+    </div>
+    <div class="recordDetailRow">状態：${status}</div>
+    <div class="recordDetailRow">対象ステージ数：${stageCount}</div>
+    <div class="recordDetailRow">挑戦数：${record.attempts}</div>
+    <div class="recordDetailRow">クリア数：${record.clears}</div>
+    <div class="recordDetailRow">
+      最高記録：
+      ${
+        record.clears > 0
+          ? `ヒント ${record.bestHints}回 ／ タイム ${formatTime(record.bestTime)}`
+          : "記録なし"
+      }
+    </div>
+  `;
+}
+
+function escapeRecordHTML(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function normalize(value) {
   return String(value ?? "")
@@ -503,11 +869,16 @@ function pickRandomQuestion() {
 }
 
 function newQuestion() {
-  stopQuestionTimer();
+  if (current && !questionFinished && !currentAttemptSaved) {
+    saveCurrentAttempt(false);
+  } else {
+    stopQuestionTimer();
+  }
 
   current = pickRandomQuestion();
   answeredKeys = new Set();
   questionFinished = false;
+  currentAttemptSaved = false;
   hintUseCount = 0;
   updateHintCountView();
 
@@ -632,7 +1003,7 @@ function checkAnswer() {
 
 function completeQuestion() {
   questionFinished = true;
-  stopQuestionTimer();
+  saveCurrentAttempt(true);
   score++;
 
   if (score > bestScore) {
@@ -727,7 +1098,7 @@ function giveUp() {
   if (!confirm("残りの正解を表示しますか？\n連続クリア数は0に戻ります。")) return;
 
   questionFinished = true;
-  stopQuestionTimer();
+  saveCurrentAttempt(false);
   score = 0;
   updateScoreView();
 
@@ -870,7 +1241,12 @@ function updateScoreView() {
 }
 
 function changeMode() {
-  stopQuestionTimer();
+  if (current && !questionFinished && !currentAttemptSaved) {
+    saveCurrentAttempt(false);
+  } else {
+    stopQuestionTimer();
+  }
+
   score = 0;
   buildQuizPool();
   loadBest();
