@@ -1159,11 +1159,7 @@ function showHint() {
 }
   
   function renderPersistentHints() {
-  hintArea.innerHTML = `
-    <div class="hintTitle">
-      ヒント（${currentHints.length}/3）
-    </div>
-  `;
+  const hintArea = document.getElementById("persistentHint");
 
   // 回答済みになったヒントを除外
   currentHints = currentHints.filter(hint =>
@@ -1176,11 +1172,12 @@ function showHint() {
     return;
   }
 
-  const message = document.createElement("div");
-  message.textContent =
+  const title = document.createElement("div");
+  title.className = "hintTitle";
+  title.textContent =
     `ヒント：未回答ステージに登場する別の敵（${currentHints.length}/3）`;
 
-  hintArea.appendChild(message);
+  hintArea.appendChild(title);
 
   currentHints.forEach((hint, index) => {
     const enemyBox = document.createElement("div");
