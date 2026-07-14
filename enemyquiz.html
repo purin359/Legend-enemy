@@ -71,15 +71,17 @@ button:disabled {
   background: #e05252;
 }
 
-.scoreRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 8px 0 12px;
-  font-size: 15px;
+.scoreRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 16px;
+  align-items:center;
 }
 
+.recordBtn{
+  width:100%;
+}
+  
 .questionBox {
   border-radius: 12px;
   background: #eaf4ff;
@@ -427,6 +429,13 @@ button:disabled {
 <div class="scoreRow">
   <div id="score">連続クリア: 0</div>
   <div id="best">最高記録: 0</div>
+  <button
+    type="button"
+    class="recordBtn"
+    onclick="openRecordList()"
+  >
+    最高記録一覧
+  </button>
   <div id="timer">タイム: 00:00</div>
   <div id="hintCount">ヒント: 0回</div>
 </div>
@@ -455,7 +464,6 @@ button:disabled {
 
   <div class="btnRow">
     <button id="checkBtn" type="button" onclick="checkAnswer()">回答</button>
-    <button type="button" class="recordBtn" onclick="openRecordList()">最高記録一覧</button>
     <button id="hintBtn" type="button" class="secondaryBtn" onclick="showHint()">ヒント</button>
     <button id="giveUpBtn" type="button" class="dangerBtn" onclick="giveUp()">ギブアップ</button>
     <button id="nextBtn" type="button" onclick="newQuestion()" class="hidden">次の敵</button>
