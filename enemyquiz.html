@@ -1018,7 +1018,7 @@ body {
 <body>
 
 <div class="titleRow">
-  <h2>レジェンド敵クイズ</h2>
+  <h2>レジェンド敵クイズ　Ver.15.5.0対応</h2>
   <button type="button" class="settingsBtn" onclick="toggleSettings()">設定</button>
 </div>
 
@@ -1251,7 +1251,8 @@ function getEnemyRecord(mode, enemyName) {
       clears: 0,
       bestTime: null,
       bestHints: null,
-      maxAnswered: 0
+      maxAnswered: 0,
+      clearedStageKeys: []
     };
   }
 
@@ -1269,7 +1270,10 @@ function getEnemyRecord(mode, enemyName) {
         record.bestHints === null || record.bestHints === undefined
           ? null
           : Number(record.bestHints),
-      maxAnswered: Number(record.maxAnswered) || 0
+      maxAnswered: Number(record.maxAnswered) || 0,
+      clearedStageKeys: Array.isArray(record.clearedStageKeys)
+        ? record.clearedStageKeys.map(String)
+        : []
     };
   } catch {
     return {
@@ -1277,7 +1281,8 @@ function getEnemyRecord(mode, enemyName) {
       clears: 0,
       bestTime: null,
       bestHints: null,
-      maxAnswered: 0
+      maxAnswered: 0,
+      clearedStageKeys: []
     };
   }
 }
@@ -1307,6 +1312,14 @@ function saveCurrentAttempt(cleared) {
 
   if (cleared) {
     record.clears++;
+
+    // 今回クリアした時点の対象ステージ構成を保存
+    record.clearedStageKeys = current.stages
+      .map(stage => makeStageKey(stage))
+      .sort();
+
+    // 全問正解時は最大回答数も現在の総数に合わせる
+    record.maxAnswered = current.stages.length;
 
     const isFirstClear =
       record.bestHints === null ||
@@ -1381,11 +1394,15 @@ function renderRecordList() {
     cell.className = "recordCell";
     cell.title = entry.enemyName;
 
-    if (record.clears > 0 && record.bestHints === 0) {
+    const currentlyCleared =
+      isEnemyCurrentlyCleared(record, entry.stages);
+
+    if (currentlyCleared && record.bestHints === 0) {
       cell.classList.add("recordNoHint");
-    } else if (record.clears > 0) {
+    } else if (currentlyCleared) {
       cell.classList.add("recordCleared");
-    } else if (record.attempts > 0) {
+    } else if (record.attempts > 0 || record.clears > 0) {
+      // 過去にクリア済みでも、JSON更新で対象ステージが増えた場合は未クリア扱い
       cell.classList.add("recordAttempted");
     }
 
@@ -1410,21 +1427,32 @@ function showEnemyRecord(enemyName, stageCount) {
   const record = getEnemyRecord(mode, enemyName);
   const detail = document.getElementById("recordDetail");
 
+  const target = quizPool.find(
+    item => normalize(item.enemyName) === normalize(enemyName)
+  );
+
+  const currentlyCleared =
+    target
+      ? isEnemyCurrentlyCleared(record, target.stages)
+      : false;
+
   let status = "未挑戦";
 
-  if (record.clears > 0 && record.bestHints === 0) {
+  if (currentlyCleared && record.bestHints === 0) {
     status = "ヒントなしクリア";
-  } else if (record.clears > 0) {
+  } else if (currentlyCleared) {
     status = "クリア済み";
-  } else if (record.attempts > 0) {
+  } else if (record.attempts > 0 || record.clears > 0) {
     status = "挑戦済み・未クリア";
   }
 
-  // 全問正解済みなら全体数だけ、未クリアなら最大回答数/全体数
+  const answeredRecord =
+    getCurrentAnsweredRecord(record, stageCount);
+
   const stageRecordText =
-    record.clears > 0
+    currentlyCleared
       ? `${stageCount}`
-      : `${Math.min(record.maxAnswered || 0, stageCount)}/${stageCount}`;
+      : `${answeredRecord}/${stageCount}`;
 
   detail.innerHTML = `
     <div class="recordDetailTitle">
@@ -1443,7 +1471,7 @@ function showEnemyRecord(enemyName, stageCount) {
     <div class="recordDetailRow">
       最高記録：
       ${
-        record.clears > 0
+        currentlyCleared
           ? `ヒント ${record.bestHints}回 ／ タイム ${formatTime(record.bestTime)}`
           : "記録なし"
       }
@@ -1625,12 +1653,46 @@ function buildQuizPool() {
 }
 
 
+
+function isEnemyCurrentlyCleared(record, stages) {
+  if (!record || Number(record.clears) <= 0) {
+    return false;
+  }
+
+  const currentKeys = stages
+    .map(stage => makeStageKey(stage))
+    .sort();
+
+  const savedKeys = Array.isArray(record.clearedStageKeys)
+    ? [...record.clearedStageKeys].map(String).sort()
+    : [];
+
+  // 新方式の記録：ステージ構成が完全一致した時だけクリア済み
+  if (savedKeys.length > 0) {
+    return (
+      savedKeys.length === currentKeys.length &&
+      savedKeys.every((key, index) => key === currentKeys[index])
+    );
+  }
+
+  // 旧記録との互換：
+  // 以前の最大回答数が現在の総数以上ならクリア済みとして引き継ぐ
+  return Number(record.maxAnswered) >= currentKeys.length;
+}
+
+function getCurrentAnsweredRecord(record, stageCount) {
+  return Math.min(
+    Math.max(0, Number(record.maxAnswered) || 0),
+    stageCount
+  );
+}
+
 function getUnclearedQuestionPool() {
   const mode = document.getElementById("mode").value;
 
   return quizPool.filter(item => {
     const record = getEnemyRecord(mode, item.enemyName);
-    return record.clears === 0;
+    return !isEnemyCurrentlyCleared(record, item.stages);
   });
 }
 
@@ -1640,8 +1702,10 @@ function getHintClearedQuestionPool() {
   return quizPool.filter(item => {
     const record = getEnemyRecord(mode, item.enemyName);
 
-    // クリア済みだが、最高記録でヒントを1回以上使っている敵
-    return record.clears > 0 && Number(record.bestHints) > 0;
+    return (
+      isEnemyCurrentlyCleared(record, item.stages) &&
+      Number(record.bestHints) > 0
+    );
   });
 }
 
