@@ -567,6 +567,215 @@ body.darkMode .recordCell:not(.recordAttempted):not(.recordCleared):not(.recordN
   }
 }
 
+
+/* ===== スマホでもPCと同じ並びを維持 ===== */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.titleRow {
+  flex-wrap: nowrap;
+}
+
+.titleRow h2 {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topRow {
+  display: grid;
+  grid-template-columns: auto auto minmax(138px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.topRow select,
+.topRow button {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+#mode {
+  width: auto;
+}
+
+#questionPickMode {
+  width: 100%;
+  min-width: 138px;
+}
+
+.scoreRecordBtn {
+  grid-area: auto;
+  justify-self: auto;
+}
+
+.scoreRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-areas: none;
+  gap: 8px;
+}
+
+#score,
+#best,
+#timer,
+#hintCount {
+  grid-area: auto;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.answerRow {
+  flex-wrap: nowrap;
+}
+
+.btnRow {
+  flex-wrap: nowrap;
+}
+
+.btnRow button {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+#persistentHint {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hintTitle {
+  grid-column: 1 / -1;
+}
+
+.hintEnemy {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 6px;
+  gap: 5px;
+  flex-direction: column;
+}
+
+.hintEnemy img {
+  width: 42px;
+  height: 42px;
+}
+
+.hintEnemy span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  body {
+    max-width: none;
+    padding: 10px;
+  }
+
+  h2,
+  .titleRow h2 {
+    font-size: 19px;
+  }
+
+  select,
+  input,
+  button {
+    font-size: 14px;
+  }
+
+  select,
+  button {
+    padding: 8px 9px;
+  }
+
+  .topRow {
+    grid-template-columns: auto auto minmax(118px, 1fr) auto;
+    gap: 5px;
+  }
+
+  #questionPickMode {
+    min-width: 118px;
+  }
+
+  .topRow .secondaryBtn,
+  .topRow .scoreRecordBtn {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .scoreRow {
+    gap: 4px;
+    font-size: 12px;
+    margin: 6px 0 10px;
+  }
+
+  .questionBox {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .questionBox img {
+    width: 76px;
+    height: 76px;
+  }
+
+  .enemyName {
+    font-size: 18px;
+  }
+
+  .progressText {
+    font-size: 14px;
+  }
+
+  #answer {
+    font-size: 16px; /* iPhoneの入力時自動ズーム防止 */
+    padding: 10px;
+  }
+
+  .clearBtn {
+    min-width: 42px;
+  }
+
+  .btnRow {
+    gap: 5px;
+  }
+
+  .btnRow button {
+    padding: 9px 5px;
+    font-size: 14px;
+  }
+
+  .answerListBox {
+    padding: 10px;
+  }
+
+  .recordDialog {
+    padding: 10px;
+  }
+
+  .recordGrid {
+    gap: 3px;
+  }
+
+  .recordLegend {
+    gap: 6px;
+    font-size: 11px;
+  }
+}
+
 </style>
 </head>
 <body>
