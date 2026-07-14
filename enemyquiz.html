@@ -776,6 +776,21 @@ body {
   }
 }
 
+.titleButtons{
+  display:flex;
+  gap:6px;
+}
+
+.infoBtn{
+  background:#777;
+  width:40px;
+  height:40px;
+  padding:0;
+  border-radius:8px;
+  font-size:22px;
+  font-weight:bold;
+}
+
 
 /* ===== スマホをステージ当てクイズ風のコンパクト表示にする ===== */
 @media (max-width: 520px) {
@@ -1011,6 +1026,16 @@ body {
     width: 42px;
     height: 42px;
   }
+
+  .titleButtons{
+    gap:4px;
+  }
+
+  .infoBtn{
+    width:34px;
+    height:34px;
+    font-size:18px;
+  }
 }
 
 </style>
@@ -1019,7 +1044,16 @@ body {
 
 <div class="titleRow">
   <h2>レジェンド敵クイズ　Ver.15.5.0対応</h2>
-  <button type="button" class="settingsBtn" onclick="toggleSettings()">設定</button>
+
+  <div class="titleButtons">
+    <button type="button"
+            class="infoBtn"
+            onclick="openInfo()">
+      ⓘ
+    </button>
+    
+    <button type="button" class="settingsBtn" onclick="toggleSettings()">設定</button>
+  </div>
 </div>
 
 <div id="settingsPanel" class="settingsPanel">
@@ -2423,7 +2457,98 @@ async function init() {
 }
 
 init();
-</script>
 
+function openInfo(){
+  document.getElementById("infoOverlay")
+    .classList.add("open");
+}
+
+function closeInfo(){
+  document.getElementById("infoOverlay")
+    .classList.remove("open");
+}
+
+function closeInfoByOutside(e){
+  if(e.target.id==="infoOverlay"){
+    closeInfo();
+  }
+}
+</script>
+<div id="infoOverlay" class="recordOverlay" onclick="closeInfoByOutside(event)">
+  <div class="recordDialog">
+
+    <div class="recordHeader">
+      <h3>使い方</h3>
+
+      <button
+        type="button"
+        class="recordCloseBtn"
+        onclick="closeInfo()">
+        ×
+      </button>
+    </div>
+
+    <div style="line-height:1.8">
+
+      <h4>■ レジェンド選択ボタン</h4>
+
+      <p>
+      全て、レジェンド、真レジェンド、レジェンド0の範囲から
+      対象となるステージを選べます。
+      </p>
+
+      <h4>■ 選択される敵を決める</h4>
+
+      <p>
+      <b>完全ランダム</b>では、範囲内の全ての敵から選択されます。
+      </p>
+
+      <p>
+      <b>未クリア優先</b>では、
+      まだ挑戦したことのない敵、
+      まだクリアしていない敵の中から選択されます。
+      </p>
+
+      <p>
+      全てクリアすると
+      <b>ヒントあり優先</b>に変わり、
+      ヒントありでクリアしている敵の中から選択されます。
+      </p>
+
+      <h4>■ 最高記録一覧</h4>
+
+      <p>
+      敵をタップすると、
+      現在選択されている範囲での
+      その敵の最高記録を見ることができます。
+      </p>
+
+      <h4>■ ヒント</h4>
+
+      <p>
+      ヒントを使うと、
+      まだ回答していないステージから1つ選ばれ、
+      そのステージに登場する敵が1体表示されます。
+      </p>
+
+      <p>
+      そのステージを回答すると、
+      対応するヒントは消えます。
+      </p>
+
+      <p>
+      ヒントは何回でも使用できますが、
+      使用するたびにヒント使用回数が増えます。
+      </p>
+
+      <p>
+      一度に3つまで保持できます。
+      同じステージが複数回選ばれることもあります。
+      </p>
+
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
