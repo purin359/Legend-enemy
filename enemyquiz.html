@@ -791,6 +791,23 @@ body {
   font-weight:bold;
 }
 
+.recordSummary {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px solid #b9d7f5;
+  border-radius: 8px;
+  background: #eef6ff;
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+body.darkMode .recordSummary {
+  background: #243446;
+  border-color: #54769a;
+  color: #eee;
+}
+
 
 /* ===== スマホをステージ当てクイズ風のコンパクト表示にする ===== */
 @media (max-width: 520px) {
@@ -1036,6 +1053,14 @@ body {
     height:32px;
     font-size:17px;
   }
+
+  .recordSummary {
+    margin-bottom: 7px;
+    padding: 6px;
+    font-size: 10px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
 }
 
 </style>
@@ -1168,6 +1193,8 @@ body {
       <span><i class="recordColor recordCleared"></i>クリア済み</span>
       <span><i class="recordColor recordAttempted"></i>挑戦済み・未クリア</span>
     </div>
+
+    <div id="recordSummary" class="recordSummary"></div>
 
     <div id="recordGrid" class="recordGrid"></div>
     <div id="recordDetail" class="recordDetail">
@@ -1396,10 +1423,14 @@ function closeRecordListByOutside(event) {
 }
 
 function renderRecordList() {
+  function renderRecordList() {
   const mode = document.getElementById("mode").value;
-  const modeLabel = document.getElementById("mode").selectedOptions[0]?.textContent || mode;
+  const modeLabel =
+    document.getElementById("mode").selectedOptions[0]?.textContent || mode;
+
   const grid = document.getElementById("recordGrid");
   const detail = document.getElementById("recordDetail");
+  const summary = document.getElementById("recordSummary");
 
   document.getElementById("recordTitle").textContent =
     `${modeLabel}・最高記録一覧`;
@@ -1420,6 +1451,12 @@ function renderRecordList() {
     return oa - ob;
   });
 
+  // 集計用
+  let noHintCount = 0;
+  let clearedWithHintCount = 0;
+  let attemptedCount = 0;
+  let untouchedCount = 0;
+
   sortedPool.forEach(entry => {
     const record = getEnemyRecord(mode, entry.enemyName);
     const cell = document.createElement("button");
@@ -1433,13 +1470,20 @@ function renderRecordList() {
 
     if (currentlyCleared && record.bestHints === 0) {
       cell.classList.add("recordNoHint");
+      noHintCount++;
+
     } else if (currentlyCleared) {
       cell.classList.add("recordCleared");
-    } else if (record.attempts > 0 || record.clears > 0) {
-      // 過去にクリア済みでも、JSON更新で対象ステージが増えた場合は未クリア扱い
-      cell.classList.add("recordAttempted");
-    }
+      clearedWithHintCount++;
 
+    } else if (record.attempts > 0 || record.clears > 0) {
+      cell.classList.add("recordAttempted");
+      attemptedCount++;
+
+    } else {
+      untouchedCount++;
+    }
+    
     const image = document.createElement("img");
     image.src = getEnemyImagePath(entry.enemyName);
     image.alt = entry.enemyName;
@@ -1452,6 +1496,18 @@ function renderRecordList() {
     cell.onclick = () => showEnemyRecord(entry.enemyName, entry.stages.length);
     fragment.appendChild(cell);
   });
+
+  const totalEnemyCount = sortedPool.length;
+    const totalClearedCount =
+      noHintCount + clearedWithHintCount;
+
+    summary.innerHTML = `
+      <b>敵数</b> ${totalClearedCount}/${totalEnemyCount}
+　    <b>ヒントなし</b> ${noHintCount}
+　    <b>クリア</b> ${clearedWithHintCount}
+　    <b>未クリア</b> ${attemptedCount}
+　    <b>未挑戦</b> ${untouchedCount}
+    `;
 
   grid.appendChild(fragment);
 }
