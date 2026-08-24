@@ -9737,5 +9737,77 @@
         "bosses": "古兵器マンボロス"
       }
     ]
+  },
+  {
+    "chapterId": "ND034",
+    "chapterName": "偏愛化学実験場",
+    "stages": [
+      {
+        "stageId": 0,
+        "stageName": "共依存化合物",
+        "castleId": "9",
+        "background": "1041",
+        "castleHP": 1800000,
+        "castleDistance": 4200,
+        "energy": 200,
+        "unitLimit": 20,
+        "bosses": "ドヴェルダーク"
+      },
+      {
+        "stageId": 1,
+        "stageName": "スポイトで測る愛",
+        "castleId": "18",
+        "background": "1060",
+        "castleHP": 1500000,
+        "castleDistance": 6000,
+        "energy": 180,
+        "unitLimit": 20,
+        "bosses": "クオリネス卿"
+      },
+      {
+        "stageId": 2,
+        "stageName": "推しロス・コープ",
+        "castleId": "7",
+        "background": "1042",
+        "castleHP": 1600000,
+        "castleDistance": 5000,
+        "energy": 210,
+        "unitLimit": 20,
+        "bosses": "オールドリー"
+      },
+      {
+        "stageId": 3,
+        "stageName": "嫉妬の炎色反応",
+        "castleId": "20",
+        "background": "1055",
+        "castleHP": 1700000,
+        "castleDistance": 5500,
+        "energy": 220,
+        "unitLimit": 20,
+        "bosses": "亡者デブウ"
+      },
+      {
+        "stageId": 4,
+        "stageName": "好き好きスキーム",
+        "castleId": "16",
+        "background": "258",
+        "castleHP": 2000000,
+        "castleDistance": 5000,
+        "energy": 210,
+        "unitLimit": 50,
+        "bosses": "悪の帝王 ニャンダム"
+      },
+      {
+        "stageId": 5,
+        "stageName": "ろ過された真心",
+        "castleId": "21",
+        "background": "243",
+        "castleHP": 2000000,
+        "castleDistance": 5200,
+        "energy": 240,
+        "unitLimit": 20,
+        "bosses": "クオリネス卿"
+      }
+    ]
   }
 ]
