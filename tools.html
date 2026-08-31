@@ -239,6 +239,103 @@ canvas {
   text-align: center;
 }
 
+/* ===== 複数敵検索 ===== */
+
+.multiEnemySelectedArea {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.multiEnemyChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  border: 1px solid #ccc;
+  border-radius: 8px;
+
+  padding: 5px 8px;
+  background: #f8f8f8;
+}
+
+.multiEnemyChip img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.multiEnemyChipName {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.multiEnemyRemove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  font-size: 18px;
+  line-height: 1;
+
+  padding: 2px 4px;
+}
+
+.multiEnemyRemove:hover {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.multiEnemySearchWrap {
+  position: relative;
+  margin-top: 10px;
+  max-width: 350px;
+}
+
+#multiEnemyInput {
+  width: 250px;
+  box-sizing: border-box;
+  padding: 7px;
+}
+
+#multiEnemySuggest {
+  position: absolute;
+  top: 100%;
+  left: 0;
+
+  width: 250px;
+  max-height: 200px;
+  overflow-y: auto;
+
+  border: 1px solid #ccc;
+  background: white;
+
+  z-index: 20;
+}
+
+.multiEnemySuggestItem {
+  padding: 7px 9px;
+  cursor: pointer;
+}
+
+.multiEnemySuggestItem:hover,
+.multiEnemySuggestItem.active {
+  background: #cfe8ff;
+}
+
+.multiEnemyStageIcons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.multiEnemyStageIcons img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
 </style>
 </head>
 
@@ -250,6 +347,7 @@ canvas {
 
 <div class="menu">
   <button class="funcBtn active" onclick="openFunc('detailSort', this)">詳細並び替え</button>
+  <button class="funcBtn" onclick="openFunc('multiEnemySearch', this)">複数敵検索</button>
   <button class="funcBtn" onclick="openFunc('bossList', this)">ボス一覧</button>
   <button class="funcBtn" onclick="openFunc('bossAttrList', this)">ボス属性</button>
   <button class="funcBtn" onclick="openFunc('multiBossStage', this)">複数種ボス</button>
@@ -598,6 +696,63 @@ canvas {
   </table>
 
 </div>
+
+  <!-- ===== 複数敵検索 ===== -->
+
+<div id="multiEnemySearch" class="funcArea">
+
+  <h3>複数敵検索</h3>
+
+  <select id="multiEnemyMode" onchange="drawMultiEnemySearch()">
+    <option value="ALL">全て</option>
+    <option value="N">レジェンド</option>
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+
+  <!-- 確定済み敵 -->
+  <div
+    id="multiEnemySelectedArea"
+    class="multiEnemySelectedArea">
+  </div>
+
+
+  <!-- 敵入力 -->
+  <div class="multiEnemySearchWrap">
+
+    <input
+      id="multiEnemyInput"
+      type="text"
+      autocomplete="off"
+      placeholder="敵名を入力">
+
+    <div id="multiEnemySuggest"></div>
+
+  </div>
+
+
+  <div
+    id="multiEnemyInfo"
+    style="margin:12px 0;font-weight:bold;">
+  </div>
+
+
+  <table class="detailTable">
+
+    <thead>
+      <tr>
+        <th>章名</th>
+        <th>ステージ名</th>
+        <th>敵構成</th>
+      </tr>
+    </thead>
+
+    <tbody id="multiEnemyTableBody"></tbody>
+
+  </table>
+
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -614,6 +769,10 @@ let detailDesc = true;
 let castlesData = [];
 let castleMap = {};
 let enemyFirstAreaMap = new Map();
+// 複数敵検索
+let multiEnemySelected = [];
+let multiEnemySuggestList = [];
+let multiEnemySuggestIndex = -1;
 
 function normalize(str) {
   return String(str)
@@ -783,6 +942,11 @@ function openFunc(id, btn) {
   if (id === "noNewEnemyStage") {
     drawNoNewEnemyStage();
   }
+
+  if (id === "multiEnemySearch") {
+    drawMultiEnemySelected();
+    drawMultiEnemySearch();
+  }
 }
 
 async function init() {
@@ -810,6 +974,7 @@ async function init() {
   enemyNames = Object.values(enemiesData).map(e => e.name);
 
   setupSuggest();
+  setupMultiEnemySuggest();
 
   openFunc("detailSort", document.querySelectorAll(".funcBtn")[0]);
 }
@@ -2714,6 +2879,601 @@ function appendNoNewEnemySection(tbody, title, stages) {
     tr.appendChild(enemyTd);
 
     tbody.appendChild(tr);
+  });
+}
+
+// ========================================
+// 複数敵検索
+// ========================================
+
+function setupMultiEnemySuggest() {
+
+  const input =
+    document.getElementById("multiEnemyInput");
+
+  const suggest =
+    document.getElementById("multiEnemySuggest");
+
+
+  // -------------------------
+  // 入力時
+  // -------------------------
+
+  input.addEventListener("input", () => {
+
+    const key = normalize(input.value);
+
+    suggest.innerHTML = "";
+
+    multiEnemySuggestList = [];
+    multiEnemySuggestIndex = -1;
+
+
+    if (!key) {
+      return;
+    }
+
+
+    // すでに選択されている敵は候補から除外
+    const selectedSet = new Set(
+      multiEnemySelected.map(name => normalize(name))
+    );
+
+
+    multiEnemySuggestList =
+      enemyNames
+        .filter(name =>
+          normalize(name).includes(key) &&
+          !selectedSet.has(normalize(name))
+        )
+        .slice(0, 20);
+
+
+    multiEnemySuggestList.forEach((name, index) => {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "multiEnemySuggestItem";
+
+      div.textContent = name;
+
+
+      div.onclick = () => {
+        addMultiEnemy(name);
+      };
+
+
+      suggest.appendChild(div);
+
+    });
+
+  });
+
+
+  // -------------------------
+  // キーボード
+  // -------------------------
+
+  input.addEventListener("keydown", e => {
+
+    if (e.isComposing || e.keyCode === 229) {
+      return;
+    }
+
+
+    if (
+      e.key === "ArrowDown" &&
+      multiEnemySuggestList.length
+    ) {
+
+      e.preventDefault();
+
+      multiEnemySuggestIndex =
+        (multiEnemySuggestIndex + 1) %
+        multiEnemySuggestList.length;
+
+      updateMultiEnemySuggestSelection();
+
+      return;
+    }
+
+
+    if (
+      e.key === "ArrowUp" &&
+      multiEnemySuggestList.length
+    ) {
+
+      e.preventDefault();
+
+      multiEnemySuggestIndex =
+        (
+          multiEnemySuggestIndex -
+          1 +
+          multiEnemySuggestList.length
+        ) %
+        multiEnemySuggestList.length;
+
+      updateMultiEnemySuggestSelection();
+
+      return;
+    }
+
+
+    // Enterで確定
+    if (e.key === "Enter") {
+
+      e.preventDefault();
+
+
+      if (multiEnemySuggestList.length === 0) {
+        return;
+      }
+
+
+      if (multiEnemySuggestIndex < 0) {
+        multiEnemySuggestIndex = 0;
+      }
+
+
+      addMultiEnemy(
+        multiEnemySuggestList[
+          multiEnemySuggestIndex
+        ]
+      );
+
+    }
+
+  });
+
+
+  // 入力欄以外を押したら閉じる
+  document.addEventListener("click", e => {
+
+    if (
+      !e.target.closest(".multiEnemySearchWrap")
+    ) {
+      suggest.innerHTML = "";
+    }
+
+  });
+}
+
+
+// ========================================
+// サジェスト選択表示
+// ========================================
+
+function updateMultiEnemySuggestSelection() {
+
+  const items =
+    document.querySelectorAll(
+      ".multiEnemySuggestItem"
+    );
+
+
+  items.forEach((item, index) => {
+
+    item.classList.toggle(
+      "active",
+      index === multiEnemySuggestIndex
+    );
+
+
+    if (index === multiEnemySuggestIndex) {
+
+      item.scrollIntoView({
+        block: "nearest"
+      });
+
+    }
+
+  });
+}
+
+
+// ========================================
+// 敵追加
+// ========================================
+
+function addMultiEnemy(enemyName) {
+
+  if (!enemyName) {
+    return;
+  }
+
+
+  const key =
+    normalize(enemyName);
+
+
+  // 二重追加防止
+  if (
+    multiEnemySelected.some(
+      name => normalize(name) === key
+    )
+  ) {
+
+    document.getElementById(
+      "multiEnemyInput"
+    ).value = "";
+
+    document.getElementById(
+      "multiEnemySuggest"
+    ).innerHTML = "";
+
+    return;
+  }
+
+
+  multiEnemySelected.push(enemyName);
+
+
+  // 入力欄クリア
+  document.getElementById(
+    "multiEnemyInput"
+  ).value = "";
+
+  document.getElementById(
+    "multiEnemySuggest"
+  ).innerHTML = "";
+
+
+  multiEnemySuggestList = [];
+  multiEnemySuggestIndex = -1;
+
+
+  // 選択敵と検索結果を即時更新
+  drawMultiEnemySelected();
+  drawMultiEnemySearch();
+
+
+  // 次の敵をすぐ入力できるようにする
+  document.getElementById(
+    "multiEnemyInput"
+  ).focus();
+}
+
+
+// ========================================
+// 敵削除
+// ========================================
+
+function removeMultiEnemy(index) {
+
+  multiEnemySelected.splice(index, 1);
+
+  drawMultiEnemySelected();
+  drawMultiEnemySearch();
+}
+
+
+// ========================================
+// 選択された敵のボックス表示
+// ========================================
+
+function drawMultiEnemySelected() {
+
+  const area =
+    document.getElementById(
+      "multiEnemySelectedArea"
+    );
+
+
+  area.innerHTML = "";
+
+
+  if (multiEnemySelected.length === 0) {
+
+    area.innerHTML = `
+      <span style="color:#777;">
+        敵を選択してください
+      </span>
+    `;
+
+    return;
+  }
+
+
+  multiEnemySelected.forEach(
+    (enemyName, index) => {
+
+      const box =
+        document.createElement("div");
+
+      box.className =
+        "multiEnemyChip";
+
+
+      // ×ボタン
+      const remove =
+        document.createElement("button");
+
+      remove.type = "button";
+      remove.className =
+        "multiEnemyRemove";
+
+      remove.textContent = "×";
+
+      remove.title =
+        `${enemyName}を削除`;
+
+      remove.onclick = () => {
+        removeMultiEnemy(index);
+      };
+
+
+      // 敵画像
+      const img =
+        document.createElement("img");
+
+      img.src =
+        getEnemyImagePath(enemyName);
+
+      img.alt = enemyName;
+
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = "image/noimage.png";
+      };
+
+
+      // 名前
+      const name =
+        document.createElement("span");
+
+      name.className =
+        "multiEnemyChipName";
+
+      name.textContent =
+        enemyName;
+
+
+      // 指定順
+      // × → 画像 → 名前
+      box.appendChild(remove);
+      box.appendChild(img);
+      box.appendChild(name);
+
+      area.appendChild(box);
+
+    }
+  );
+}
+
+
+// ========================================
+// ステージ検索
+// ========================================
+
+function drawMultiEnemySearch() {
+
+  const tbody =
+    document.getElementById(
+      "multiEnemyTableBody"
+    );
+
+  const info =
+    document.getElementById(
+      "multiEnemyInfo"
+    );
+
+  const mode =
+    document.getElementById(
+      "multiEnemyMode"
+    ).value;
+
+
+  tbody.innerHTML = "";
+
+
+  // 敵未選択
+  if (multiEnemySelected.length === 0) {
+
+    info.textContent =
+      "敵を1体以上選択してください";
+
+    return;
+  }
+
+
+  // 検索する敵
+  const selectedKeys =
+    multiEnemySelected.map(
+      name => normalize(name)
+    );
+
+
+  const results = [];
+
+
+  stagesData.forEach(ch => {
+
+    if (!isTargetChapter(ch, mode)) {
+      return;
+    }
+
+
+    (ch.stages || []).forEach(st => {
+
+      const stageEnemySet =
+        new Set(
+          (st.enemies || []).map(
+            enemyName => normalize(enemyName)
+          )
+        );
+
+
+      // 選択した敵が「全員」いるか
+      const allIncluded =
+        selectedKeys.every(
+          key => stageEnemySet.has(key)
+        );
+
+
+      if (!allIncluded) {
+        return;
+      }
+
+
+      results.push({
+        chapterId: ch.chapterId,
+        chapterName: ch.chapterName,
+        stageId: st.stageId,
+        stageName: st.stageName,
+        enemies: st.enemies || []
+      });
+
+    });
+
+  });
+
+
+  // ステージ順
+  results.sort((a, b) => {
+
+    return (
+      getFirstNum(
+        `${a.chapterId}-${a.stageId}`
+      ) -
+      getFirstNum(
+        `${b.chapterId}-${b.stageId}`
+      )
+    );
+
+  });
+
+
+  info.textContent =
+    `${multiEnemySelected.length}体すべてが登場するステージ：${results.length}件`;
+
+
+  if (results.length === 0) {
+
+    const tr =
+      document.createElement("tr");
+
+    tr.innerHTML = `
+      <td colspan="3">
+        該当ステージはありません
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+
+    return;
+  }
+
+
+  // -------------------------
+  // 表示
+  // -------------------------
+
+  results.forEach(st => {
+
+    const tr =
+      document.createElement("tr");
+
+
+    // 章名
+    const chapterTd =
+      document.createElement("td");
+
+    chapterTd.className =
+      "chapterCell";
+
+    chapterTd.textContent =
+      st.chapterName;
+
+
+    // ステージ名
+    const stageTd =
+      document.createElement("td");
+
+    stageTd.className =
+      "stageCell";
+
+
+    const link =
+      document.createElement("span");
+
+    link.className =
+      "stageLink";
+
+    link.textContent =
+      st.stageName;
+
+
+    link.onclick = () => {
+
+      goStageDetail(
+        st.chapterId,
+        st.stageId,
+        st.stageName
+      );
+
+    };
+
+
+    stageTd.appendChild(link);
+
+
+    // 敵構成
+    const enemyTd =
+      document.createElement("td");
+
+    const icons =
+      document.createElement("div");
+
+    icons.className =
+      "multiEnemyStageIcons";
+
+
+    (st.enemies || []).forEach(
+      enemyName => {
+
+        if (
+          normalize(enemyName) ===
+          normalize("カンバン娘")
+        ) {
+          return;
+        }
+
+
+        const img =
+          document.createElement("img");
+
+        img.src =
+          getEnemyImagePath(enemyName);
+
+        img.title =
+          enemyName;
+
+
+        img.onerror = () => {
+          img.onerror = null;
+          img.src =
+            "image/noimage.png";
+        };
+
+
+        icons.appendChild(img);
+
+      }
+    );
+
+
+    enemyTd.appendChild(icons);
+
+
+    tr.appendChild(chapterTd);
+    tr.appendChild(stageTd);
+    tr.appendChild(enemyTd);
+
+
+    tbody.appendChild(tr);
+
   });
 }
   
