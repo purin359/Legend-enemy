@@ -257,6 +257,7 @@ canvas {
   <button class="funcBtn" onclick="openFunc('enemyTypeCount', this)">敵種類数</button>
   <button class="funcBtn" onclick="openFunc('sameAttrStage', this)">単属性ステージ</button>
   <button class="funcBtn" onclick="openFunc('stageAttrList', this)">ステージ別属性一覧</button>
+  <button class="funcBtn" onclick="openFunc('noNewEnemyStage', this)">初登場敵なし</button>
   <button class="funcBtn" onclick="openFunc('energyTotal', this)">章別統率力</button>
   <button class="funcBtn" onclick="openFunc('graph', this)">登場ステージグラフ</button>
 </div>
@@ -569,6 +570,34 @@ canvas {
   <div id="multiBossArea"></div>
 
 </div>
+
+  <div id="noNewEnemyStage" class="funcArea">
+
+  <h3>初登場敵がいないステージ</h3>
+
+  <select id="noNewEnemyMode" onchange="drawNoNewEnemyStage()">
+    <option value="NA">真レジェンド</option>
+    <option value="ND">レジェンド0</option>
+  </select>
+
+  <div
+    id="noNewEnemyInfo"
+    style="margin:10px 0;font-weight:bold;">
+  </div>
+
+  <table class="detailTable">
+    <thead>
+      <tr>
+        <th>章名</th>
+        <th>ステージ名</th>
+        <th>敵構成</th>
+      </tr>
+    </thead>
+
+    <tbody id="noNewEnemyTableBody"></tbody>
+  </table>
+
+</div>
 <script>
 let stagesData = [];
 let enemiesData = [];
@@ -584,6 +613,7 @@ let stageDetailsData = [];
 let detailDesc = true;
 let castlesData = [];
 let castleMap = {};
+let enemyFirstAreaMap = new Map();
 
 function normalize(str) {
   return String(str)
@@ -598,6 +628,107 @@ function normalize(str) {
     .replace(/[ 　]+/g, "")
     .toLowerCase()
     .trim();
+}
+
+// ===== 敵の初登場区分を自動判定 =====
+
+function getChapterArea(chapterId) {
+  const id = String(chapterId || "");
+
+  // レジェンド扱い
+  if (id === "E026") {
+    return "N";
+  }
+
+  // 真レジェンド扱い
+  if (id === "E068" || id === "E069") {
+    return "NA";
+  }
+
+  if (id.startsWith("ND")) {
+    return "ND";
+  }
+
+  if (id.startsWith("NA")) {
+    return "NA";
+  }
+
+  if (id.startsWith("N")) {
+    return "N";
+  }
+
+  return null;
+}
+
+
+function buildEnemyFirstAreaMap() {
+  enemyFirstAreaMap = new Map();
+
+  const appearedN = new Set();
+  const appearedNA = new Set();
+  const appearedND = new Set();
+
+  stagesData.forEach(ch => {
+    const area = getChapterArea(ch.chapterId);
+
+    if (!area) return;
+
+    (ch.stages || []).forEach(st => {
+      (st.enemies || []).forEach(enemyName => {
+
+        // カンバン娘は除外
+        if (normalize(enemyName) === normalize("カンバン娘")) {
+          return;
+        }
+
+        const key = normalize(enemyName);
+
+        if (area === "N") {
+          appearedN.add(key);
+        }
+
+        if (area === "NA") {
+          appearedNA.add(key);
+        }
+
+        if (area === "ND") {
+          appearedND.add(key);
+        }
+      });
+    });
+  });
+
+
+  // レジェンドに登場している敵
+  appearedN.forEach(key => {
+    enemyFirstAreaMap.set(key, "N");
+  });
+
+
+  // レジェンドにおらず、
+  // 真レジェンドに登場する敵
+  appearedNA.forEach(key => {
+    if (!appearedN.has(key)) {
+      enemyFirstAreaMap.set(key, "NA");
+    }
+  });
+
+
+  // レジェンド・真レジェンドにおらず、
+  // レジェンド0に登場する敵
+  appearedND.forEach(key => {
+    if (
+      !appearedN.has(key) &&
+      !appearedNA.has(key)
+    ) {
+      enemyFirstAreaMap.set(key, "ND");
+    }
+  });
+}
+
+
+function getEnemyFirstArea(enemyName) {
+  return enemyFirstAreaMap.get(normalize(enemyName)) || "";
 }
 
 function openFunc(id, btn) {
@@ -648,11 +779,17 @@ function openFunc(id, btn) {
   if (id === "multiBossStage") {
     drawMultiBossStage();
   }
+
+  if (id === "noNewEnemyStage") {
+    drawNoNewEnemyStage();
+  }
 }
 
 async function init() {
   stagesData = await fetch("stages.json").then(r => r.json());
   enemiesData = await fetch("enemies.json").then(r => r.json());
+
+  buildEnemyFirstAreaMap();
 
   stageDetailsData = await fetch("stageDetails.json")
     .then(r => r.ok ? r.json() : [])
@@ -2287,6 +2424,189 @@ function toggleStageAttrOrder() {
   box.appendChild(title);
   box.appendChild(iconDiv);
   frag.appendChild(box);
+}
+
+// 初登場敵がいないステージ
+
+function drawNoNewEnemyStage() {
+  const mode =
+    document.getElementById("noNewEnemyMode").value;
+
+  const tbody =
+    document.getElementById("noNewEnemyTableBody");
+
+  const info =
+    document.getElementById("noNewEnemyInfo");
+
+  tbody.innerHTML = "";
+
+  const results = [];
+
+
+  stagesData.forEach(ch => {
+
+    // 真レジェンドまたはレジェンド0のみ
+    if (!isTargetChapter(ch, mode)) return;
+
+
+    (ch.stages || []).forEach(st => {
+
+      // カンバン娘を除外
+      const enemies = (st.enemies || []).filter(
+        enemyName =>
+          normalize(enemyName) !== normalize("カンバン娘")
+      );
+
+
+      const hasTargetFirstEnemy = enemies.some(enemyName => {
+
+        const firstArea =
+          getEnemyFirstArea(enemyName);
+
+
+        // 真レジェンド
+        // 真レジェンド初登場敵がいたら対象外
+        if (mode === "NA") {
+          return firstArea === "NA";
+        }
+
+
+        // レジェンド0
+        // 真レジェンド初登場または
+        // レジェンド0初登場がいたら対象外
+        if (mode === "ND") {
+          return (
+            firstArea === "NA" ||
+            firstArea === "ND"
+          );
+        }
+
+
+        return false;
+      });
+
+
+      if (hasTargetFirstEnemy) {
+        return;
+      }
+
+
+      results.push({
+        chapterId: ch.chapterId,
+        chapterName: ch.chapterName,
+        stageId: st.stageId,
+        stageName: st.stageName,
+        enemies: st.enemies || []
+      });
+
+    });
+
+  });
+
+
+  // ステージ順
+  results.sort((a, b) => {
+    return (
+      getFirstNum(`${a.chapterId}-${a.stageId}`) -
+      getFirstNum(`${b.chapterId}-${b.stageId}`)
+    );
+  });
+
+
+  const label =
+    mode === "NA"
+      ? "真レジェンド"
+      : "レジェンド0";
+
+
+  info.textContent =
+    `${label}：${results.length}ステージ`;
+
+
+  results.forEach(st => {
+
+    const tr =
+      document.createElement("tr");
+
+
+    // 章
+    const chapterTd =
+      document.createElement("td");
+
+    chapterTd.className = "chapterCell";
+    chapterTd.textContent = st.chapterName;
+
+
+    // ステージ
+    const stageTd =
+      document.createElement("td");
+
+    stageTd.className = "stageCell";
+
+    const link =
+      document.createElement("span");
+
+    link.className = "stageLink";
+    link.textContent = st.stageName;
+
+    link.onclick = () => {
+      goStageDetail(
+        st.chapterId,
+        st.stageId,
+        st.stageName
+      );
+    };
+
+    stageTd.appendChild(link);
+
+
+    // 敵構成
+    const enemyTd =
+      document.createElement("td");
+
+
+    st.enemies.forEach(enemyName => {
+
+      if (
+        normalize(enemyName) ===
+        normalize("カンバン娘")
+      ) {
+        return;
+      }
+
+
+      const img =
+        document.createElement("img");
+
+      img.src =
+        getEnemyImagePath(enemyName);
+
+      img.title = enemyName;
+
+      img.style.width = "36px";
+      img.style.height = "36px";
+      img.style.objectFit = "contain";
+      img.style.marginRight = "4px";
+
+
+      img.onerror = () => {
+        img.src = "image/noimage.png";
+      };
+
+
+      enemyTd.appendChild(img);
+
+    });
+
+
+    tr.appendChild(chapterTd);
+    tr.appendChild(stageTd);
+    tr.appendChild(enemyTd);
+
+    tbody.appendChild(tr);
+
+  });
+
 }
   
 init();
