@@ -2440,90 +2440,205 @@ function drawNoNewEnemyStage() {
 
   tbody.innerHTML = "";
 
-  const results = [];
+  // =========================
+  // 真レジェンド
+  // =========================
+  if (mode === "NA") {
 
+    const results = [];
+
+    stagesData.forEach(ch => {
+      if (!isTargetChapter(ch, "NA")) return;
+
+      (ch.stages || []).forEach(st => {
+
+        const enemies = (st.enemies || []).filter(
+          enemyName =>
+            normalize(enemyName) !== normalize("カンバン娘")
+        );
+
+        if (enemies.length === 0) return;
+
+        // 真レジェンド初登場の敵がいるか
+        const hasNAFirst = enemies.some(enemyName =>
+          getEnemyFirstArea(enemyName) === "NA"
+        );
+
+        // 真レジェンド初登場敵がいないものだけ
+        if (hasNAFirst) return;
+
+        results.push({
+          chapterId: ch.chapterId,
+          chapterName: ch.chapterName,
+          stageId: st.stageId,
+          stageName: st.stageName,
+          enemies: st.enemies || []
+        });
+      });
+    });
+
+    sortNoNewEnemyStages(results);
+
+    info.textContent =
+      `レジェンドまでに登場している敵のみ：${results.length}ステージ`;
+
+    appendNoNewEnemySection(
+      tbody,
+      "レジェンドまでに登場している敵のみ",
+      results
+    );
+
+    return;
+  }
+
+
+  // =========================
+  // レジェンド0
+  // =========================
+
+  const legendOnly = [];
+  const upToTrueLegend = [];
 
   stagesData.forEach(ch => {
-
-    // 真レジェンドまたはレジェンド0のみ
-    if (!isTargetChapter(ch, mode)) return;
-
+    if (!isTargetChapter(ch, "ND")) return;
 
     (ch.stages || []).forEach(st => {
 
-      // カンバン娘を除外
       const enemies = (st.enemies || []).filter(
         enemyName =>
           normalize(enemyName) !== normalize("カンバン娘")
       );
 
-
-      const hasTargetFirstEnemy = enemies.some(enemyName => {
-
-        const firstArea =
-          getEnemyFirstArea(enemyName);
+      if (enemies.length === 0) return;
 
 
-        // 真レジェンド
-        // 真レジェンド初登場敵がいたら対象外
-        if (mode === "NA") {
-          return firstArea === "NA";
-        }
+      // 各敵の初登場区分
+      const firstAreas = enemies.map(enemyName =>
+        getEnemyFirstArea(enemyName)
+      );
 
 
-        // レジェンド0
-        // 真レジェンド初登場または
-        // レジェンド0初登場がいたら対象外
-        if (mode === "ND") {
-          return (
-            firstArea === "NA" ||
-            firstArea === "ND"
-          );
-        }
+      // -------------------------
+      // ① レジェンドのみ
+      // -------------------------
+      // 全敵がN初登場
+      const isLegendOnly =
+        firstAreas.every(area => area === "N");
 
+      if (isLegendOnly) {
+        legendOnly.push({
+          chapterId: ch.chapterId,
+          chapterName: ch.chapterName,
+          stageId: st.stageId,
+          stageName: st.stageName,
+          enemies: st.enemies || []
+        });
 
-        return false;
-      });
-
-
-      if (hasTargetFirstEnemy) {
+        // こちらに入ったステージは
+        // 下の「真レジェンドまで」には入れない
         return;
       }
 
 
-      results.push({
-        chapterId: ch.chapterId,
-        chapterName: ch.chapterName,
-        stageId: st.stageId,
-        stageName: st.stageName,
-        enemies: st.enemies || []
-      });
+      // -------------------------
+      // ② 真レジェンドまでのみ
+      // -------------------------
+
+      // ND初登場敵がいない
+      const noNDFirst =
+        firstAreas.every(area =>
+          area === "N" || area === "NA"
+        );
+
+      // NA初登場敵が最低1体いる
+      const hasNAFirst =
+        firstAreas.some(area => area === "NA");
+
+      if (noNDFirst && hasNAFirst) {
+        upToTrueLegend.push({
+          chapterId: ch.chapterId,
+          chapterName: ch.chapterName,
+          stageId: st.stageId,
+          stageName: st.stageName,
+          enemies: st.enemies || []
+        });
+      }
 
     });
-
   });
 
 
-  // ステージ順
-  results.sort((a, b) => {
+  sortNoNewEnemyStages(legendOnly);
+  sortNoNewEnemyStages(upToTrueLegend);
+
+
+  info.textContent =
+    `レジェンドのみ：${legendOnly.length}ステージ　` +
+    `真レジェンドまでのみ：${upToTrueLegend.length}ステージ`;
+
+
+  // 上
+  appendNoNewEnemySection(
+    tbody,
+    "レジェンドのみ",
+    legendOnly
+  );
+
+  // 下
+  appendNoNewEnemySection(
+    tbody,
+    "真レジェンドまでのみ",
+    upToTrueLegend
+  );
+}
+
+function sortNoNewEnemyStages(list) {
+  list.sort((a, b) => {
     return (
       getFirstNum(`${a.chapterId}-${a.stageId}`) -
       getFirstNum(`${b.chapterId}-${b.stageId}`)
     );
   });
+}
+
+function appendNoNewEnemySection(tbody, title, stages) {
+
+  // 見出し
+  const titleTr = document.createElement("tr");
+
+  titleTr.innerHTML = `
+    <th colspan="3"
+        style="
+          text-align:left;
+          background:#e8f3ff;
+          font-size:16px;
+          padding:10px;
+        ">
+      ${title}
+      <span style="font-weight:normal;">
+        （${stages.length}ステージ）
+      </span>
+    </th>
+  `;
+
+  tbody.appendChild(titleTr);
 
 
-  const label =
-    mode === "NA"
-      ? "真レジェンド"
-      : "レジェンド0";
+  if (stages.length === 0) {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td colspan="3" style="text-align:center;">
+        該当ステージなし
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+    return;
+  }
 
 
-  info.textContent =
-    `${label}：${results.length}ステージ`;
-
-
-  results.forEach(st => {
+  stages.forEach(st => {
 
     const tr =
       document.createElement("tr");
@@ -2564,8 +2679,7 @@ function drawNoNewEnemyStage() {
     const enemyTd =
       document.createElement("td");
 
-
-    st.enemies.forEach(enemyName => {
+    (st.enemies || []).forEach(enemyName => {
 
       if (
         normalize(enemyName) ===
@@ -2573,7 +2687,6 @@ function drawNoNewEnemyStage() {
       ) {
         return;
       }
-
 
       const img =
         document.createElement("img");
@@ -2588,14 +2701,11 @@ function drawNoNewEnemyStage() {
       img.style.objectFit = "contain";
       img.style.marginRight = "4px";
 
-
       img.onerror = () => {
         img.src = "image/noimage.png";
       };
 
-
       enemyTd.appendChild(img);
-
     });
 
 
@@ -2604,9 +2714,7 @@ function drawNoNewEnemyStage() {
     tr.appendChild(enemyTd);
 
     tbody.appendChild(tr);
-
   });
-
 }
   
 init();
