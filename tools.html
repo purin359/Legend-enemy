@@ -3448,18 +3448,40 @@ function drawMultiEnemySearch() {
           getEnemyImagePath(enemyName);
 
         img.title =
+          `${enemyName}を検索条件に追加`;
+
+        img.alt =
           enemyName;
 
+        // タップできることが分かるようにする
+        img.style.cursor = "pointer";
 
         img.onerror = () => {
           img.onerror = null;
-          img.src =
-            "image/noimage.png";
+          img.src = "image/noimage.png";
         };
 
-
+        // 敵画像をタップ
+        img.onclick = () => {
+        
+          // すでに選択済みなら何もしない
+          const alreadySelected =
+            multiEnemySelected.some(
+              name =>
+                normalize(name) ===
+                normalize(enemyName)
+            );
+        
+          if (alreadySelected) {
+            return;
+          }
+        
+          // 検索条件へ追加
+          addMultiEnemy(enemyName);
+        };
+        
         icons.appendChild(img);
-
+  
       }
     );
 
