@@ -9954,5 +9954,77 @@
         "bosses": "犬武者 武蔵"
       }
     ]
+  },
+  {
+    "chapterId": "ND037",
+    "chapterName": "ダンシング解放区",
+    "stages": [
+      {
+        "stageId": 0,
+        "stageName": "ルンバ酒場",
+        "castleId": "1",
+        "background": "1041",
+        "castleHP": 1500000,
+        "castleDistance": 4800,
+        "energy": 200,
+        "unitLimit": 20,
+        "bosses": "殺意のわんこ"
+      },
+      {
+        "stageId": 1,
+        "stageName": "土下座のワルツ",
+        "castleId": "8",
+        "background": "226",
+        "castleHP": 2300000,
+        "castleDistance": 4500,
+        "energy": 180,
+        "unitLimit": 50,
+        "bosses": "アンドロメ・ダ長官"
+      },
+      {
+        "stageId": 2,
+        "stageName": "酸欠の舞",
+        "castleId": "0",
+        "background": "1057",
+        "castleHP": 2000000,
+        "castleDistance": 5000,
+        "energy": 210,
+        "unitLimit": 30,
+        "bosses": "ユメミちゃん"
+      },
+      {
+        "stageId": 3,
+        "stageName": "ヒップホップ国会答弁",
+        "castleId": "3",
+        "background": "1035",
+        "castleHP": 2000000,
+        "castleDistance": 5500,
+        "energy": 220,
+        "unitLimit": 10,
+        "bosses": "かわわっぱJr."
+      },
+      {
+        "stageId": 4,
+        "stageName": "職質ステップ",
+        "castleId": "13",
+        "background": "1042",
+        "castleHP": 1500000,
+        "castleDistance": 5000,
+        "energy": 210,
+        "unitLimit": 20,
+        "bosses": "パラサイトブンブン"
+      },
+      {
+        "stageId": 5,
+        "stageName": "徹夜明けのサンバ",
+        "castleId": "12",
+        "background": "1048",
+        "castleHP": 2400000,
+        "castleDistance": 5500,
+        "energy": 240,
+        "unitLimit": 20,
+        "bosses": "サタンカーメン8号"
+      }
+    ]
   }
 ]
